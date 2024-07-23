@@ -2,7 +2,7 @@ import { toast } from "sonner";
 import supabase from "../../supabase/client";
 
 export const createServiceTypeAction = async (
-  values: ServiceType["Insert"]
+  values: DB['service_types']["Insert"]
 ) => {
   const { error } = await supabase.from("service_types").insert(values);
   if (error) {
@@ -13,7 +13,7 @@ export const createServiceTypeAction = async (
 };
 
 export const updateServiceTypeAction = async (
-  values: ServiceType["Update"]
+  values: DB['service_types']["Update"]
 ) => {
   if (values.id) {
     const { error } = await supabase
@@ -26,3 +26,14 @@ export const updateServiceTypeAction = async (
     toast.success("service type updated successfully");
   }
 };
+
+export const deleteServicesTypeAction = async ({ id }: { id: string }) => {
+  if (id) {
+    const { error } = await supabase.from("service_types").delete().eq('id', id);
+    if (error) {
+      toast.error(error.message);
+    }
+    toast.success("service type deleted successfully");
+  }
+
+}

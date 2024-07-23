@@ -3,13 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { ColumnDef } from "@tanstack/react-table";
 import { DeletePatient, UpdatePatientForm } from "../../../forms/PatientForm";
 
-export type NewPatientType = PatientsType["Row"] & {
-  insurance_plan: {
-    name: string | null;
-  };
-};
-
-export const patients: ColumnDef<NewPatientType>[] = [
+export const patients: ColumnDef<DB["patients"]["Row"]>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -59,20 +53,18 @@ export const patients: ColumnDef<NewPatientType>[] = [
   },
 
   {
-    accessorKey: "insurance_plan",
-    header: "Insurance Plan",
+    accessorKey: "hmo_plans",
+    header: "HMO Plan",
     cell: ({ row }) => (
-      <div className="lowercase">{row.original.insurance_plan.name}</div>
+      <div className="lowercase">{row.getValue("hmo_plans.name")}</div>
     ),
   },
   {
-    accessorKey: "insurance_code",
+    accessorKey: "hmo_code",
     header: () => <div className="text-right">HMO Code</div>,
     cell: ({ row }) => {
       return (
-        <div className="text-right font-medium">
-          {row.getValue("insurance_code")}
-        </div>
+        <div className="text-right font-medium">{row.getValue("hmo_code")}</div>
       );
     },
   },

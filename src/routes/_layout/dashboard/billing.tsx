@@ -1,24 +1,17 @@
 import { Box, Card, Heading, Tabs, Text } from "@radix-ui/themes";
 import { createFileRoute } from "@tanstack/react-router";
-import { PatientForm } from "../../forms/PatientForm";
-import supabase from "../../supabase/client";
-import { toast } from "sonner";
+import { PatientForm } from "../../../forms/PatientForm";
+import { getHMOPlans, getPatients } from "../../../actions/actions";
+
+const loadData = async () => {
+  const { hmo_plans_data } = await getHMOPlans();
+  const { patient_data } = await getPatients();
+
+  return { hmo_plans_data, patient_data };
+};
 
 export const Route = createFileRoute("/_layout/dashboard/billing")({
-  loader: async () => {
-    const { data: patient_data, error: patient_error } = await supabase
-      .from("patients")
-      .select("*");
-    const { data, error } = await supabase.from("insurance_plan").select("*");
-    if (error || patient_error) {
-      toast.error(error?.message || patient_error?.message);
-    }
-    const loadedData = {
-      insurance_plan: data,
-      patient_data: patient_data,
-    };
-    return loadedData;
-  },
+  loader: loadData,
   component: () => (
     <div>
       <Card

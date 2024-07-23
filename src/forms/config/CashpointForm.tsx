@@ -26,7 +26,7 @@ export function CreateCashpointForm() {
   const [open, onOpenChange] = useState(false);
   const navigate = useNavigate();
 
-  const { data } = useLoaderData({ from: "/_layout/dashboard/config" });
+  const { data } = useLoaderData({ from: "/_layout/dashboard/config/" });
 
   const form = useForm({
     defaultValues: {
@@ -190,7 +190,7 @@ export function UpdateCashpointForm({
   const [open, onOpenChange] = useState(false);
   const navigate = useNavigate();
 
-  const { data } = useLoaderData({ from: "/_layout/dashboard/config" });
+  const { data } = useLoaderData({ from: "/_layout/dashboard/config/" });
 
   const form = useForm({
     defaultValues: {

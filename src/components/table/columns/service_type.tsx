@@ -1,11 +1,10 @@
 import { Checkbox } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
-import {
-  DeleteServiceTypeForm,
-  UpdateServiceTypeForm,
-} from "../../../forms/config/ServiceTypeForm";
+import { DeleteActionForm } from "../../../actions/DeleteAction";
+import { deleteServicesTypeAction } from "../../../actions/config/service-types";
+import { UpdateServiceTypeForm } from "../../../forms/config/ServiceTypeForm";
 
-export const service_type_column: ColumnDef<ServiceType["Row"]>[] = [
+export const service_type_column: ColumnDef<DB["service_types"]["Row"]>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -43,7 +42,16 @@ export const service_type_column: ColumnDef<ServiceType["Row"]>[] = [
       return (
         <div className="flex gap-4">
           <UpdateServiceTypeForm {...service} />
-          <DeleteServiceTypeForm id={service.id} />
+          <DeleteActionForm
+            id={service.id}
+            inValidate="service"
+            title="Delete Service"
+            warning="Are you sure? this service will be parmanently deleted from the
+          database."
+            actionFn={async () =>
+              await deleteServicesTypeAction({ id: service.id })
+            }
+          />
         </div>
       );
     },

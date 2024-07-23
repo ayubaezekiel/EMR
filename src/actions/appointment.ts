@@ -1,12 +1,7 @@
 import { toast } from "sonner";
 import supabase from "../supabase/client";
 
-// interface ActionType<T> {
-//     values: T,
-//     operation: 'Insert' | 'Update'
-// }
-
-export const createAppointmentAction = async (values: AppointmentType['Insert']) => {
+export const createAppointmentAction = async (values: DB["appointments"]['Insert']) => {
     const { error } = await supabase.from("appointments").insert(values);
     if (error) {
         toast.error(error.message);
@@ -16,7 +11,7 @@ export const createAppointmentAction = async (values: AppointmentType['Insert'])
 
 }
 
-export const updateAppointmentAction = async (values: AppointmentType['Update']) => {
+export const updateAppointmentAction = async (values: DB["appointments"]['Update']) => {
     if (values.id) {
         const { error } = await supabase.from("appointments").update(values).eq('id', values.id);
         if (error) {
@@ -27,10 +22,13 @@ export const updateAppointmentAction = async (values: AppointmentType['Update'])
 
 }
 
-// export function Practice<VType>({ values, operation }: ActionType<VType>) {
-//     console.log('TYPE', values);
-//     console.log('OPT', operation)
+export const deleteAppointmentAction = async ({ id }: { id: string }) => {
+    if (id) {
+        const { error } = await supabase.from("appointments").delete().eq('id', id);
+        if (error) {
+            toast.error(error.message);
+        }
+        toast.success("appointment deleted successfully");
+    }
 
-// }
-
-// const b = Practice<AppointmentType['Insert']>({operation:'Insert',values:{appointments_type_id:''}})
+}

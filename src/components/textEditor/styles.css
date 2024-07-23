@@ -1,0 +1,7 @@
+.rich-text-class ul li {
+  list-style-type: disc;
+}
+
+.rich-text-class ol li {
+  list-style-type: decimal;
+}

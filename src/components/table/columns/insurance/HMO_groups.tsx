@@ -1,14 +1,10 @@
-import { Button, Checkbox } from "@radix-ui/themes";
+import { Checkbox } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
-import {
-  DeleteInsuranceBillerForm,
-  UpdateInsuranceBillerForm,
-} from "../../../../forms/config/insurance/InsuranceBillersForm";
+import { UpdateHMOGroupForm } from "../../../../forms/config/insurance/HMOGroup";
+import { DeleteActionForm } from "../../../../actions/DeleteAction";
+import { deleteHMOGroupAction } from "../../../../actions/config/insurance";
 
-export const insurance_billers_column: ColumnDef<
-  DB["insurance_billers"]["Row"]
->[] = [
+export const hmo_groups_column: ColumnDef<DB["hmo_group"]["Row"]>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -36,34 +32,24 @@ export const insurance_billers_column: ColumnDef<
     header: "Name",
     cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
-  {
-    accessorKey: "validity",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Validity
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("validity")}</div>
-    ),
-  },
 
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const biller = row.original;
+      const group = row.original;
 
       return (
         <div className="flex gap-4">
-          <UpdateInsuranceBillerForm {...biller} />
-          <DeleteInsuranceBillerForm id={biller.id} />
+          <UpdateHMOGroupForm {...group} />
+          <DeleteActionForm
+            id={group.id}
+            redirectTo="/dashboard/config"
+            title="Delete HMO Group"
+            warning="Are you sure? This HMO group will be parmanently deleted from the
+          database."
+            actionFn={async () => await deleteHMOGroupAction({ id: group.id })}
+          />
         </div>
       );
     },

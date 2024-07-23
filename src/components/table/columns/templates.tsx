@@ -1,12 +1,12 @@
-import { Button, Checkbox } from "@radix-ui/themes";
+import { Checkbox } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
-import {
-  DeleteInsurancePlanForm,
-  UpdateInsurancePlanForm,
-} from "../../../forms/config/insurance/InsurancePlanForm";
+import { deleteConsultationTemplatesAction } from "../../../actions/config/templates";
+import { DeleteActionForm } from "../../../actions/DeleteAction";
+import { UpdateConsultationTemplateForm } from "../../../forms/config/TemplatesForm";
 
-export const insurance_plans: ColumnDef<InsuranceType["Row"]>[] = [
+export const consultation_templates_column: ColumnDef<
+  DB["consultation_templates"]["Row"]
+>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -35,33 +35,24 @@ export const insurance_plans: ColumnDef<InsuranceType["Row"]>[] = [
     cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
   {
-    accessorKey: "validity",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Validity
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("validity")}</div>
-    ),
-  },
-
-  {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const plans = row.original;
+      const temp = row.original;
 
       return (
         <div className="flex gap-4">
-          <UpdateInsurancePlanForm {...plans} />
-          <DeleteInsurancePlanForm id={plans.id} />
+          <UpdateConsultationTemplateForm {...temp} />
+          <DeleteActionForm
+            id={temp.id}
+            inValidate="consultationTemplates"
+            title="Delete Consultation Template"
+            warning="Are you sure? this template will be parmanently deleted from the
+          database."
+            actionFn={async () =>
+              await deleteConsultationTemplatesAction({ id: temp.id })
+            }
+          />
         </div>
       );
     },

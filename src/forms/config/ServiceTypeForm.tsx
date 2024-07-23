@@ -1,8 +1,4 @@
-import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
-import { useState } from "react";
 import {
-  AlertDialog,
   Button,
   Dialog,
   Flex,
@@ -10,16 +6,17 @@ import {
   Text,
   TextField,
 } from "@radix-ui/themes";
-import { Edit, Trash } from "lucide-react";
-import { FieldInfo } from "../../components/FieldInfo";
-import { z } from "zod";
-import supabase from "../../supabase/client";
-import { toast } from "sonner";
+import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
+import { zodValidator } from "@tanstack/zod-form-adapter";
+import { Edit } from "lucide-react";
+import { useState } from "react";
+import { z } from "zod";
 import {
   createServiceTypeAction,
   updateServiceTypeAction,
 } from "../../actions/config/service-types";
+import { FieldInfo } from "../../components/FieldInfo";
 
 export function CreateServiceTypeForm() {
   const [open, onOpenChange] = useState(false);
@@ -99,7 +96,7 @@ export function CreateServiceTypeForm() {
 export function UpdateServiceTypeForm({
   id,
   ...values
-}: ServiceType["Update"]) {
+}: DB["service_types"]["Update"]) {
   const [open, onOpenChange] = useState(false);
   const navigate = useNavigate();
 
@@ -174,63 +171,5 @@ export function UpdateServiceTypeForm({
         </Dialog.Content>
       </Dialog.Root>
     </div>
-  );
-}
-
-export function DeleteServiceTypeForm({ id }: { id: string }) {
-  const navigate = useNavigate();
-  const form = useForm({
-    defaultValues: {
-      id: id,
-    },
-    onSubmit: async ({ value }) => {
-      const { error } = await supabase
-        .from("service_types")
-        .delete()
-        .eq("id", value.id);
-      if (error) {
-        toast.error(error.message);
-      } else {
-        navigate({ to: "/dashboard/config" });
-        toast.success("service type deleted successfull");
-      }
-    },
-  });
-
-  return (
-    <AlertDialog.Root>
-      <AlertDialog.Trigger>
-        <Button color="red" variant="ghost">
-          <Trash size={16} />
-        </Button>
-      </AlertDialog.Trigger>
-      <AlertDialog.Content maxWidth="450px">
-        <AlertDialog.Title>Delete Service Type</AlertDialog.Title>
-        <AlertDialog.Description size="2">
-          Are you sure? This service type will be parmanently deleted from the
-          database.
-        </AlertDialog.Description>
-
-        <Flex gap="3" mt="4" justify="end">
-          <AlertDialog.Cancel>
-            <Button variant="soft" color="gray">
-              Cancel
-            </Button>
-          </AlertDialog.Cancel>
-          <AlertDialog.Action>
-            <form
-              onSubmit={(e) => {
-                e.stopPropagation(), e.preventDefault(), form.handleSubmit();
-                form.reset();
-              }}
-            >
-              <Button type="submit" variant="solid" color="red">
-                Confirm
-              </Button>
-            </form>
-          </AlertDialog.Action>
-        </Flex>
-      </AlertDialog.Content>
-    </AlertDialog.Root>
   );
 }

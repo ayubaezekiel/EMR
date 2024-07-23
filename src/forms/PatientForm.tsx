@@ -13,19 +13,19 @@ import { z } from "zod";
 import { FieldInfo } from "../components/FieldInfo";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import states from "../lib/statesAndLocalGov.json";
-import { patientAction, updatePatientAction } from "../actions/actions";
+import { patientAction, updatePatientAction } from "../actions/patient";
 import { useState } from "react";
 import { useLoaderData, useNavigate } from "@tanstack/react-router";
 import { Edit, Trash } from "lucide-react";
 import supabase from "../supabase/client";
-import { toast } from "sonner";
+import { deletePatientAction } from "../actions/patient";
 
 export function PatientForm() {
   const [myStates, setMyState] = useState<string[] | undefined>([]);
   const [open, onOpenChange] = useState(false);
   const navigate = useNavigate();
 
-  const { insurance_plan: plans } = useLoaderData({
+  const { hmo_plans_data } = useLoaderData({
     from: "/_layout/dashboard/billing",
   });
 
@@ -458,7 +458,7 @@ export function PatientForm() {
                 }}
                 children={(field) => (
                   <div className="flex flex-col">
-                    <Text size={"3"}>Insurance Plan*</Text>
+                    <Text size={"3"}>HMO Plan*</Text>
                     <Select.Root
                       name={field.name}
                       value={field.state.value}
@@ -467,7 +467,7 @@ export function PatientForm() {
                       <Select.Trigger />
                       <Select.Content position="popper">
                         <Select.Group>
-                          {plans?.map((p) => (
+                          {hmo_plans_data?.map((p) => (
                             <Select.Item key={p.id} value={p.id}>
                               {p.name}
                             </Select.Item>
@@ -517,11 +517,11 @@ export function PatientForm() {
   );
 }
 
-export function UpdatePatientForm({ id, ...values }: PatientsType["Update"]) {
+export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
   const [myStates, setMyState] = useState<string[] | undefined>([]);
   const [open, onOpenChange] = useState(false);
 
-  const { insurance_plan: plans } = useLoaderData({
+  const { hmo_plans_data } = useLoaderData({
     from: "/_layout/dashboard/patients",
   });
 
@@ -931,13 +931,13 @@ export function UpdatePatientForm({ id, ...values }: PatientsType["Update"]) {
               />
 
               <form.Field
-                name="insurance_plan_id"
+                name="hmo_plan_id"
                 validators={{
                   onChange: z.string(),
                 }}
                 children={(field) => (
                   <div className="flex flex-col">
-                    <Text size={"3"}>Insurance Plan*</Text>
+                    <Text size={"3"}>HMO Plan*</Text>
                     <Select.Root
                       name={field.name}
                       value={field.state.value!}
@@ -946,7 +946,7 @@ export function UpdatePatientForm({ id, ...values }: PatientsType["Update"]) {
                       <Select.Trigger />
                       <Select.Content position="popper">
                         <Select.Group>
-                          {plans?.map((p) => (
+                          {hmo_plans_data?.map((p) => (
                             <Select.Item key={p.id} value={p.id}>
                               {p.name}
                             </Select.Item>
@@ -960,13 +960,13 @@ export function UpdatePatientForm({ id, ...values }: PatientsType["Update"]) {
               />
 
               <form.Field
-                name="insurance_code"
+                name="hmo_code"
                 validators={{
                   onChange: z.string(),
                 }}
                 children={(field) => (
                   <label htmlFor={field.name}>
-                    <Text size={"3"}>Insurance Code(fill if insured)</Text>
+                    <Text size={"3"}>HMO Code(fill if insured)</Text>
                     <TextField.Root
                       name={field.name}
                       id={field.name}
@@ -997,19 +997,14 @@ export function UpdatePatientForm({ id, ...values }: PatientsType["Update"]) {
 }
 
 export function DeletePatient({ id }: { id: string }) {
+  const navigate = useNavigate();
   const form = useForm({
     defaultValues: {
       id: id,
     },
-    onSubmit: async ({ value }) => {
-      const { error } = await supabase
-        .from("patients")
-        .delete()
-        .eq("id", value.id);
-      if (error) {
-        toast.error(error.message);
-      }
-      toast.success("patient deleted successfull");
+    onSubmit: async () => {
+      await deletePatientAction({ id: id });
+      navigate({ to: "/dashboard/patients" });
     },
   });
 

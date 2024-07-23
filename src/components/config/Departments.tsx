@@ -1,11 +1,13 @@
 import { Flex, Heading } from "@radix-ui/themes";
-import { useLoaderData } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { departmentsQueryOptions } from "../../actions/queries";
 import { CreateDepartmentForm } from "../../forms/config/DepartmentForm";
 import { DataTable } from "../table/DataTable";
 import { departemnt_column } from "../table/columns/department";
 
 export function Departments() {
-  const { data } = useLoaderData({ from: "/_layout/dashboard/config" });
+  // const { data } = useLoaderData({ from: "/_layout/dashboard/config/" });
+  const { data } = useSuspenseQuery(departmentsQueryOptions);
 
   return (
     <div>
@@ -18,7 +20,7 @@ export function Departments() {
         filterLabel="filter by name..."
         filterer="name"
         columns={departemnt_column}
-        data={data.department ?? []}
+        data={data.department_data ?? []}
       />
     </div>
   );

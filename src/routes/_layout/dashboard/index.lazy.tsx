@@ -1,15 +1,19 @@
-import { Box, Button, Card, Heading, Section } from "@radix-ui/themes";
+import { Box, Button, Card, Heading } from "@radix-ui/themes";
 import { createLazyFileRoute } from "@tanstack/react-router";
-
-import { services_routes } from "../../lib/constants";
+import { services_routes } from "../../../lib/constants";
 import { Link } from "@tanstack/react-router";
 import { Home } from "lucide-react";
+import { CreatePatientVitalsForm } from "../../../forms/config/Vitals";
 
 export const Route = createLazyFileRoute("/_layout/dashboard/")({
   component: () => (
-    <Section>
-      <Heading mb={"3"}>Dashboard</Heading>
-      <div className="grid md:grid-cols-2 gap-4 lg:grid-cols-4">
+    <>
+      <div className="flex justify-between items-center">
+        <Heading mb={"3"}>Dashboard</Heading>
+        <CreatePatientVitalsForm />
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-4 lg:grid-cols-4 mt-10">
         <Card>
           <Box height={"100px"}>
             <Link to={"/dashboard"} className="w-full h-full ">
@@ -19,15 +23,7 @@ export const Route = createLazyFileRoute("/_layout/dashboard/")({
             </Link>
           </Box>
         </Card>
-        <Card>
-          <Box height={"100px"}>
-            <Link to={"/dashboard"} className="w-full h-full ">
-              <Button variant="ghost" style={{ width: "100%", height: "100%" }}>
-                <Home /> Notifications
-              </Button>
-            </Link>
-          </Box>
-        </Card>
+
         {services_routes.map((p) => (
           <Card>
             <Box height={"100px"} key={p.route}>
@@ -43,6 +39,6 @@ export const Route = createLazyFileRoute("/_layout/dashboard/")({
           </Card>
         ))}
       </div>
-    </Section>
+    </>
   ),
 });

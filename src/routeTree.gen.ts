@@ -15,11 +15,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRoute } from './routes/__root'
 import { Route as LayoutImport } from './routes/_layout'
 import { Route as IndexImport } from './routes/index'
-import { Route as LayoutDashboardPatientsImport } from './routes/_layout/dashboard.patients'
-import { Route as LayoutDashboardNursingImport } from './routes/_layout/dashboard.nursing'
-import { Route as LayoutDashboardConfigImport } from './routes/_layout/dashboard.config'
-import { Route as LayoutDashboardBillingImport } from './routes/_layout/dashboard.billing'
-import { Route as LayoutDashboardAppointmentsImport } from './routes/_layout/dashboard.appointments'
+import { Route as LayoutDashboardPatientsImport } from './routes/_layout/dashboard/patients'
+import { Route as LayoutDashboardBillingImport } from './routes/_layout/dashboard/billing'
+import { Route as LayoutDashboardConfigIndexImport } from './routes/_layout/dashboard/config/index'
+import { Route as LayoutDashboardAppointmentsIndexImport } from './routes/_layout/dashboard/appointments/index'
+import { Route as LayoutDashboardConfigConsultationImport } from './routes/_layout/dashboard/config/consultation'
+import { Route as LayoutDashboardAppointmentsAppointmentIdImport } from './routes/_layout/dashboard/appointments/$appointmentId'
 
 // Create Virtual Routes
 
@@ -41,21 +42,11 @@ const LayoutDashboardIndexLazyRoute = LayoutDashboardIndexLazyImport.update({
   path: '/dashboard/',
   getParentRoute: () => LayoutRoute,
 } as any).lazy(() =>
-  import('./routes/_layout/dashboard.index.lazy').then((d) => d.Route),
+  import('./routes/_layout/dashboard/index.lazy').then((d) => d.Route),
 )
 
 const LayoutDashboardPatientsRoute = LayoutDashboardPatientsImport.update({
   path: '/dashboard/patients',
-  getParentRoute: () => LayoutRoute,
-} as any)
-
-const LayoutDashboardNursingRoute = LayoutDashboardNursingImport.update({
-  path: '/dashboard/nursing',
-  getParentRoute: () => LayoutRoute,
-} as any)
-
-const LayoutDashboardConfigRoute = LayoutDashboardConfigImport.update({
-  path: '/dashboard/config',
   getParentRoute: () => LayoutRoute,
 } as any)
 
@@ -64,9 +55,28 @@ const LayoutDashboardBillingRoute = LayoutDashboardBillingImport.update({
   getParentRoute: () => LayoutRoute,
 } as any)
 
-const LayoutDashboardAppointmentsRoute =
-  LayoutDashboardAppointmentsImport.update({
-    path: '/dashboard/appointments',
+const LayoutDashboardConfigIndexRoute = LayoutDashboardConfigIndexImport.update(
+  {
+    path: '/dashboard/config/',
+    getParentRoute: () => LayoutRoute,
+  } as any,
+)
+
+const LayoutDashboardAppointmentsIndexRoute =
+  LayoutDashboardAppointmentsIndexImport.update({
+    path: '/dashboard/appointments/',
+    getParentRoute: () => LayoutRoute,
+  } as any)
+
+const LayoutDashboardConfigConsultationRoute =
+  LayoutDashboardConfigConsultationImport.update({
+    path: '/dashboard/config/consultation',
+    getParentRoute: () => LayoutRoute,
+  } as any)
+
+const LayoutDashboardAppointmentsAppointmentIdRoute =
+  LayoutDashboardAppointmentsAppointmentIdImport.update({
+    path: '/dashboard/appointments/$appointmentId',
     getParentRoute: () => LayoutRoute,
   } as any)
 
@@ -88,32 +98,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutImport
       parentRoute: typeof rootRoute
     }
-    '/_layout/dashboard/appointments': {
-      id: '/_layout/dashboard/appointments'
-      path: '/dashboard/appointments'
-      fullPath: '/dashboard/appointments'
-      preLoaderRoute: typeof LayoutDashboardAppointmentsImport
-      parentRoute: typeof LayoutImport
-    }
     '/_layout/dashboard/billing': {
       id: '/_layout/dashboard/billing'
       path: '/dashboard/billing'
       fullPath: '/dashboard/billing'
       preLoaderRoute: typeof LayoutDashboardBillingImport
-      parentRoute: typeof LayoutImport
-    }
-    '/_layout/dashboard/config': {
-      id: '/_layout/dashboard/config'
-      path: '/dashboard/config'
-      fullPath: '/dashboard/config'
-      preLoaderRoute: typeof LayoutDashboardConfigImport
-      parentRoute: typeof LayoutImport
-    }
-    '/_layout/dashboard/nursing': {
-      id: '/_layout/dashboard/nursing'
-      path: '/dashboard/nursing'
-      fullPath: '/dashboard/nursing'
-      preLoaderRoute: typeof LayoutDashboardNursingImport
       parentRoute: typeof LayoutImport
     }
     '/_layout/dashboard/patients': {
@@ -130,6 +119,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutDashboardIndexLazyImport
       parentRoute: typeof LayoutImport
     }
+    '/_layout/dashboard/appointments/$appointmentId': {
+      id: '/_layout/dashboard/appointments/$appointmentId'
+      path: '/dashboard/appointments/$appointmentId'
+      fullPath: '/dashboard/appointments/$appointmentId'
+      preLoaderRoute: typeof LayoutDashboardAppointmentsAppointmentIdImport
+      parentRoute: typeof LayoutImport
+    }
+    '/_layout/dashboard/config/consultation': {
+      id: '/_layout/dashboard/config/consultation'
+      path: '/dashboard/config/consultation'
+      fullPath: '/dashboard/config/consultation'
+      preLoaderRoute: typeof LayoutDashboardConfigConsultationImport
+      parentRoute: typeof LayoutImport
+    }
+    '/_layout/dashboard/appointments/': {
+      id: '/_layout/dashboard/appointments/'
+      path: '/dashboard/appointments'
+      fullPath: '/dashboard/appointments'
+      preLoaderRoute: typeof LayoutDashboardAppointmentsIndexImport
+      parentRoute: typeof LayoutImport
+    }
+    '/_layout/dashboard/config/': {
+      id: '/_layout/dashboard/config/'
+      path: '/dashboard/config'
+      fullPath: '/dashboard/config'
+      preLoaderRoute: typeof LayoutDashboardConfigIndexImport
+      parentRoute: typeof LayoutImport
+    }
   }
 }
 
@@ -138,12 +155,13 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren({
   IndexRoute,
   LayoutRoute: LayoutRoute.addChildren({
-    LayoutDashboardAppointmentsRoute,
     LayoutDashboardBillingRoute,
-    LayoutDashboardConfigRoute,
-    LayoutDashboardNursingRoute,
     LayoutDashboardPatientsRoute,
     LayoutDashboardIndexLazyRoute,
+    LayoutDashboardAppointmentsAppointmentIdRoute,
+    LayoutDashboardConfigConsultationRoute,
+    LayoutDashboardAppointmentsIndexRoute,
+    LayoutDashboardConfigIndexRoute,
   }),
 })
 
@@ -165,36 +183,41 @@ export const routeTree = rootRoute.addChildren({
     "/_layout": {
       "filePath": "_layout.tsx",
       "children": [
-        "/_layout/dashboard/appointments",
         "/_layout/dashboard/billing",
-        "/_layout/dashboard/config",
-        "/_layout/dashboard/nursing",
         "/_layout/dashboard/patients",
-        "/_layout/dashboard/"
+        "/_layout/dashboard/",
+        "/_layout/dashboard/appointments/$appointmentId",
+        "/_layout/dashboard/config/consultation",
+        "/_layout/dashboard/appointments/",
+        "/_layout/dashboard/config/"
       ]
     },
-    "/_layout/dashboard/appointments": {
-      "filePath": "_layout/dashboard.appointments.tsx",
-      "parent": "/_layout"
-    },
     "/_layout/dashboard/billing": {
-      "filePath": "_layout/dashboard.billing.tsx",
-      "parent": "/_layout"
-    },
-    "/_layout/dashboard/config": {
-      "filePath": "_layout/dashboard.config.tsx",
-      "parent": "/_layout"
-    },
-    "/_layout/dashboard/nursing": {
-      "filePath": "_layout/dashboard.nursing.tsx",
+      "filePath": "_layout/dashboard/billing.tsx",
       "parent": "/_layout"
     },
     "/_layout/dashboard/patients": {
-      "filePath": "_layout/dashboard.patients.tsx",
+      "filePath": "_layout/dashboard/patients.tsx",
       "parent": "/_layout"
     },
     "/_layout/dashboard/": {
-      "filePath": "_layout/dashboard.index.lazy.tsx",
+      "filePath": "_layout/dashboard/index.lazy.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/dashboard/appointments/$appointmentId": {
+      "filePath": "_layout/dashboard/appointments/$appointmentId.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/dashboard/config/consultation": {
+      "filePath": "_layout/dashboard/config/consultation.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/dashboard/appointments/": {
+      "filePath": "_layout/dashboard/appointments/index.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/dashboard/config/": {
+      "filePath": "_layout/dashboard/config/index.tsx",
       "parent": "/_layout"
     }
   }

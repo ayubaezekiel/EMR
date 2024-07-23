@@ -1,12 +1,13 @@
 import { Flex, Heading } from "@radix-ui/themes";
-import { useLoaderData } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { cashpointsQueryOptions } from "../../actions/queries";
 import { CreateCashpointForm } from "../../forms/config/CashpointForm";
 import { DataTable } from "../table/DataTable";
 import { cashpoint_column } from "../table/columns/cash_point";
 
 export function Cashpoint() {
-  const { data } = useLoaderData({ from: "/_layout/dashboard/config" });
-
+  // const { data } = useLoaderData({ from: "/_layout/dashboard/config/" });
+  const { data } = useSuspenseQuery(cashpointsQueryOptions);
   return (
     <div>
       <Flex mb={"3"} justify={"between"}>
@@ -18,7 +19,7 @@ export function Cashpoint() {
         filterLabel="filter by name..."
         filterer="name"
         columns={cashpoint_column}
-        data={data.cashpoints ?? []}
+        data={data.cashpoint_data ?? []}
       />
     </div>
   );
