@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 import supabase from "../supabase/client";
 
-export async function patientAction(values: PatientsType['Insert']) {
+export async function patientAction(values: DB['patients']['Insert']) {
     const { error } = await supabase.from('patients').insert(values);
     if (error) {
         toast.error(error.message);
@@ -10,13 +10,15 @@ export async function patientAction(values: PatientsType['Insert']) {
     }
 }
 
-export const updatePatientAction = async (values: PatientsType['Update']) => {
+export const updatePatientAction = async (values: DB['patients']['Update']) => {
     if (values.id) {
         const { error } = await supabase.from("patients").update(values).eq('id', values.id);
         if (error) {
             toast.error(error.message);
+        } else {
+            toast.success("patient updated successfully");
         }
-        toast.success("patient updated successfully");
+
     }
 }
 
@@ -25,7 +27,9 @@ export const deletePatientAction = async ({ id }: { id: string }) => {
         const { error } = await supabase.from("patients").delete().eq('id', id);
         if (error) {
             toast.error(error.message);
+        } else {
+            toast.success("patient deleted successfully");
         }
-        toast.success("patient deleted successfully");
+
     }
 }

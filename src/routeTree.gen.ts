@@ -15,10 +15,11 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Route as rootRoute } from './routes/__root'
 import { Route as LayoutImport } from './routes/_layout'
 import { Route as IndexImport } from './routes/index'
-import { Route as LayoutDashboardPatientsImport } from './routes/_layout/dashboard/patients'
 import { Route as LayoutDashboardBillingImport } from './routes/_layout/dashboard/billing'
+import { Route as LayoutDashboardPatientsIndexImport } from './routes/_layout/dashboard/patients/index'
 import { Route as LayoutDashboardConfigIndexImport } from './routes/_layout/dashboard/config/index'
 import { Route as LayoutDashboardAppointmentsIndexImport } from './routes/_layout/dashboard/appointments/index'
+import { Route as LayoutDashboardPatientsPatientIdImport } from './routes/_layout/dashboard/patients/$patientId'
 import { Route as LayoutDashboardConfigConsultationImport } from './routes/_layout/dashboard/config/consultation'
 import { Route as LayoutDashboardAppointmentsAppointmentIdImport } from './routes/_layout/dashboard/appointments/$appointmentId'
 
@@ -45,15 +46,16 @@ const LayoutDashboardIndexLazyRoute = LayoutDashboardIndexLazyImport.update({
   import('./routes/_layout/dashboard/index.lazy').then((d) => d.Route),
 )
 
-const LayoutDashboardPatientsRoute = LayoutDashboardPatientsImport.update({
-  path: '/dashboard/patients',
-  getParentRoute: () => LayoutRoute,
-} as any)
-
 const LayoutDashboardBillingRoute = LayoutDashboardBillingImport.update({
   path: '/dashboard/billing',
   getParentRoute: () => LayoutRoute,
 } as any)
+
+const LayoutDashboardPatientsIndexRoute =
+  LayoutDashboardPatientsIndexImport.update({
+    path: '/dashboard/patients/',
+    getParentRoute: () => LayoutRoute,
+  } as any)
 
 const LayoutDashboardConfigIndexRoute = LayoutDashboardConfigIndexImport.update(
   {
@@ -65,6 +67,12 @@ const LayoutDashboardConfigIndexRoute = LayoutDashboardConfigIndexImport.update(
 const LayoutDashboardAppointmentsIndexRoute =
   LayoutDashboardAppointmentsIndexImport.update({
     path: '/dashboard/appointments/',
+    getParentRoute: () => LayoutRoute,
+  } as any)
+
+const LayoutDashboardPatientsPatientIdRoute =
+  LayoutDashboardPatientsPatientIdImport.update({
+    path: '/dashboard/patients/$patientId',
     getParentRoute: () => LayoutRoute,
   } as any)
 
@@ -105,13 +113,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutDashboardBillingImport
       parentRoute: typeof LayoutImport
     }
-    '/_layout/dashboard/patients': {
-      id: '/_layout/dashboard/patients'
-      path: '/dashboard/patients'
-      fullPath: '/dashboard/patients'
-      preLoaderRoute: typeof LayoutDashboardPatientsImport
-      parentRoute: typeof LayoutImport
-    }
     '/_layout/dashboard/': {
       id: '/_layout/dashboard/'
       path: '/dashboard'
@@ -133,6 +134,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutDashboardConfigConsultationImport
       parentRoute: typeof LayoutImport
     }
+    '/_layout/dashboard/patients/$patientId': {
+      id: '/_layout/dashboard/patients/$patientId'
+      path: '/dashboard/patients/$patientId'
+      fullPath: '/dashboard/patients/$patientId'
+      preLoaderRoute: typeof LayoutDashboardPatientsPatientIdImport
+      parentRoute: typeof LayoutImport
+    }
     '/_layout/dashboard/appointments/': {
       id: '/_layout/dashboard/appointments/'
       path: '/dashboard/appointments'
@@ -147,6 +155,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutDashboardConfigIndexImport
       parentRoute: typeof LayoutImport
     }
+    '/_layout/dashboard/patients/': {
+      id: '/_layout/dashboard/patients/'
+      path: '/dashboard/patients'
+      fullPath: '/dashboard/patients'
+      preLoaderRoute: typeof LayoutDashboardPatientsIndexImport
+      parentRoute: typeof LayoutImport
+    }
   }
 }
 
@@ -156,12 +171,13 @@ export const routeTree = rootRoute.addChildren({
   IndexRoute,
   LayoutRoute: LayoutRoute.addChildren({
     LayoutDashboardBillingRoute,
-    LayoutDashboardPatientsRoute,
     LayoutDashboardIndexLazyRoute,
     LayoutDashboardAppointmentsAppointmentIdRoute,
     LayoutDashboardConfigConsultationRoute,
+    LayoutDashboardPatientsPatientIdRoute,
     LayoutDashboardAppointmentsIndexRoute,
     LayoutDashboardConfigIndexRoute,
+    LayoutDashboardPatientsIndexRoute,
   }),
 })
 
@@ -184,20 +200,17 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_layout.tsx",
       "children": [
         "/_layout/dashboard/billing",
-        "/_layout/dashboard/patients",
         "/_layout/dashboard/",
         "/_layout/dashboard/appointments/$appointmentId",
         "/_layout/dashboard/config/consultation",
+        "/_layout/dashboard/patients/$patientId",
         "/_layout/dashboard/appointments/",
-        "/_layout/dashboard/config/"
+        "/_layout/dashboard/config/",
+        "/_layout/dashboard/patients/"
       ]
     },
     "/_layout/dashboard/billing": {
       "filePath": "_layout/dashboard/billing.tsx",
-      "parent": "/_layout"
-    },
-    "/_layout/dashboard/patients": {
-      "filePath": "_layout/dashboard/patients.tsx",
       "parent": "/_layout"
     },
     "/_layout/dashboard/": {
@@ -212,12 +225,20 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_layout/dashboard/config/consultation.tsx",
       "parent": "/_layout"
     },
+    "/_layout/dashboard/patients/$patientId": {
+      "filePath": "_layout/dashboard/patients/$patientId.tsx",
+      "parent": "/_layout"
+    },
     "/_layout/dashboard/appointments/": {
       "filePath": "_layout/dashboard/appointments/index.tsx",
       "parent": "/_layout"
     },
     "/_layout/dashboard/config/": {
       "filePath": "_layout/dashboard/config/index.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/dashboard/patients/": {
+      "filePath": "_layout/dashboard/patients/index.tsx",
       "parent": "/_layout"
     }
   }

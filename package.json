@@ -11,10 +11,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@internationalized/date": "^3.5.5",
     "@mantine/core": "^7.11.2",
+    "@mantine/dates": "^7.11.2",
     "@mantine/form": "^7.11.2",
     "@mantine/hooks": "^7.11.2",
     "@mantine/tiptap": "^7.11.2",
+    "@nextui-org/date-picker": "^2.1.6",
+    "@nextui-org/react": "^2.4.6",
     "@radix-ui/react-collapsible": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.1",
     "@radix-ui/react-icons": "^1.3.0",
@@ -50,6 +54,8 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
+    "dayjs": "^1.11.12",
+    "framer-motion": "^11.3.17",
     "lucide-react": "^0.408.0",
     "nigeria-states-lgas": "^0.0.2",
     "react": "^18.3.1",

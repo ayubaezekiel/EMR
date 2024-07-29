@@ -139,6 +139,28 @@ export const getDepartments = async () => {
 
 
 
+export const getPatients = async () => {
+    const { data: patient_data, error: patient_error } = await supabase
+        .from("patients")
+        .select("*,hmo_plans(id,name)")
+
+    if (patient_error) {
+        toast.error(patient_error.message)
+    }
+
+
+    return { patient_data }
+}
+export const getPatientById = async (id: string) => {
+    const { data: patient_data, error: patient_error } = await supabase
+        .from("patients")
+        .select("*,hmo_plans(id,name)").eq('id', id).single()
+
+    if (patient_error) {
+        toast.error(patient_error.message)
+    }
+    return { patient_data }
+}
 
 
 
@@ -168,18 +190,6 @@ export const getPatientVitals = async () => {
 
 
 
-export const getPatients = async () => {
-    const { data: patient_data, error: patient_error } = await supabase
-        .from("patients")
-        .select("*,hmo_plans(name)")
-
-    if (patient_error) {
-        toast.error(patient_error.message)
-    }
-
-
-    return { patient_data }
-}
 
 export const getSpecialties = async () => {
     const { data: specialties_data, error: specialties_err } = await supabase.from("specialties").select("*");
@@ -227,7 +237,9 @@ export const getAppointmentTypes = async () => {
 
 export const getAppointments = async () => {
     const { data: appointment_data, error: appointment_error } =
-        await supabase.from("appointments").select(`*,patients(id,first_name,middle_name,last_name),clinics(name),consultation_specialties(name)`);
+        await supabase.from("appointments")
+            .select(
+                `*,patients(id,first_name,middle_name,last_name),clinics(name),consultation_specialties(id,name,default_price,follow_up_price),appointments_types(id,name)`);
 
     if (appointment_error) {
         toast.error(appointment_error.message)

@@ -16,8 +16,10 @@ export const updateAppointmentAction = async (values: DB["appointments"]['Update
         const { error } = await supabase.from("appointments").update(values).eq('id', values.id);
         if (error) {
             toast.error(error.message);
+        } else {
+            toast.success("appointment updated successfully");
         }
-        toast.success("appointment updated successfully");
+
     }
 
 }
@@ -27,8 +29,10 @@ export const deleteAppointmentAction = async ({ id }: { id: string }) => {
         const { error } = await supabase.from("appointments").delete().eq('id', id);
         if (error) {
             toast.error(error.message);
+        } else {
+            toast.success("appointment deleted successfully");
         }
-        toast.success("appointment deleted successfully");
+
     }
 
 }

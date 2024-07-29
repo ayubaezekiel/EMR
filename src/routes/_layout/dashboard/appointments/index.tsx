@@ -11,79 +11,136 @@ import {
   Tabs,
   Text,
 } from "@radix-ui/themes";
-import { QueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { UserCheck } from "lucide-react";
+import { useState } from "react";
 import { DeleteActionForm } from "../../../../actions/DeleteAction";
 import { changeAppointmentStatus } from "../../../../actions/actions";
 import { deleteAppointmentAction } from "../../../../actions/appointment";
 import {
   appointmentsQueryOptions,
   appointmentsTypesQueryOptions,
-  clinicsQueryOptions,
-  patientsQueryOptions,
-  specialtiesQueryOptions,
 } from "../../../../actions/queries";
+import PendingComponent from "../../../../components/PendingComponent";
 import { DateRangePicker } from "../../../../components/ui/date-range-picker";
 import {
   CreateAppointmentForm,
   UpdateAppointmentForm,
 } from "../../../../forms/AppointmentForm";
 
-const loadData = async (queryClient: QueryClient) => {
-  const { patient_data } =
-    await queryClient.ensureQueryData(patientsQueryOptions);
-  const { clinics_data } =
-    await queryClient.ensureQueryData(clinicsQueryOptions);
-  const { appointment_type_data } = await queryClient.ensureQueryData(
-    appointmentsTypesQueryOptions
-  );
-  const { specialties_data } = await queryClient.ensureQueryData(
-    specialtiesQueryOptions
-  );
-  const { appointment_data } = await queryClient.ensureQueryData(
-    appointmentsQueryOptions
-  );
-
-  return {
-    appointment_data,
-    patient_data,
-    clinics_data,
-    appointment_type_data,
-    specialties_data,
-  };
-};
 export const Route = createFileRoute("/_layout/dashboard/appointments/")({
-  loader: async ({ context: { queryClient } }) => await loadData(queryClient),
-
   component: () => (
     <>
       <Heading mb={"3"}>Appointments</Heading>
-      <Tabs.Root defaultValue="consultation">
+      <Tabs.Root defaultValue="waiting">
         <Tabs.List>
-          <Tabs.Trigger value="consultation">Consultation</Tabs.Trigger>
-          <Tabs.Trigger value="laboratory">Laboratory</Tabs.Trigger>
-          <Tabs.Trigger value="pharmacy">Pharmacy</Tabs.Trigger>
-          <Tabs.Trigger value="antenatal">Antenatal</Tabs.Trigger>
-          <Tabs.Trigger value="radiology">Radiology</Tabs.Trigger>
+          <Tabs.Trigger value="waiting">Waiting</Tabs.Trigger>
+          <Tabs.Trigger value="checked">Checked In</Tabs.Trigger>
+          <Tabs.Trigger value="missed">Missed</Tabs.Trigger>
+          <Tabs.Trigger value="completed">Completed</Tabs.Trigger>
         </Tabs.List>
-        <Tabs.Content value="consultation" mt={"2"}>
-          <AppointmentCard />
+
+        <Tabs.Content value="waiting" mt={"2"}>
+          <AppointmentCard
+            isCheckedIn={false}
+            isCompleted={false}
+            isMissed={false}
+            isWaiting={true}
+          />
+        </Tabs.Content>
+        <Tabs.Content value="checked" mt={"2"}>
+          <AppointmentCard
+            isCheckedIn={true}
+            isCompleted={false}
+            isMissed={false}
+            isWaiting={false}
+          />
+        </Tabs.Content>
+        <Tabs.Content value="missed" mt={"2"}>
+          <AppointmentCard
+            isCheckedIn={false}
+            isCompleted={false}
+            isMissed={true}
+            isWaiting={false}
+          />
+        </Tabs.Content>
+
+        <Tabs.Content value="completed" mt={"2"}>
+          <AppointmentCard
+            isCheckedIn={false}
+            isCompleted={true}
+            isMissed={false}
+            isWaiting={false}
+          />
         </Tabs.Content>
       </Tabs.Root>
     </>
   ),
 });
 
-function AppointmentCard() {
-  const {
-    data: { appointment_data },
-  } = useSuspenseQuery(appointmentsQueryOptions);
-  const {
-    data: { clinics_data },
-  } = useSuspenseQuery(clinicsQueryOptions);
+interface AppointmentStatus {
+  isWaiting?: boolean;
+  isCheckedIn?: boolean;
+  isMissed?: boolean;
+  isCompleted?: boolean;
+}
+function AppointmentCard({
+  isCheckedIn,
+  isCompleted,
+  isMissed,
+  isWaiting,
+}: AppointmentStatus) {
+  const [type, setType] = useState("");
 
-  const navigate = useNavigate();
+  const { data: appointments, isPending: appointmentPending } = useQuery(
+    appointmentsQueryOptions
+  );
+  const { data: appointment_type, isPending: appointmentType } = useQuery(
+    appointmentsTypesQueryOptions
+  );
+
+  if (appointmentPending || appointmentType) return <PendingComponent />;
+
+  const appointment_type_data = appointment_type?.appointment_type_data;
+
+  const appointment_data_waiting = appointments?.appointment_data?.filter(
+    (a) => {
+      if (type.length < 3) {
+        return Boolean(a.is_waiting) === isWaiting;
+      }
+      if (type.length > 3) {
+        return (
+          a.appointments_types?.name.toLowerCase() === type.toLowerCase() &&
+          a.is_waiting === isWaiting
+        );
+      }
+    }
+  );
+  const appointment_data_checkedIn = appointments?.appointment_data?.filter(
+    (a) => {
+      if (type.length < 3) {
+        return Boolean(a.is_checkedin) === isCheckedIn;
+      }
+      if (type.length > 3) {
+        return (
+          a.appointments_types?.name.toLowerCase() === type.toLowerCase() &&
+          a.is_checkedin === isCheckedIn
+        );
+      }
+    }
+  );
+
+  const appointment_data_missed = appointments?.appointment_data?.filter(
+    (a) =>
+      a.appointments_types?.name.toLowerCase() === type.toLowerCase() &&
+      a.is_missed === isMissed
+  );
+  const appointment_data_completed = appointments?.appointment_data?.filter(
+    (a) =>
+      a.appointments_types?.name.toLowerCase() === type.toLowerCase() &&
+      a.is_completed === isCompleted
+  );
 
   return (
     <div className="w-full">
@@ -105,26 +162,15 @@ function AppointmentCard() {
               locale="en-GB"
               showCompare={false}
             />
-            <Select.Root>
-              <Select.Trigger placeholder="Filter by status" />
+
+            <Select.Root onValueChange={(e) => setType(e)}>
+              <Select.Trigger placeholder="Filter by type" />
               <Select.Content position="popper">
                 <Select.Group>
-                  <Select.Label>--filter by status--</Select.Label>
-                  <Select.Item value="waiting">Waiting</Select.Item>
-                  <Select.Item value="missed">Missed</Select.Item>
-                  <Select.Item value="checkedIn">Checked In</Select.Item>
-                  <Select.Item value="completed">completed</Select.Item>
-                </Select.Group>
-              </Select.Content>
-            </Select.Root>
-            <Select.Root>
-              <Select.Trigger placeholder="Filter by clinic" />
-              <Select.Content position="popper">
-                <Select.Group>
-                  <Select.Label>--filter by clinic--</Select.Label>
-                  {clinics_data?.map((c) => (
-                    <Select.Item key={c.id} value={c.id}>
-                      {c.name}
+                  <Select.Label>--filter by appointment type--</Select.Label>
+                  {appointment_type_data?.map((t) => (
+                    <Select.Item key={t.id} value={t.name}>
+                      {t.name}
                     </Select.Item>
                   ))}
                 </Select.Group>
@@ -134,157 +180,614 @@ function AppointmentCard() {
         </div>
       </Card>
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
-        {appointment_data?.map((a) => (
-          <Card key={a.id}>
-            <Flex justify={"between"}>
-              <Flex gap={"2"} align={"center"}>
-                <Avatar fallback={<UserCheck />} radius="full" size={"3"} />
-                <Flex direction={"column"}>
-                  <Flex gap={"1"} align={"center"}>
-                    <Strong>
-                      {a.patients?.first_name} {a.patients?.middle_name}{" "}
-                      {a.patients?.last_name} [
-                      {a.patients_id.slice(0, 8).toUpperCase()}]
-                    </Strong>
-                  </Flex>
-                  <Flex gap={"1"} align={"center"}>
-                    <Text size={"1"}>
-                      <Strong>created</Strong>
-                    </Text>
-                    .
-                    <Text size={"1"}>
-                      {new Date(a.created_at!).toUTCString()}
-                    </Text>
+        {isWaiting &&
+          appointment_data_waiting?.map((a) => (
+            <Card key={a.id}>
+              <Flex justify={"between"}>
+                <Flex gap={"2"} align={"center"}>
+                  <Avatar fallback={<UserCheck />} radius="full" size={"3"} />
+                  <Flex direction={"column"}>
+                    <Flex gap={"1"} align={"center"}>
+                      <Strong>
+                        {a.patients?.first_name} {a.patients?.middle_name}{" "}
+                        {a.patients?.last_name} [
+                        {a.patients_id.slice(0, 8).toUpperCase()}]
+                      </Strong>
+                    </Flex>
+                    <Flex gap={"1"} align={"center"}>
+                      <Text size={"1"}>
+                        <Strong>created</Strong>
+                      </Text>
+                      .
+                      <Text size={"1"}>
+                        {new Date(a.created_at!).toUTCString()}
+                      </Text>
+                    </Flex>
                   </Flex>
                 </Flex>
+
+                <div>
+                  <UpdateAppointmentForm {...a} id={a.id} />
+                  <DeleteActionForm
+                    id={a.id}
+                    warning="Are you sure you want to delete this appointment?"
+                    title="Delete Appointment"
+                    inValidate="appointments"
+                    actionFn={async () => {
+                      await deleteAppointmentAction({ id: a.id });
+                    }}
+                  />
+                </div>
               </Flex>
 
-              <div>
-                <UpdateAppointmentForm {...a} id={a.id} />
-                <DeleteActionForm
+              <Flex direction={"column"} mt={"4"}>
+                <Flex gap={"2"} mb={"4"} direction={"column"} justify={"end"}>
+                  <div>
+                    <Badge radius="full">
+                      From:{" "}
+                      {a.duration
+                        ? `${new Date(`${a.duration}`.slice(2, 20)).toUTCString()}`
+                        : "No date"}
+                    </Badge>
+                  </div>
+                  <div>
+                    <Badge radius="full" color="red">
+                      To:{" "}
+                      {a.duration
+                        ? `${new Date(`${a.duration}`.slice(24, 43)).toUTCString()}`
+                        : "No date"}
+                    </Badge>
+                  </div>
+                </Flex>
+                <Strong>
+                  {a.consultation_specialties?.name.toUpperCase()}
+                </Strong>
+                <Flex gap={"2"} justify={"between"} align={"center"}>
+                  <Text>{a.clinics?.name}</Text>
+                  <div className="flex gap-2">
+                    {a.is_waiting && (
+                      <Badge color="amber">
+                        waiting
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+                    {a.is_missed && (
+                      <Badge color="red">
+                        missed
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+                    {a.is_checkedin && (
+                      <Badge color="blue">
+                        checked in{" "}
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+
+                    {a.is_completed && (
+                      <Badge>
+                        completed
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+                  </div>
+                </Flex>
+              </Flex>
+              <Flex justify={"between"} mt={"4"}>
+                <ConfirmAppointmentUpdate
                   id={a.id}
-                  warning="Are you sure you want to delete this appointment?"
-                  title="Delete Appointment"
-                  redirectTo="/dashboard/appointments"
+                  title="Move To Waiting?"
+                  triggleLabel="Waiting"
+                  disabled={a.is_waiting!}
+                  warning="Are you sure you want to move this appointment to waiting?"
                   actionFn={async () => {
-                    await deleteAppointmentAction({ id: a.id });
+                    await changeAppointmentStatus({
+                      id: a.id,
+                      isWaiting: true,
+                      isCheckedIn: false,
+                      isCompleted: false,
+                      isMissed: false,
+                    });
                   }}
                 />
-              </div>
-            </Flex>
+                <ConfirmAppointmentUpdate
+                  id={a.id}
+                  title="Mark As Missed?"
+                  triggleLabel="Missed"
+                  disabled={a.is_missed!}
+                  warning="Are you sure you want to mark this appointment as missed?"
+                  actionFn={async () => {
+                    await changeAppointmentStatus({
+                      id: a.id,
+                      isMissed: true,
+                      isWaiting: false,
+                      isCheckedIn: false,
+                      isCompleted: false,
+                    });
+                  }}
+                />
+                <ConfirmAppointmentUpdate
+                  id={a.id}
+                  title="Has Checked In?"
+                  triggleLabel="Checked In"
+                  disabled={a.is_checkedin!}
+                  warning="Are you sure this patient has checked in?"
+                  actionFn={async () => {
+                    await changeAppointmentStatus({
+                      id: a.id,
+                      isCheckedIn: true,
+                      isWaiting: false,
+                      isCompleted: false,
+                      isMissed: false,
+                    });
+                  }}
+                />
 
-            <Flex direction={"column"} mt={"4"}>
-              <Flex gap={"2"} mb={"4"} direction={"column"} justify={"end"}>
-                <div>
-                  <Badge radius="full">
-                    From:{" "}
-                    {a.duration
-                      ? `${new Date(`${a.duration}`.slice(2, 20)).toUTCString()}`
-                      : "No date"}
-                  </Badge>
-                </div>
-                <div>
-                  <Badge radius="full" color="red">
-                    To:{" "}
-                    {a.duration
-                      ? `${new Date(`${a.duration}`.slice(24, 43)).toUTCString()}`
-                      : "No date"}
-                  </Badge>
-                </div>
-              </Flex>
-              <Strong>{a.consultation_specialties?.name.toUpperCase()}</Strong>
-              <Flex gap={"2"} justify={"between"} align={"center"}>
-                <Text>{a.clinics?.name}</Text>
-                <div className="flex gap-2">
-                  {a.is_waiting && (
-                    <Badge color="amber">
-                      waiting
-                      <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
-                    </Badge>
-                  )}
-                  {a.is_missed && (
-                    <Badge color="red">
-                      missed
-                      <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
-                    </Badge>
-                  )}
-                  {a.is_checkedin && (
-                    <Badge color="blue">
-                      checked in{" "}
-                      <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
-                    </Badge>
-                  )}
-
-                  {a.is_completed && (
-                    <Badge>
-                      completed
-                      <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
-                    </Badge>
-                  )}
-                </div>
-              </Flex>
-            </Flex>
-            <Flex justify={"between"} mt={"4"}>
-              <ConfirmAppointmentUpdate
-                id={a.id}
-                title="Move To Waiting?"
-                triggleLabel="Waiting"
-                disabled={a.is_waiting!}
-                warning="Are you sure you want to move this appointment to waiting?"
-                actionFn={async () => {
-                  await changeAppointmentStatus({
-                    id: a.id,
-                    isWaiting: true,
-                    isCheckedIn: false,
-                    isCompleted: false,
-                    isMissed: false,
-                  });
-                  navigate({ to: "/dashboard/appointments" });
-                }}
-              />
-
-              <ConfirmAppointmentUpdate
-                id={a.id}
-                title="Mark As Missed?"
-                triggleLabel="Missed"
-                disabled={a.is_missed!}
-                warning="Are you sure you want to mark this appointment as missed?"
-                actionFn={async () => {
-                  await changeAppointmentStatus({
-                    id: a.id,
-                    isMissed: true,
-                    isWaiting: false,
-                    isCheckedIn: false,
-                    isCompleted: false,
-                  });
-                  navigate({ to: "/dashboard/appointments" });
-                }}
-              />
-              <ConfirmAppointmentUpdate
-                id={a.id}
-                title="Has Checked In?"
-                triggleLabel="Checked In"
-                disabled={a.is_checkedin!}
-                warning="Are you sure this patient has checked in?"
-                actionFn={async () => {
-                  await changeAppointmentStatus({
-                    id: a.id,
-                    isCheckedIn: true,
-                    isWaiting: false,
-                    isCompleted: false,
-                    isMissed: false,
-                  });
-                  navigate({ to: "/dashboard/appointments" });
-                }}
-              />
-              <Link to={`/dashboard/appointments/${a.id}`}>
-                <Button size={"2"} radius="full">
-                  Attend
+                <Button
+                  asChild
+                  disabled={!isCheckedIn}
+                  size={"2"}
+                  radius="full"
+                >
+                  <Link to={`/dashboard/appointments/${a.id}`}> Attend</Link>
                 </Button>
-              </Link>
-            </Flex>
-          </Card>
-        ))}
+              </Flex>
+            </Card>
+          ))}
+
+        {isCheckedIn &&
+          appointment_data_checkedIn?.map((a) => (
+            <Card key={a.id}>
+              <Flex justify={"between"}>
+                <Flex gap={"2"} align={"center"}>
+                  <Avatar fallback={<UserCheck />} radius="full" size={"3"} />
+                  <Flex direction={"column"}>
+                    <Flex gap={"1"} align={"center"}>
+                      <Strong>
+                        {a.patients?.first_name} {a.patients?.middle_name}{" "}
+                        {a.patients?.last_name} [
+                        {a.patients_id.slice(0, 8).toUpperCase()}]
+                      </Strong>
+                    </Flex>
+                    <Flex gap={"1"} align={"center"}>
+                      <Text size={"1"}>
+                        <Strong>created</Strong>
+                      </Text>
+                      .
+                      <Text size={"1"}>
+                        {new Date(a.created_at!).toUTCString()}
+                      </Text>
+                    </Flex>
+                  </Flex>
+                </Flex>
+
+                <div>
+                  <UpdateAppointmentForm {...a} id={a.id} />
+                  <DeleteActionForm
+                    id={a.id}
+                    warning="Are you sure you want to delete this appointment?"
+                    title="Delete Appointment"
+                    inValidate="appointments"
+                    actionFn={async () => {
+                      await deleteAppointmentAction({ id: a.id });
+                    }}
+                  />
+                </div>
+              </Flex>
+
+              <Flex direction={"column"} mt={"4"}>
+                <Flex gap={"2"} mb={"4"} direction={"column"} justify={"end"}>
+                  <div>
+                    <Badge radius="full">
+                      From:{" "}
+                      {a.duration
+                        ? `${new Date(`${a.duration}`.slice(2, 20)).toUTCString()}`
+                        : "No date"}
+                    </Badge>
+                  </div>
+                  <div>
+                    <Badge radius="full" color="red">
+                      To:{" "}
+                      {a.duration
+                        ? `${new Date(`${a.duration}`.slice(24, 43)).toUTCString()}`
+                        : "No date"}
+                    </Badge>
+                  </div>
+                </Flex>
+                <Strong>
+                  {a.consultation_specialties?.name.toUpperCase()}
+                </Strong>
+                <Flex gap={"2"} justify={"between"} align={"center"}>
+                  <Text>{a.clinics?.name}</Text>
+                  <div className="flex gap-2">
+                    {a.is_waiting && (
+                      <Badge color="amber">
+                        waiting
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+                    {a.is_missed && (
+                      <Badge color="red">
+                        missed
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+                    {a.is_checkedin && (
+                      <Badge color="blue">
+                        checked in{" "}
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+
+                    {a.is_completed && (
+                      <Badge>
+                        completed
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+                  </div>
+                </Flex>
+              </Flex>
+              <Flex justify={"between"} mt={"4"}>
+                <ConfirmAppointmentUpdate
+                  id={a.id}
+                  title="Move To Waiting?"
+                  triggleLabel="Waiting"
+                  disabled={a.is_waiting!}
+                  warning="Are you sure you want to move this appointment to waiting?"
+                  actionFn={async () => {
+                    await changeAppointmentStatus({
+                      id: a.id,
+                      isWaiting: true,
+                      isCheckedIn: false,
+                      isCompleted: false,
+                      isMissed: false,
+                    });
+                  }}
+                />
+
+                <ConfirmAppointmentUpdate
+                  id={a.id}
+                  title="Mark As Missed?"
+                  triggleLabel="Missed"
+                  disabled={a.is_missed!}
+                  warning="Are you sure you want to mark this appointment as missed?"
+                  actionFn={async () => {
+                    await changeAppointmentStatus({
+                      id: a.id,
+                      isMissed: true,
+                      isWaiting: false,
+                      isCheckedIn: false,
+                      isCompleted: false,
+                    });
+                  }}
+                />
+                <ConfirmAppointmentUpdate
+                  id={a.id}
+                  title="Has Checked In?"
+                  triggleLabel="Checked In"
+                  disabled={a.is_checkedin!}
+                  warning="Are you sure this patient has checked in?"
+                  actionFn={async () => {
+                    await changeAppointmentStatus({
+                      id: a.id,
+                      isCheckedIn: true,
+                      isWaiting: false,
+                      isCompleted: false,
+                      isMissed: false,
+                    });
+                  }}
+                />
+                <Button asChild size={"2"} radius="full">
+                  <Link to={`/dashboard/appointments/${a.id}`}>Attend</Link>
+                </Button>
+              </Flex>
+            </Card>
+          ))}
+
+        {isMissed &&
+          appointment_data_missed?.map((a) => (
+            <Card key={a.id}>
+              <Flex justify={"between"}>
+                <Flex gap={"2"} align={"center"}>
+                  <Avatar fallback={<UserCheck />} radius="full" size={"3"} />
+                  <Flex direction={"column"}>
+                    <Flex gap={"1"} align={"center"}>
+                      <Strong>
+                        {a.patients?.first_name} {a.patients?.middle_name}{" "}
+                        {a.patients?.last_name} [
+                        {a.patients_id.slice(0, 8).toUpperCase()}]
+                      </Strong>
+                    </Flex>
+                    <Flex gap={"1"} align={"center"}>
+                      <Text size={"1"}>
+                        <Strong>created</Strong>
+                      </Text>
+                      .
+                      <Text size={"1"}>
+                        {new Date(a.created_at!).toUTCString()}
+                      </Text>
+                    </Flex>
+                  </Flex>
+                </Flex>
+
+                <div>
+                  <UpdateAppointmentForm {...a} id={a.id} />
+                  <DeleteActionForm
+                    id={a.id}
+                    warning="Are you sure you want to delete this appointment?"
+                    title="Delete Appointment"
+                    inValidate="appointments"
+                    actionFn={async () => {
+                      await deleteAppointmentAction({ id: a.id });
+                    }}
+                  />
+                </div>
+              </Flex>
+
+              <Flex direction={"column"} mt={"4"}>
+                <Flex gap={"2"} mb={"4"} direction={"column"} justify={"end"}>
+                  <div>
+                    <Badge radius="full">
+                      From:{" "}
+                      {a.duration
+                        ? `${new Date(`${a.duration}`.slice(2, 20)).toUTCString()}`
+                        : "No date"}
+                    </Badge>
+                  </div>
+                  <div>
+                    <Badge radius="full" color="red">
+                      To:{" "}
+                      {a.duration
+                        ? `${new Date(`${a.duration}`.slice(24, 43)).toUTCString()}`
+                        : "No date"}
+                    </Badge>
+                  </div>
+                </Flex>
+                <Strong>
+                  {a.consultation_specialties?.name.toUpperCase()}
+                </Strong>
+                <Flex gap={"2"} justify={"between"} align={"center"}>
+                  <Text>{a.clinics?.name}</Text>
+                  <div className="flex gap-2">
+                    {a.is_waiting && (
+                      <Badge color="amber">
+                        waiting
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+                    {a.is_missed && (
+                      <Badge color="red">
+                        missed
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+                    {a.is_checkedin && (
+                      <Badge color="blue">
+                        checked in{" "}
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+
+                    {a.is_completed && (
+                      <Badge>
+                        completed
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+                  </div>
+                </Flex>
+              </Flex>
+              <Flex justify={"between"} mt={"4"}>
+                <ConfirmAppointmentUpdate
+                  id={a.id}
+                  title="Move To Waiting?"
+                  triggleLabel="Waiting"
+                  disabled={a.is_waiting!}
+                  warning="Are you sure you want to move this appointment to waiting?"
+                  actionFn={async () => {
+                    await changeAppointmentStatus({
+                      id: a.id,
+                      isWaiting: true,
+                      isCheckedIn: false,
+                      isCompleted: false,
+                      isMissed: false,
+                    });
+                  }}
+                />
+
+                <ConfirmAppointmentUpdate
+                  id={a.id}
+                  title="Mark As Missed?"
+                  triggleLabel="Missed"
+                  disabled={a.is_missed!}
+                  warning="Are you sure you want to mark this appointment as missed?"
+                  actionFn={async () => {
+                    await changeAppointmentStatus({
+                      id: a.id,
+                      isMissed: true,
+                      isWaiting: false,
+                      isCheckedIn: false,
+                      isCompleted: false,
+                    });
+                  }}
+                />
+                <ConfirmAppointmentUpdate
+                  id={a.id}
+                  title="Has Checked In?"
+                  triggleLabel="Checked In"
+                  disabled={a.is_checkedin!}
+                  warning="Are you sure this patient has checked in?"
+                  actionFn={async () => {
+                    await changeAppointmentStatus({
+                      id: a.id,
+                      isCheckedIn: true,
+                      isWaiting: false,
+                      isCompleted: false,
+                      isMissed: false,
+                    });
+                  }}
+                />
+                <Link to={`/dashboard/appointments/${a.id}`}>
+                  <Button size={"2"} radius="full">
+                    Attend
+                  </Button>
+                </Link>
+              </Flex>
+            </Card>
+          ))}
+
+        {isCompleted &&
+          appointment_data_completed?.map((a) => (
+            <Card key={a.id}>
+              <Flex justify={"between"}>
+                <Flex gap={"2"} align={"center"}>
+                  <Avatar fallback={<UserCheck />} radius="full" size={"3"} />
+                  <Flex direction={"column"}>
+                    <Flex gap={"1"} align={"center"}>
+                      <Strong>
+                        {a.patients?.first_name} {a.patients?.middle_name}{" "}
+                        {a.patients?.last_name} [
+                        {a.patients_id.slice(0, 8).toUpperCase()}]
+                      </Strong>
+                    </Flex>
+                    <Flex gap={"1"} align={"center"}>
+                      <Text size={"1"}>
+                        <Strong>created</Strong>
+                      </Text>
+                      .
+                      <Text size={"1"}>
+                        {new Date(a.created_at!).toUTCString()}
+                      </Text>
+                    </Flex>
+                  </Flex>
+                </Flex>
+
+                <div>
+                  <UpdateAppointmentForm {...a} id={a.id} />
+                  <DeleteActionForm
+                    id={a.id}
+                    warning="Are you sure you want to delete this appointment?"
+                    title="Delete Appointment"
+                    inValidate="appointments"
+                    actionFn={async () => {
+                      await deleteAppointmentAction({ id: a.id });
+                    }}
+                  />
+                </div>
+              </Flex>
+
+              <Flex direction={"column"} mt={"4"}>
+                <Flex gap={"2"} mb={"4"} direction={"column"} justify={"end"}>
+                  <div>
+                    <Badge radius="full">
+                      From:{" "}
+                      {a.duration
+                        ? `${new Date(`${a.duration}`.slice(2, 20)).toUTCString()}`
+                        : "No date"}
+                    </Badge>
+                  </div>
+                  <div>
+                    <Badge radius="full" color="red">
+                      To:{" "}
+                      {a.duration
+                        ? `${new Date(`${a.duration}`.slice(24, 43)).toUTCString()}`
+                        : "No date"}
+                    </Badge>
+                  </div>
+                </Flex>
+                <Strong>
+                  {a.consultation_specialties?.name.toUpperCase()}
+                </Strong>
+                <Flex gap={"2"} justify={"between"} align={"center"}>
+                  <Text>{a.clinics?.name}</Text>
+                  <div className="flex gap-2">
+                    {a.is_waiting && (
+                      <Badge color="amber">
+                        waiting
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+                    {a.is_missed && (
+                      <Badge color="red">
+                        missed
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+                    {a.is_checkedin && (
+                      <Badge color="blue">
+                        checked in{" "}
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+
+                    {a.is_completed && (
+                      <Badge>
+                        completed
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+                  </div>
+                </Flex>
+              </Flex>
+              <Flex justify={"between"} mt={"4"}>
+                <ConfirmAppointmentUpdate
+                  id={a.id}
+                  title="Move To Waiting?"
+                  triggleLabel="Waiting"
+                  disabled={a.is_waiting!}
+                  warning="Are you sure you want to move this appointment to waiting?"
+                  actionFn={async () => {
+                    await changeAppointmentStatus({
+                      id: a.id,
+                      isWaiting: true,
+                      isCheckedIn: false,
+                      isCompleted: false,
+                      isMissed: false,
+                    });
+                  }}
+                />
+
+                <ConfirmAppointmentUpdate
+                  id={a.id}
+                  title="Mark As Missed?"
+                  triggleLabel="Missed"
+                  disabled={a.is_missed!}
+                  warning="Are you sure you want to mark this appointment as missed?"
+                  actionFn={async () => {
+                    await changeAppointmentStatus({
+                      id: a.id,
+                      isMissed: true,
+                      isWaiting: false,
+                      isCheckedIn: false,
+                      isCompleted: false,
+                    });
+                  }}
+                />
+                <ConfirmAppointmentUpdate
+                  id={a.id}
+                  title="Has Checked In?"
+                  triggleLabel="Checked In"
+                  disabled={a.is_checkedin!}
+                  warning="Are you sure this patient has checked in?"
+                  actionFn={async () => {
+                    await changeAppointmentStatus({
+                      id: a.id,
+                      isCheckedIn: true,
+                      isWaiting: false,
+                      isCompleted: false,
+                      isMissed: false,
+                    });
+                  }}
+                />
+                <Link to={`/dashboard/appointments/${a.id}`}>
+                  <Button size={"2"} radius="full">
+                    Attend
+                  </Button>
+                </Link>
+              </Flex>
+            </Card>
+          ))}
       </div>
     </div>
   );
@@ -306,10 +809,11 @@ const ConfirmAppointmentUpdate = ({
   triggleLabel,
   disabled,
 }: UpdateActionType) => {
+  const queryClient = useQueryClient();
   return (
     <AlertDialog.Root>
       <AlertDialog.Trigger>
-        <Button size={"2"} radius="full" variant="soft">
+        <Button disabled={disabled} size={"2"} radius="full" variant="soft">
           {triggleLabel}
         </Button>
       </AlertDialog.Trigger>
@@ -328,7 +832,10 @@ const ConfirmAppointmentUpdate = ({
               disabled={disabled}
               variant="solid"
               color="red"
-              onClick={() => actionFn({ id: id })}
+              onClick={() => {
+                actionFn({ id: id });
+                queryClient.invalidateQueries({ queryKey: ["appointments"] });
+              }}
             >
               Confirm
             </Button>

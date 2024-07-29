@@ -17,6 +17,8 @@ export const patientsQueryOptions = queryOptions({
     queryFn: async () => await getPatients(),
 })
 
+
+
 export const specialtiesQueryOptions = queryOptions({
     queryKey: ['specialties'],
     queryFn: async () => await getSpecialties(),

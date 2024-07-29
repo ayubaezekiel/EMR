@@ -1,7 +1,9 @@
 import { Checkbox } from "@radix-ui/themes";
 import { Link } from "@tanstack/react-router";
 import { ColumnDef } from "@tanstack/react-table";
-import { DeletePatient, UpdatePatientForm } from "../../../forms/PatientForm";
+import { DeleteActionForm } from "../../../actions/DeleteAction";
+import { deletePatientAction } from "../../../actions/patient";
+import { UpdatePatientForm } from "../../../forms/PatientForm";
 
 export const patients: ColumnDef<DB["patients"]["Row"]>[] = [
   {
@@ -53,7 +55,7 @@ export const patients: ColumnDef<DB["patients"]["Row"]>[] = [
   },
 
   {
-    accessorKey: "hmo_plans",
+    accessorKey: "hmo_plans.name",
     header: "HMO Plan",
     cell: ({ row }) => (
       <div className="lowercase">{row.getValue("hmo_plans.name")}</div>
@@ -98,8 +100,19 @@ export const patients: ColumnDef<DB["patients"]["Row"]>[] = [
 
       return (
         <div className="flex gap-4">
-          <UpdatePatientForm {...patient} />
-          <DeletePatient id={patient.id} />
+          <UpdatePatientForm
+            {...patient}
+            hmo_plan_id={patient.hmo_plan_id}
+            id={patient.id}
+          />
+          <DeleteActionForm
+            id={patient.id}
+            inValidate="patients"
+            title="Delete Specialty"
+            warning="Are you sure? this patient will be parmanently deleted from the
+          database."
+            actionFn={async () => await deletePatientAction({ id: patient.id })}
+          />
         </div>
       );
     },

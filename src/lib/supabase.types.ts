@@ -541,6 +541,52 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          ammount: string
+          appointments_id: string
+          cash_points_id: string
+          id: string
+          payments_method_id: string
+        }
+        Insert: {
+          ammount: string
+          appointments_id: string
+          cash_points_id: string
+          id?: string
+          payments_method_id: string
+        }
+        Update: {
+          ammount?: string
+          appointments_id?: string
+          cash_points_id?: string
+          id?: string
+          payments_method_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_appointments_id_fkey"
+            columns: ["appointments_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_cash_points_id_fkey"
+            columns: ["cash_points_id"]
+            isOneToOne: false
+            referencedRelation: "cash_points"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_payments_method_id_fkey"
+            columns: ["payments_method_id"]
+            isOneToOne: false
+            referencedRelation: "payment_methods"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_types: {
         Row: {
           created_at: string | null

@@ -1,3 +1,4 @@
+import { Input } from "@nextui-org/react";
 import {
   Button,
   Checkbox,
@@ -9,8 +10,10 @@ import {
   TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useLoaderData, useNavigate } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-form-adapter";
+import { addDays, format } from "date-fns";
 import { Edit } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -19,19 +22,29 @@ import {
   createAppointmentAction,
   updateAppointmentAction,
 } from "../actions/appointment";
+import {
+  appointmentsTypesQueryOptions,
+  clinicsQueryOptions,
+  consultationSpecialtiesQueryOptions,
+  patientsQueryOptions,
+} from "../actions/queries";
 import { FieldInfo } from "../components/FieldInfo";
+import PendingComponent from "../components/PendingComponent";
 import supabase from "../supabase/client";
 
 export function CreateAppointmentForm() {
-  const {
-    appointment_type_data,
-    clinics_data,
-    patient_data,
-    specialties_data,
-  } = useLoaderData({
-    from: "/_layout/dashboard/appointments/",
-  });
+  const { data: appointment_types, isPending } = useQuery(
+    appointmentsTypesQueryOptions
+  );
+  const { data: clinics, isPending: clinicsPending } =
+    useQuery(clinicsQueryOptions);
 
+  const { data: specialties, isPending: specialtiesPending } = useQuery(
+    consultationSpecialtiesQueryOptions
+  );
+
+  const { data: patients, isPending: patientsPending } =
+    useQuery(patientsQueryOptions);
   const [open, onOpenChange] = useState(false);
   const navigate = useNavigate();
 
@@ -64,6 +77,14 @@ export function CreateAppointmentForm() {
       }
     },
   });
+
+  if (isPending || clinicsPending || patientsPending || specialtiesPending)
+    return <PendingComponent />;
+
+  const appointment_type_data = appointment_types?.appointment_type_data;
+  const clinics_data = clinics?.clinics_data;
+  const specialties_data = specialties?.consultation_specialties_data;
+  const patient_data = patients?.patient_data;
 
   return (
     <div>
@@ -280,19 +301,29 @@ export function UpdateAppointmentForm({
   id,
   ...values
 }: DB["appointments"]["Update"]) {
-  const {
-    patient_data,
-    clinics_data,
-    appointment_type_data,
-    specialties_data,
-  } = useLoaderData({
-    from: "/_layout/dashboard/appointments/",
-  });
+  const { data: appointment_types, isPending } = useQuery(
+    appointmentsTypesQueryOptions
+  );
+  const { data: clinics, isPending: clinicsPending } =
+    useQuery(clinicsQueryOptions);
 
+  const { data: specialties, isPending: specialtiesPending } = useQuery(
+    consultationSpecialtiesQueryOptions
+  );
+
+  const { data: patients, isPending: patientsPending } =
+    useQuery(patientsQueryOptions);
+
+  const date = new Date();
+
+  const today = format(date, "yyyy-MM-dd'T'HH:mm");
+  const nextDay = format(addDays(today, 2), "yyyy-MM-dd'T'HH:mm");
+  // `${values.duration}`.slice(2, 24);
+  // `${values.duration}`.slice(27, 49);
   const [open, onOpenChange] = useState(false);
-  const navigate = useNavigate();
-  const [from, setFrom] = useState(`${values.duration}`.slice(2, 24));
-  const [to, setTo] = useState(`${values.duration}`.slice(27, 49));
+  const [from, setFrom] = useState(today);
+  const [to, setTo] = useState(nextDay);
+  const queryClient = useQueryClient();
 
   const form = useForm({
     defaultValues: {
@@ -319,10 +350,20 @@ export function UpdateAppointmentForm({
         });
         form.reset();
         onOpenChange(false);
-        navigate({ to: "/dashboard/appointments" });
+        queryClient.invalidateQueries({ queryKey: ["appointments"] });
       }
     },
   });
+
+  console.log(form.state.values.duration);
+
+  if (isPending || clinicsPending || patientsPending || specialtiesPending)
+    return <PendingComponent />;
+
+  const appointment_type_data = appointment_types?.appointment_type_data;
+  const clinics_data = clinics?.clinics_data;
+  const specialties_data = specialties?.consultation_specialties_data;
+  const patient_data = patients?.patient_data;
 
   return (
     <div>
@@ -346,7 +387,30 @@ export function UpdateAppointmentForm({
             }}
           >
             <div className="flex md:gap-4 md:flex-row flex-col gap-2">
-              <label className="flex flex-col">
+              <div className="w-full flex gap-2">
+                <div className="w-full">
+                  <Text size={"3"}>Starting*</Text>
+                  <Input
+                    onChange={(e) =>
+                      setFrom(format(e.target.value, "yyyy-MM-dd'T'HH:mm"))
+                    }
+                    variant="bordered"
+                    type="datetime-local"
+                  />
+                </div>
+                <div className="w-full">
+                  <Text size={"3"}>Ending*</Text>
+                  <Input
+                    onChange={(e) =>
+                      setTo(format(e.target.value, "yyyy-MM-dd'T'HH:mm"))
+                    }
+                    variant="bordered"
+                    type="datetime-local"
+                  />
+                </div>
+              </div>
+
+              {/* <label className="flex flex-col">
                 <Text size={"3"}>Starting*</Text>
                 <TextField.Root
                   required
@@ -363,7 +427,7 @@ export function UpdateAppointmentForm({
                   type="datetime-local"
                   onChange={(e) => setTo(e.target.value)}
                 />
-              </label>
+              </label> */}
             </div>
             <form.Field
               name="patients_id"
@@ -532,4 +596,19 @@ export function UpdateAppointmentForm({
       </Dialog.Root>
     </div>
   );
+}
+
+{
+  /* <DateRangePicker
+                  label="Appointment duration"
+                  hideTimeZone
+                  visibleMonths={2}
+                  onChange={(e) => {
+                    setFrom(`${e.start}`), setTo(`${e.end}`);
+                  }}
+                  defaultValue={{
+                    start: parseZonedDateTime(`${today}[America/Los_Angeles]`),
+                    end: parseZonedDateTime(`${nextDay}[America/Los_Angeles]`),
+                  }}
+                /> */
 }

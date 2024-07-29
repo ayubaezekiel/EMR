@@ -30,7 +30,6 @@ import {
 } from "lucide-react";
 import { services_routes } from "../lib/constants";
 import { NavPatientFilters } from "./NavFilters";
-import { Route } from "../routes/_layout";
 
 const nav_items = [
   { icon: Home, route: "/dashboard", tip: "Home" },
@@ -38,9 +37,8 @@ const nav_items = [
   { icon: BookCheck, route: "/dashboard/billing", tip: "Billing" },
 ];
 
-export function Header() {
+export function Header({ user }: { user: string }) {
   const [open, onOpenChange] = useState(false);
-  const user = Route.useLoaderData();
 
   const navigate = useNavigate();
   const LogOut = async () => {
@@ -115,7 +113,7 @@ export function Header() {
             </Box>
           </SheetContent>
         </Sheet>
-        <div className="hidden md:block">
+        <div className="hidden lg:block">
           <Avatar size={"4"} fallback="L" radius="full" />
         </div>
         <NavPatientFilters />
@@ -149,9 +147,7 @@ export function Header() {
             </IconButton>
           </DropdownMenu.Trigger>
           <DropdownMenu.Content variant="soft">
-            <DropdownMenu.Label>
-              {user?.email ?? <Spinner />}
-            </DropdownMenu.Label>
+            <DropdownMenu.Label>{user ?? <Spinner />}</DropdownMenu.Label>
             <DropdownMenu.Separator />
             <DropdownMenu.Item onClick={LogOut}>Logout</DropdownMenu.Item>
           </DropdownMenu.Content>
