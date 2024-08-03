@@ -6,6 +6,7 @@ import { PatientVitals } from "../../../../components/consultation/PatientVitals
 import { Step, Stepper, useStepper } from "../../../../components/stepper";
 import { Examination } from "../../../../components/consultation/Examinitation";
 import { Diagnosis } from "../../../../components/consultation/Diagnosis";
+import { TreatmentPlan } from "../../../../components/consultation/TreatmentPlan";
 
 export const Route = createFileRoute(
   "/_layout/dashboard/appointments/$appointmentId"
@@ -42,7 +43,7 @@ const steps = [
   {
     label: "Plan",
     description: "Record treatment plan",
-    comp: <PatientVitals />,
+    comp: <TreatmentPlan />,
   },
   {
     label: "Issue Requests",
