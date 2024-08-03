@@ -6,10 +6,6 @@ import { consultation_templates_column } from "../table/columns/templates";
 import { DataTable } from "../table/DataTable";
 
 export function ConsultationTemplates() {
-  //   const { consultation_templates_data } = useLoaderData({
-  //     from: "/_layout/dashboard/config/consultation",
-  //   });
-
   const { data } = useSuspenseQuery(consultationTemplatesQueryOptions);
 
   return (

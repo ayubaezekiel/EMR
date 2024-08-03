@@ -329,7 +329,10 @@ function AppointmentCard({
                   size={"2"}
                   radius="full"
                 >
-                  <Link to={`/dashboard/appointments/${a.id}`}> Attend</Link>
+                  <Link to={`/dashboard/appointments/${a.patients_id}`}>
+                    {" "}
+                    Attend
+                  </Link>
                 </Button>
               </Flex>
             </Card>
@@ -479,7 +482,9 @@ function AppointmentCard({
                   }}
                 />
                 <Button asChild size={"2"} radius="full">
-                  <Link to={`/dashboard/appointments/${a.id}`}>Attend</Link>
+                  <Link to={`/dashboard/appointments/${a.patients_id}`}>
+                    Attend
+                  </Link>
                 </Button>
               </Flex>
             </Card>
@@ -628,7 +633,7 @@ function AppointmentCard({
                     });
                   }}
                 />
-                <Link to={`/dashboard/appointments/${a.id}`}>
+                <Link to={`/dashboard/appointments/${a.patients_id}`}>
                   <Button size={"2"} radius="full">
                     Attend
                   </Button>
@@ -780,7 +785,7 @@ function AppointmentCard({
                     });
                   }}
                 />
-                <Link to={`/dashboard/appointments/${a.id}`}>
+                <Link to={`/dashboard/appointments/${a.patients_id}`}>
                   <Button size={"2"} radius="full">
                     Attend
                   </Button>

@@ -22,3 +22,14 @@ export const updateCashpointAction = async (values: CashpointType['Update']) => 
     }
 
 }
+
+export const deleteCashpointAction = async ({ id }: { id: string }) => {
+    if (id) {
+        const { error } = await supabase.from("cash_points").delete().eq('id', id);
+        if (error) {
+            toast.error(error.message);
+        }
+        toast.success("cashpoint deleted successfully");
+    }
+
+}

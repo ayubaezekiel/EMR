@@ -15,3 +15,6 @@ export const checkAuth = async () => {
   }
   return data.session?.user
 };
+
+
+

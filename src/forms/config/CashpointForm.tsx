@@ -1,12 +1,4 @@
-import { useForm } from "@tanstack/react-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import {
-  createCashpointAction,
-  updateCashpointAction,
-} from "../../actions/config/cashpoint";
-import { useState } from "react";
-import {
-  AlertDialog,
   Button,
   Dialog,
   Flex,
@@ -15,18 +7,35 @@ import {
   Text,
   TextField,
 } from "@radix-ui/themes";
-import { Edit, Trash } from "lucide-react";
-import { FieldInfo } from "../../components/FieldInfo";
+import { useForm } from "@tanstack/react-form";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { zodValidator } from "@tanstack/zod-form-adapter";
+import { Edit } from "lucide-react";
+import { useState } from "react";
 import { z } from "zod";
-import supabase from "../../supabase/client";
-import { toast } from "sonner";
-import { useLoaderData, useNavigate } from "@tanstack/react-router";
+import {
+  createCashpointAction,
+  updateCashpointAction,
+} from "../../actions/config/cashpoint";
+import {
+  branchQueryOptions,
+  clinicsQueryOptions,
+  serviceTypesQueryOptions,
+} from "../../actions/queries";
+import { FieldInfo } from "../../components/FieldInfo";
+import PendingComponent from "../../components/PendingComponent";
 
 export function CreateCashpointForm() {
   const [open, onOpenChange] = useState(false);
-  const navigate = useNavigate();
 
-  const { data } = useLoaderData({ from: "/_layout/dashboard/config/" });
+  const { data: branch, isPending: isBranchPending } =
+    useQuery(branchQueryOptions);
+  const { data: clinics, isPending: isClinicsPending } =
+    useQuery(clinicsQueryOptions);
+  const { data: service_type, isPending: isServiceTypePending } = useQuery(
+    serviceTypesQueryOptions
+  );
+  const queryClient = useQueryClient();
 
   const form = useForm({
     defaultValues: {
@@ -40,9 +49,12 @@ export function CreateCashpointForm() {
       await createCashpointAction(value);
       form.reset();
       onOpenChange(false);
-      navigate({ to: "/dashboard/config" });
+      queryClient.invalidateQueries({ queryKey: ["hmoPlan"] });
     },
   });
+
+  if (isClinicsPending || isBranchPending || isServiceTypePending)
+    return <PendingComponent />;
 
   return (
     <div>
@@ -102,7 +114,7 @@ export function CreateCashpointForm() {
                   >
                     <Select.Trigger placeholder="select branch..." />
                     <Select.Content position="popper">
-                      {data.branch?.map((b) => (
+                      {branch?.branch_data?.map((b) => (
                         <Select.Item key={b.id} value={b.id}>
                           {b.name}
                         </Select.Item>
@@ -129,7 +141,7 @@ export function CreateCashpointForm() {
                   >
                     <Select.Trigger placeholder="select clinic..." />
                     <Select.Content position="popper">
-                      {data.clinics?.map((c) => (
+                      {clinics?.clinics_data?.map((c) => (
                         <Select.Item key={c.id} value={c.id}>
                           {c.name}
                         </Select.Item>
@@ -156,7 +168,7 @@ export function CreateCashpointForm() {
                   >
                     <Select.Trigger placeholder="select service type..." />
                     <Select.Content position="popper">
-                      {data.service_type?.map((s) => (
+                      {service_type?.service_type_data?.map((s) => (
                         <Select.Item key={s.id} value={s.id}>
                           {s.name}
                         </Select.Item>
@@ -188,9 +200,15 @@ export function UpdateCashpointForm({
   ...values
 }: CashpointType["Update"]) {
   const [open, onOpenChange] = useState(false);
-  const navigate = useNavigate();
 
-  const { data } = useLoaderData({ from: "/_layout/dashboard/config/" });
+  const { data: branch, isPending: isBranchPending } =
+    useQuery(branchQueryOptions);
+  const { data: clinics, isPending: isClinicsPending } =
+    useQuery(clinicsQueryOptions);
+  const { data: service_type, isPending: isServiceTypePending } = useQuery(
+    serviceTypesQueryOptions
+  );
+  const queryClient = useQueryClient();
 
   const form = useForm({
     defaultValues: {
@@ -203,9 +221,12 @@ export function UpdateCashpointForm({
       form.reset();
       onOpenChange(false);
 
-      navigate({ to: "/dashboard/config" });
+      queryClient.invalidateQueries({ queryKey: ["cashpoints"] });
     },
   });
+
+  if (isClinicsPending || isBranchPending || isServiceTypePending)
+    return <PendingComponent />;
 
   return (
     <div>
@@ -266,7 +287,7 @@ export function UpdateCashpointForm({
                   >
                     <Select.Trigger placeholder="select branch..." />
                     <Select.Content position="popper">
-                      {data.branch?.map((b) => (
+                      {branch?.branch_data?.map((b) => (
                         <Select.Item key={b.id} value={b.id}>
                           {b.name}
                         </Select.Item>
@@ -293,7 +314,7 @@ export function UpdateCashpointForm({
                   >
                     <Select.Trigger placeholder="select clinic..." />
                     <Select.Content position="popper">
-                      {data.clinics?.map((c) => (
+                      {clinics?.clinics_data?.map((c) => (
                         <Select.Item key={c.id} value={c.id}>
                           {c.name}
                         </Select.Item>
@@ -320,7 +341,7 @@ export function UpdateCashpointForm({
                   >
                     <Select.Trigger placeholder="select service type..." />
                     <Select.Content position="popper">
-                      {data.service_type?.map((s) => (
+                      {service_type?.service_type_data?.map((s) => (
                         <Select.Item key={s.id} value={s.id}>
                           {s.name}
                         </Select.Item>
@@ -344,63 +365,5 @@ export function UpdateCashpointForm({
         </Dialog.Content>
       </Dialog.Root>
     </div>
-  );
-}
-
-export function DeleteCashpointForm({ id }: { id: string }) {
-  const navigate = useNavigate();
-  const form = useForm({
-    defaultValues: {
-      id: id,
-    },
-    onSubmit: async ({ value }) => {
-      const { error } = await supabase
-        .from("cash_points")
-        .delete()
-        .eq("id", value.id);
-      if (error) {
-        toast.error(error.message);
-      } else {
-        navigate({ to: "/dashboard/config" });
-        toast.success("cashpoint deleted successfull");
-      }
-    },
-  });
-
-  return (
-    <AlertDialog.Root>
-      <AlertDialog.Trigger>
-        <Button color="red" variant="ghost">
-          <Trash size={16} />
-        </Button>
-      </AlertDialog.Trigger>
-      <AlertDialog.Content maxWidth="450px">
-        <AlertDialog.Title>Delete Cashpoint</AlertDialog.Title>
-        <AlertDialog.Description size="2">
-          Are you sure? This cashpoint will be parmanently deleted from the
-          database.
-        </AlertDialog.Description>
-
-        <Flex gap="3" mt="4" justify="end">
-          <AlertDialog.Cancel>
-            <Button variant="soft" color="gray">
-              Cancel
-            </Button>
-          </AlertDialog.Cancel>
-          <AlertDialog.Action>
-            <form
-              onSubmit={(e) => {
-                e.stopPropagation(), e.preventDefault(), form.handleSubmit();
-                form.reset();
-              }}
-            >
-              <Button type="submit" variant="solid" color="red">
-                Confirm
-              </Button>
-            </form>
-          </AlertDialog.Action>
-        </Flex>
-      </AlertDialog.Content>
-    </AlertDialog.Root>
   );
 }

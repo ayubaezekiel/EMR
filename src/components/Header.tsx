@@ -37,7 +37,7 @@ const nav_items = [
   { icon: BookCheck, route: "/dashboard/billing", tip: "Billing" },
 ];
 
-export function Header({ user }: { user: string }) {
+export function Header({ user, userId }: { user: string; userId: string }) {
   const [open, onOpenChange] = useState(false);
 
   const navigate = useNavigate();
@@ -148,8 +148,14 @@ export function Header({ user }: { user: string }) {
           </DropdownMenu.Trigger>
           <DropdownMenu.Content variant="soft">
             <DropdownMenu.Label>{user ?? <Spinner />}</DropdownMenu.Label>
+            <DropdownMenu.Item asChild>
+              <Link to={`/dashboard/users/${userId}`}>Update Profile</Link>
+            </DropdownMenu.Item>
+
             <DropdownMenu.Separator />
-            <DropdownMenu.Item onClick={LogOut}>Logout</DropdownMenu.Item>
+            <DropdownMenu.Item onClick={LogOut} color="red">
+              Logout
+            </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Root>
       </Flex>

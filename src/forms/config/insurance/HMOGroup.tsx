@@ -7,7 +7,7 @@ import {
   TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
@@ -20,7 +20,7 @@ import { FieldInfo } from "../../../components/FieldInfo";
 
 export function CreateHMOGroupForm() {
   const [open, onOpenChange] = useState(false);
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const form = useForm({
     defaultValues: {
@@ -31,7 +31,7 @@ export function CreateHMOGroupForm() {
       await createHMOGroupAction(value);
       form.reset();
       onOpenChange(false);
-      navigate({ to: "/dashboard/config" });
+      queryClient.invalidateQueries({ queryKey: ["hmoPlan"] });
     },
   });
 
@@ -99,7 +99,7 @@ export function UpdateHMOGroupForm({
   ...values
 }: DB["hmo_group"]["Update"]) {
   const [open, onOpenChange] = useState(false);
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const form = useForm({
     defaultValues: {
@@ -111,8 +111,7 @@ export function UpdateHMOGroupForm({
       await updateHMOGroupAction(value);
       form.reset();
       onOpenChange(false);
-
-      navigate({ to: "/dashboard/config" });
+      queryClient.invalidateQueries({ queryKey: ["hmoGroups"] });
     },
   });
 

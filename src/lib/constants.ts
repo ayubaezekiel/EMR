@@ -12,6 +12,7 @@ import {
   Pipette,
   Scan,
   Scissors,
+  User2,
   UserCheck2
 } from "lucide-react";
 
@@ -75,12 +76,6 @@ export const services_routes = [
     icon: Scissors,
   },
   {
-    route: "/dashboard/vaccinations/",
-    name: "Vaccinations",
-    link_title: "Manage",
-    icon: DropletIcon,
-  },
-  {
     route: "/dashboard/reports/",
     name: "Medical Reports",
     link_title: "Manage",
@@ -97,6 +92,12 @@ export const services_routes = [
     name: "Dialysis",
     icon: BarChart2,
     link_title: "Manage",
+  },
+  {
+    route: "/dashboard/users/",
+    name: "Users",
+    link_title: "Manage",
+    icon: User2,
   },
   {
     route: "/dashboard/config/",

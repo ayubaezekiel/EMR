@@ -5,6 +5,7 @@ import {
   getConsultationTemplates,
 } from "../../../../actions/actions";
 import { ConsultationTemplates } from "../../../../components/config/Templates";
+import { Vitals } from "../../../../components/config/Vitals";
 
 const loadData = async () => {
   const { consultation_specialties_data } = await getConsultationSpecialties();
@@ -17,7 +18,11 @@ export const Route = createFileRoute("/_layout/dashboard/config/consultation")({
   component: () => (
     <div className="flex flex-col gap-10">
       <ConnsultaionSpecialties />
-      <ConsultationTemplates />
+
+      <div className="grid gap-4 md:grid-cols-2 mt-4">
+        <Vitals />
+        <ConsultationTemplates />
+      </div>
     </div>
   ),
 });

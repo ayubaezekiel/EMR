@@ -1,3 +1,5 @@
+import { useForm as useMantineForm } from "@mantine/form";
+import { randomId } from "@mantine/hooks";
 import {
   Button,
   Callout,
@@ -9,27 +11,23 @@ import {
   Text,
   TextField,
 } from "@radix-ui/themes";
-import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { useForm } from "@tanstack/react-form";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { AlertCircle, Edit, PlusCircle, Trash } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { z } from "zod";
-import { updateSpecialtyAction } from "../../actions/config/specialty";
 import {
   createVitalsAction,
+  updatePatientVitalsAction,
   updateVitalsAction,
 } from "../../actions/config/vitals";
-import {
-  patientsQueryOptions,
-  vitalsQueryOptions,
-} from "../../actions/queries";
+import { vitalsQueryOptions } from "../../actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
-import { useForm as useMantineForm } from "@mantine/form";
-import { randomId } from "@mantine/hooks";
 import { Label } from "../../components/ui/label";
-import { useForm } from "@tanstack/react-form";
 import supabase from "../../supabase/client";
-import { toast } from "sonner";
+import PendingComponent from "../../components/PendingComponent";
 
 export function CreateVitalsForm() {
   const [open, onOpenChange] = useState(false);
@@ -227,17 +225,17 @@ export function UpdateVitalsForm({ id, ...values }: DB["vitals"]["Update"]) {
   );
 }
 
-export function CreatePatientVitalsForm() {
-  const { data: patients } = useSuspenseQuery(patientsQueryOptions);
-  const {
-    data: { vitals_data },
-  } = useSuspenseQuery(vitalsQueryOptions);
+export function CreatePatientVitalsForm({ patientId }: { patientId: string }) {
+  const { data, isPending } = useQuery(vitalsQueryOptions);
+
+  const queryClient = useQueryClient();
+
   const [open, onOpenChange] = useState(false);
 
   const form = useMantineForm({
     mode: "uncontrolled",
     initialValues: {
-      patient: "",
+      patient: patientId,
       vitals: [{ name: "", value: "", unit: "", key: randomId() }],
     },
   });
@@ -256,8 +254,10 @@ export function CreatePatientVitalsForm() {
         >
           <Select.Trigger placeholder="select vitals..." />
           <Select.Content position="popper">
-            {vitals_data?.map((v) => (
-              <Select.Item value={v.id}>{v.name}</Select.Item>
+            {data?.vitals_data?.map((v) => (
+              <Select.Item key={v.id} value={v.name}>
+                {v.name}
+              </Select.Item>
             ))}
           </Select.Content>
         </Select.Root>
@@ -284,7 +284,7 @@ export function CreatePatientVitalsForm() {
         >
           <Select.Trigger placeholder="kg" />
           <Select.Content position="popper">
-            {vitals_data?.map((v) => (
+            {data?.vitals_data?.map((v) => (
               <Select.Item value={v.unit!.length > 0 ? v.name : "nill"}>
                 {v.unit!.length < 1 ? "--" : v.unit}
               </Select.Item>
@@ -304,6 +304,8 @@ export function CreatePatientVitalsForm() {
     </Flex>
   ));
 
+  if (isPending) return <PendingComponent />;
+
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Trigger>
@@ -312,13 +314,14 @@ export function CreatePatientVitalsForm() {
         </Button>
       </Dialog.Trigger>
       <Dialog.Content>
+        <Dialog.Title>Record Vitals</Dialog.Title>
         <form
           onSubmit={form.onSubmit(async (values) => {
             const p_vitals = values.vitals.map((n) => ({
               name: n.name,
               unit: n.unit,
               value: n.value,
-              patient: values.patient,
+              patient: patientId,
             }));
             const { error } = await supabase
               .from("patient_vitals")
@@ -327,18 +330,16 @@ export function CreatePatientVitalsForm() {
 
             if (error) {
               toast.error(error.message);
+            } else {
+              onOpenChange(false);
+              toast.success("patient vitals recorded successfully");
+              queryClient.invalidateQueries({
+                queryKey: ["patientVitalsById"],
+              });
             }
-
-            toast.success("patient vitals recorded successfully");
           })}
         >
-          {fields.length > 0 ? (
-            <Flex mb="xs">
-              <Text size={"3"} style={{ flex: 1 }}>
-                Patient*
-              </Text>
-            </Flex>
-          ) : (
+          {fields.length < 0 && (
             <Callout.Root color="red">
               <Callout.Icon>
                 <AlertCircle />
@@ -346,23 +347,7 @@ export function CreatePatientVitalsForm() {
               </Callout.Icon>
             </Callout.Root>
           )}
-          <div className="flex flex-col w-full">
-            <Select.Root
-              required
-              size={"3"}
-              onValueChange={(e) => form.setFieldValue("patient", e)}
-            >
-              <Select.Trigger placeholder="select patient..." />
-              <Select.Content position="popper">
-                {patients.patient_data?.map((p) => (
-                  <Select.Item value={p.id}>
-                    {p.first_name} {p.middle_name} {p.last_name} [
-                    {p.id.slice(0, 8).toUpperCase()}]
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
-          </div>
+
           {fields}
 
           <Flex justify="end" mt="4">
@@ -397,20 +382,27 @@ export function UpdatePatientVitalsForm({
   const [open, onOpenChange] = useState(false);
   const queryClient = useQueryClient();
 
+  const { data, isPending } = useQuery(vitalsQueryOptions);
+
   const form = useForm({
     defaultValues: {
-      id: id,
-      ...values,
+      patient: values.patient!,
+      id: id!,
+      name: values.name!,
+      value: values.value!,
+      unit: values.unit!,
     },
     validatorAdapter: zodValidator(),
-    onSubmit: async ({ value }) => {
-      await updateSpecialtyAction(value);
-      form.reset();
+    onSubmit: async (values) => {
+      await updatePatientVitalsAction(values.value);
       onOpenChange(false);
-
-      queryClient.invalidateQueries({ queryKey: ["patientVitals"] });
+      queryClient.invalidateQueries({
+        queryKey: ["patientVitalsById"],
+      });
     },
   });
+
+  if (isPending) return <PendingComponent />;
 
   return (
     <div>
@@ -433,69 +425,92 @@ export function UpdatePatientVitalsForm({
               form.handleSubmit();
             }}
           >
-            <form.Field
-              name="name"
-              validators={{
-                onChange: z
-                  .string()
-                  .min(3, { message: "field must be atleast 3 characters" }),
-              }}
-              children={(field) => (
-                <label htmlFor={field.name} className="flex flex-col">
-                  <Text size={"3"}>Name*</Text>
-                  <TextField.Root
-                    name={field.name}
-                    id={field.name}
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    onBlur={field.handleBlur}
-                  />
-                  <FieldInfo field={field} />
-                </label>
-              )}
-            />
+            <Flex gap={"2"} mt={"2"}>
+              <form.Field
+                name="name"
+                validators={{
+                  onChange: z
+                    .string()
+                    .min(1, { message: "select a vital sign....." }),
+                }}
+                children={(field) => (
+                  <div className="flex flex-col gap-1 w-full">
+                    <Label>Name*</Label>
+                    <Select.Root
+                      name={field.name}
+                      value={field.state.value}
+                      size={"3"}
+                      onValueChange={(e) => field.handleChange(e)}
+                    >
+                      <Select.Trigger placeholder="select vitals..." />
+                      <Select.Content position="popper">
+                        {data?.vitals_data?.map((v) => (
+                          <Select.Item key={v.id} value={v.name}>
+                            {v.name}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Root>
+                    <FieldInfo field={field} />
+                  </div>
+                )}
+              />
 
-            <form.Field
-              name="value"
-              validators={{
-                onChange: z
-                  .string()
-                  .min(1, { message: "field can not be empty" }),
-              }}
-              children={(field) => (
-                <label htmlFor={field.name} className="flex flex-col">
-                  <Text size={"3"}>Value*</Text>
-                  <TextField.Root
-                    name={field.name}
-                    id={field.name}
-                    value={field.state.value!}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    onBlur={field.handleBlur}
-                  />
-                  <FieldInfo field={field} />
-                </label>
-              )}
-            />
+              <form.Field
+                name="value"
+                validators={{
+                  onChange: z
+                    .string()
+                    .min(1, { message: "field can not be empty" }),
+                }}
+                children={(field) => (
+                  <div className="flex flex-col gap-1">
+                    <Label>Value*</Label>
+                    <TextField.Root
+                      name={field.name}
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      size={"3"}
+                    />
+                    <FieldInfo field={field} />
+                  </div>
+                )}
+              />
 
-            <form.Field
-              name="unit"
-              validators={{
-                onChange: z.string().optional(),
-              }}
-              children={(field) => (
-                <label htmlFor={field.name} className="flex flex-col">
-                  <Text size={"3"}>Unit</Text>
-                  <TextField.Root
-                    name={field.name}
-                    id={field.name}
-                    value={field.state.value!}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    onBlur={field.handleBlur}
-                  />
-                  <FieldInfo field={field} />
-                </label>
-              )}
-            />
+              <form.Field
+                name="unit"
+                validators={{
+                  onChange: z
+                    .string()
+                    .min(1, { message: "select a unit....." }),
+                }}
+                children={(field) => (
+                  <div className="flex flex-col gap-1">
+                    <Label>Unit*</Label>
+                    <Select.Root
+                      name={field.name}
+                      value={field.state.value}
+                      size={"3"}
+                      onValueChange={(e) => field.handleChange(e)}
+                    >
+                      <Select.Trigger placeholder="kg.." />
+                      <Select.Content position="popper">
+                        {data?.vitals_data?.map((v) => (
+                          <Select.Item
+                            key={v.id}
+                            value={v.unit ? v.unit : "---"}
+                          >
+                            {v.unit}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Root>
+                    <FieldInfo field={field} />
+                  </div>
+                )}
+              />
+            </Flex>
+
             <Flex gap="3" mt="4" justify="end">
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}

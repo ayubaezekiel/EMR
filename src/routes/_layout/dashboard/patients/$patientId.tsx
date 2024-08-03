@@ -1,9 +1,15 @@
-import { Card, DataList, Heading, Tabs } from "@radix-ui/themes";
+import { Card, DataList, Flex, Heading, Tabs } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 
-import { getPatientById } from "../../../../actions/actions";
+import {
+  getPatientById,
+  getPatientVitalsById,
+} from "../../../../actions/actions";
 import PendingComponent from "../../../../components/PendingComponent";
+import { DataTable } from "../../../../components/table/DataTable";
+import { patient_vitals_column } from "../../../../components/table/columns/vitals";
+import { CreatePatientVitalsForm } from "../../../../forms/config/Vitals";
 
 export const Route = createFileRoute("/_layout/dashboard/patients/$patientId")({
   component: () => (
@@ -55,6 +61,16 @@ const TopPanel = () => {
 };
 
 const PatientProfileLayout = () => {
+  const { patientId } = useParams({
+    from: "/_layout/dashboard/patients/$patientId",
+  });
+  const { data, isPending } = useQuery({
+    queryFn: () => getPatientVitalsById(patientId),
+    queryKey: ["patientVitalsById"],
+  });
+
+  if (isPending) return <PendingComponent />;
+
   return (
     <div>
       <Tabs.Root defaultValue="vitals">
@@ -62,10 +78,15 @@ const PatientProfileLayout = () => {
           <Tabs.Trigger value="vitals">Vitals</Tabs.Trigger>
         </Tabs.List>
         <Tabs.Content value="vitals" mt={"4"}>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Velit
-          distinctio dolor eaque? Voluptatem quis pariatur dolorum error
-          adipisci vel perferendis odit! Aliquam quo magni et nobis fugit qui
-          quibusdam labore.
+          <Flex justify={"end"}>
+            <CreatePatientVitalsForm patientId={patientId} />
+          </Flex>
+          <DataTable
+            columns={patient_vitals_column}
+            data={data?.patient_vitals_data ?? []}
+            filterLabel="search by name..."
+            filterer="name"
+          />
         </Tabs.Content>
       </Tabs.Root>
     </div>

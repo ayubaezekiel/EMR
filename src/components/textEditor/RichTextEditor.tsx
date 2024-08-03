@@ -1,38 +1,16 @@
-import { RichTextEditor, Link } from "@mantine/tiptap";
-import { useEditor } from "@tiptap/react";
-import Highlight from "@tiptap/extension-highlight";
-import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
-import TextAlign from "@tiptap/extension-text-align";
-import Superscript from "@tiptap/extension-superscript";
-import SubScript from "@tiptap/extension-subscript";
+import { RichTextEditor } from "@mantine/tiptap";
+import { Editor } from "@tiptap/react";
+
 import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import "@mantine/tiptap/styles.css";
 import "./styles.css";
 
 interface EditorTypes {
-  content?: string;
-  id?: string;
-  onValueChange: ({ value }: { value: string }) => void;
+  editor: Editor | null;
 }
 
-export function RichEditor({ onValueChange, content }: EditorTypes) {
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Underline,
-      Link,
-      Superscript,
-      SubScript,
-      Highlight,
-      TextAlign.configure({ types: ["heading", "paragraph"] }),
-    ],
-    onUpdate: ({ editor }) => onValueChange({ value: editor.getHTML() }),
-
-    content,
-  });
-
+export function RichEditor({ editor }: EditorTypes) {
   return (
     <MantineProvider>
       <RichTextEditor editor={editor} classNames={{ root: "rich-text-class" }}>
@@ -41,9 +19,8 @@ export function RichEditor({ onValueChange, content }: EditorTypes) {
             <RichTextEditor.Bold />
             <RichTextEditor.Italic />
             <RichTextEditor.Underline />
-            {/* <RichTextEditor.Strikethrough /> */}
+
             <RichTextEditor.ClearFormatting />
-            {/* <RichTextEditor.Highlight /> */}
           </RichTextEditor.ControlsGroup>
 
           <RichTextEditor.ControlsGroup>

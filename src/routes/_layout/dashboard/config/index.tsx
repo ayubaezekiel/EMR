@@ -30,14 +30,13 @@ import { Clinics } from "../../../../components/config/Clinics";
 import { Departments } from "../../../../components/config/Departments";
 import HMOCompanies from "../../../../components/config/insurance/HMOCompanies";
 import { HMOGroups } from "../../../../components/config/insurance/HMOGroups";
-import HMOPlans from "../../../../components/config/insurance/HMOPlans";
 import { JobPostion } from "../../../../components/config/JobPosition";
 import { PaymentMethod } from "../../../../components/config/PaymentMethod";
 import { ServiceTypes } from "../../../../components/config/ServiceTypes";
 import { Specialties } from "../../../../components/config/Specialties";
 import { config_services_routes } from "../../../../lib/constants";
 import { QueryClient } from "@tanstack/react-query";
-import { Vitals } from "../../../../components/config/Vitals";
+import { HMOPlans } from "../../../../components/config/insurance/HMOPlans";
 
 const loadData = async (queryClient: QueryClient) => {
   const { hmo_plans_data } =
@@ -240,9 +239,6 @@ export const Route = createFileRoute("/_layout/dashboard/config/")({
                 <div>
                   <Departments />
                 </div>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2 mt-4">
-                <Vitals />
               </div>
             </Tabs.Content>
           </Box>

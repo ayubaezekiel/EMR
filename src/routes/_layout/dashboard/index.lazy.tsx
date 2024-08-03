@@ -3,14 +3,12 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import { services_routes } from "../../../lib/constants";
 import { Link } from "@tanstack/react-router";
 import { Home } from "lucide-react";
-import { CreatePatientVitalsForm } from "../../../forms/config/Vitals";
 
 export const Route = createLazyFileRoute("/_layout/dashboard/")({
   component: () => (
     <>
       <div className="flex justify-between items-center">
         <Heading mb={"3"}>Dashboard</Heading>
-        <CreatePatientVitalsForm />
       </div>
 
       <div className="grid md:grid-cols-2 gap-4 lg:grid-cols-4 mt-10">

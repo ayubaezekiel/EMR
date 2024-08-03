@@ -1,9 +1,8 @@
 import { Checkbox } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
-import {
-  DeleteCashpointForm,
-  UpdateCashpointForm,
-} from "../../../forms/config/CashpointForm";
+import { DeleteActionForm } from "../../../actions/DeleteAction";
+import { deleteCashpointAction } from "../../../actions/config/cashpoint";
+import { UpdateCashpointForm } from "../../../forms/config/CashpointForm";
 
 export const cashpoint_column: ColumnDef<CashpointType["Row"]>[] = [
   {
@@ -43,7 +42,14 @@ export const cashpoint_column: ColumnDef<CashpointType["Row"]>[] = [
       return (
         <div className="flex gap-4">
           <UpdateCashpointForm {...cash} />
-          <DeleteCashpointForm id={cash.id} />
+          <DeleteActionForm
+            id={cash.id}
+            inValidate="cashpoint"
+            title="Delete Cashpoint"
+            warning="Are you sure? this cashpoint will be parmanently deleted from the
+          database."
+            actionFn={async () => await deleteCashpointAction({ id: cash.id })}
+          />
         </div>
       );
     },

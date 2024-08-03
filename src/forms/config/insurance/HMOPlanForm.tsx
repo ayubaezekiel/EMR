@@ -9,7 +9,7 @@ import {
   TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useLoaderData, useNavigate } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
@@ -18,13 +18,28 @@ import {
   createHMOPlanAction,
   updateHMOPlanAction,
 } from "../../../actions/config/insurance";
+import {
+  branchQueryOptions,
+  hmoCompaniesQueryOptions,
+  hmoGroupsQueryOptions,
+} from "../../../actions/queries";
 import { FieldInfo } from "../../../components/FieldInfo";
+import PendingComponent from "../../../components/PendingComponent";
 
 export function CreateHMOPlanForm() {
   const [open, onOpenChange] = useState(false);
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const { data } = useLoaderData({ from: "/_layout/dashboard/config/" });
+  const { data: hmo_companies, isPending: isHMOCompaniesPending } = useQuery(
+    hmoCompaniesQueryOptions
+  );
+
+  const { data: branch, isPending: isBranchPending } =
+    useQuery(branchQueryOptions);
+
+  const { data: hmo_groups, isPending: isHMOGroupPending } = useQuery(
+    hmoGroupsQueryOptions
+  );
 
   const form = useForm({
     defaultValues: {
@@ -45,9 +60,11 @@ export function CreateHMOPlanForm() {
       await createHMOPlanAction(value);
       form.reset();
       onOpenChange(false);
-      navigate({ to: "/dashboard/config" });
+      queryClient.invalidateQueries({ queryKey: ["hmoPlan"] });
     },
   });
+  if (isHMOCompaniesPending || isBranchPending || isHMOGroupPending)
+    return <PendingComponent />;
 
   return (
     <div>
@@ -77,7 +94,7 @@ export function CreateHMOPlanForm() {
                   .min(3, { message: "field must be atleast 3 characters" }),
               }}
               children={(field) => (
-                <label htmlFor={field.name}>
+                <label htmlFor={field.name} className="flex flex-col">
                   <Text size={"3"}>Name*</Text>
                   <TextField.Root
                     name={field.name}
@@ -105,7 +122,7 @@ export function CreateHMOPlanForm() {
                   >
                     <Select.Trigger placeholder="select a branch..." />
                     <Select.Content position="popper">
-                      {data.branch?.map((b) => (
+                      {branch?.branch_data?.map((b) => (
                         <Select.Item key={b.id} value={b.id}>
                           {b.name}
                         </Select.Item>
@@ -131,7 +148,7 @@ export function CreateHMOPlanForm() {
                   >
                     <Select.Trigger placeholder="select a company..." />
                     <Select.Content position="popper">
-                      {data.hmo_companies?.map((c) => (
+                      {hmo_companies?.hmo_companies_data?.map((c) => (
                         <Select.Item key={c.id} value={c.id}>
                           {c.name}
                         </Select.Item>
@@ -157,7 +174,7 @@ export function CreateHMOPlanForm() {
                   >
                     <Select.Trigger placeholder="select a group..." />
                     <Select.Content position="popper">
-                      {data.hmo_groups?.map((g) => (
+                      {hmo_groups?.hmo_group_data?.map((g) => (
                         <Select.Item key={g.id} value={g.id}>
                           {g.name}
                         </Select.Item>
@@ -339,9 +356,19 @@ export function UpdateHMOPlanForm({
   ...values
 }: DB["hmo_plans"]["Update"]) {
   const [open, onOpenChange] = useState(false);
-  const navigate = useNavigate();
 
-  const { data } = useLoaderData({ from: "/_layout/dashboard/config/" });
+  const queryClient = useQueryClient();
+
+  const { data: hmo_companies, isPending: isHMOCompaniesPending } = useQuery(
+    hmoCompaniesQueryOptions
+  );
+
+  const { data: branch, isPending: isBranchPending } =
+    useQuery(branchQueryOptions);
+
+  const { data: hmo_groups, isPending: isHMOGroupPending } = useQuery(
+    hmoGroupsQueryOptions
+  );
 
   const form = useForm({
     defaultValues: {
@@ -353,10 +380,12 @@ export function UpdateHMOPlanForm({
       await updateHMOPlanAction(value);
       form.reset();
       onOpenChange(false);
-
-      navigate({ to: "/dashboard/config" });
+      queryClient.invalidateQueries({ queryKey: ["hmoPlan"] });
     },
   });
+
+  if (isHMOCompaniesPending || isBranchPending || isHMOGroupPending)
+    return <PendingComponent />;
 
   return (
     <div>
@@ -387,7 +416,7 @@ export function UpdateHMOPlanForm({
                   .min(3, { message: "field must be atleast 3 characters" }),
               }}
               children={(field) => (
-                <label htmlFor={field.name}>
+                <label htmlFor={field.name} className="flex flex-col">
                   <Text size={"3"}>Name*</Text>
                   <TextField.Root
                     name={field.name}
@@ -415,7 +444,7 @@ export function UpdateHMOPlanForm({
                   >
                     <Select.Trigger placeholder="select a branch..." />
                     <Select.Content position="popper">
-                      {data.branch?.map((b) => (
+                      {branch?.branch_data?.map((b) => (
                         <Select.Item key={b.id} value={b.id}>
                           {b.name}
                         </Select.Item>
@@ -441,7 +470,7 @@ export function UpdateHMOPlanForm({
                   >
                     <Select.Trigger placeholder="select a company..." />
                     <Select.Content position="popper">
-                      {data.hmo_companies?.map((c) => (
+                      {hmo_companies?.hmo_companies_data?.map((c) => (
                         <Select.Item key={c.id} value={c.id}>
                           {c.name}
                         </Select.Item>
@@ -467,7 +496,7 @@ export function UpdateHMOPlanForm({
                   >
                     <Select.Trigger placeholder="select a group..." />
                     <Select.Content position="popper">
-                      {data.hmo_groups?.map((g) => (
+                      {hmo_groups?.hmo_group_data?.map((g) => (
                         <Select.Item key={g.id} value={g.id}>
                           {g.name}
                         </Select.Item>

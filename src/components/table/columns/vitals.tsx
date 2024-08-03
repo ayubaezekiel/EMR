@@ -1,4 +1,4 @@
-import { Checkbox } from "@radix-ui/themes";
+import { Button, Checkbox } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
 import { DeleteActionForm } from "../../../actions/DeleteAction";
 import { deleteVitalsAction } from "../../../actions/config/vitals";
@@ -6,6 +6,7 @@ import {
   UpdatePatientVitalsForm,
   UpdateVitalsForm,
 } from "../../../forms/config/Vitals";
+import { ArrowUpDown } from "lucide-react";
 
 export const vitals_column: ColumnDef<DB["vitals"]["Row"]>[] = [
   {
@@ -85,6 +86,23 @@ export const patient_vitals_column: ColumnDef<DB["patient_vitals"]["Row"]>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
+  },
+  {
+    accessorKey: "date_created",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Date
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div>{new Date(row.getValue("date_created")).toDateString()}</div>
+    ),
   },
   {
     accessorKey: "name",

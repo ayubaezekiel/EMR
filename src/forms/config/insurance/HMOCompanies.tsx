@@ -8,7 +8,7 @@ import {
   TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
@@ -21,7 +21,7 @@ import { FieldInfo } from "../../../components/FieldInfo";
 
 export function CreateHMOCompaniesForm() {
   const [open, onOpenChange] = useState(false);
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const form = useForm({
     defaultValues: {
@@ -35,7 +35,7 @@ export function CreateHMOCompaniesForm() {
       await createHMOCompaniesAction(value);
       form.reset();
       onOpenChange(false);
-      navigate({ to: "/dashboard/config" });
+      queryClient.invalidateQueries({ queryKey: ["hmoCompanies"] });
     },
   });
 
@@ -167,7 +167,7 @@ export function UpdateHMOCompaniesForm({
   ...values
 }: DB["hmo_companies"]["Update"]) {
   const [open, onOpenChange] = useState(false);
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const form = useForm({
     defaultValues: {
@@ -179,8 +179,7 @@ export function UpdateHMOCompaniesForm({
       await updateHMOCompaniesAction(value);
       form.reset();
       onOpenChange(false);
-
-      navigate({ to: "/dashboard/config" });
+      queryClient.invalidateQueries({ queryKey: ["hmoCompanies"] });
     },
   });
 

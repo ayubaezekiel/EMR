@@ -280,6 +280,45 @@ export type Database = {
         }
         Relationships: []
       }
+      history_taking: {
+        Row: {
+          created_at: string
+          id: string
+          note: string
+          patients_id: string
+          taken_by: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note: string
+          patients_id: string
+          taken_by: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string
+          patients_id?: string
+          taken_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "history_taking_patients_id_fkey"
+            columns: ["patients_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "history_taking_taken_by_fkey1"
+            columns: ["taken_by"]
+            isOneToOne: false
+            referencedRelation: "profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hmo_companies: {
         Row: {
           address: string
@@ -404,25 +443,109 @@ export type Database = {
         }
         Relationships: []
       }
+      patient_diagnosis: {
+        Row: {
+          created_at: string
+          id: string
+          note: string
+          patients_id: string
+          taken_by: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note: string
+          patients_id: string
+          taken_by: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string
+          patients_id?: string
+          taken_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_diagnosis_patients_id_fkey"
+            columns: ["patients_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_diagnosis_taken_by_fkey1"
+            columns: ["taken_by"]
+            isOneToOne: false
+            referencedRelation: "profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patient_examination: {
+        Row: {
+          created_at: string
+          id: string
+          note: string
+          patients_id: string
+          taken_by: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note: string
+          patients_id: string
+          taken_by: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string
+          patients_id?: string
+          taken_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_examination_patients_id_fkey"
+            columns: ["patients_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_examination_taken_by_fkey1"
+            columns: ["taken_by"]
+            isOneToOne: false
+            referencedRelation: "profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patient_vitals: {
         Row: {
+          date_created: string
           id: string
           name: string
           patient: string | null
+          taken_by: string | null
           unit: string | null
           value: string | null
         }
         Insert: {
+          date_created?: string
           id?: string
           name: string
           patient?: string | null
+          taken_by?: string | null
           unit?: string | null
           value?: string | null
         }
         Update: {
+          date_created?: string
           id?: string
           name?: string
           patient?: string | null
+          taken_by?: string | null
           unit?: string | null
           value?: string | null
         }
@@ -432,6 +555,13 @@ export type Database = {
             columns: ["patient"]
             isOneToOne: false
             referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_vitals_taken_by_fkey"
+            columns: ["taken_by"]
+            isOneToOne: false
+            referencedRelation: "profile"
             referencedColumns: ["id"]
           },
         ]
@@ -587,6 +717,154 @@ export type Database = {
           },
         ]
       }
+      permissions: {
+        Row: {
+          has_access_to_accounting: boolean | null
+          has_access_to_admin_accounting: boolean | null
+          has_access_to_billing: boolean | null
+          has_access_to_config: boolean | null
+          has_access_to_dialysis_management: boolean | null
+          has_access_to_dialysis_records: boolean | null
+          has_access_to_doctor_priviledges: boolean | null
+          has_access_to_documents: boolean | null
+          has_access_to_front_desk: boolean | null
+          has_access_to_lab: boolean | null
+          has_access_to_nursing: boolean | null
+          has_access_to_pharmacy: boolean | null
+          has_access_to_pharmacy_admin: boolean | null
+          has_access_to_radiology: boolean | null
+          has_access_to_radiology_admin: boolean | null
+          has_access_to_reports: boolean | null
+          has_access_to_users: boolean | null
+          id: string
+          is_super_user: boolean | null
+          user_id: string | null
+        }
+        Insert: {
+          has_access_to_accounting?: boolean | null
+          has_access_to_admin_accounting?: boolean | null
+          has_access_to_billing?: boolean | null
+          has_access_to_config?: boolean | null
+          has_access_to_dialysis_management?: boolean | null
+          has_access_to_dialysis_records?: boolean | null
+          has_access_to_doctor_priviledges?: boolean | null
+          has_access_to_documents?: boolean | null
+          has_access_to_front_desk?: boolean | null
+          has_access_to_lab?: boolean | null
+          has_access_to_nursing?: boolean | null
+          has_access_to_pharmacy?: boolean | null
+          has_access_to_pharmacy_admin?: boolean | null
+          has_access_to_radiology?: boolean | null
+          has_access_to_radiology_admin?: boolean | null
+          has_access_to_reports?: boolean | null
+          has_access_to_users?: boolean | null
+          id?: string
+          is_super_user?: boolean | null
+          user_id?: string | null
+        }
+        Update: {
+          has_access_to_accounting?: boolean | null
+          has_access_to_admin_accounting?: boolean | null
+          has_access_to_billing?: boolean | null
+          has_access_to_config?: boolean | null
+          has_access_to_dialysis_management?: boolean | null
+          has_access_to_dialysis_records?: boolean | null
+          has_access_to_doctor_priviledges?: boolean | null
+          has_access_to_documents?: boolean | null
+          has_access_to_front_desk?: boolean | null
+          has_access_to_lab?: boolean | null
+          has_access_to_nursing?: boolean | null
+          has_access_to_pharmacy?: boolean | null
+          has_access_to_pharmacy_admin?: boolean | null
+          has_access_to_radiology?: boolean | null
+          has_access_to_radiology_admin?: boolean | null
+          has_access_to_reports?: boolean | null
+          has_access_to_users?: boolean | null
+          id?: string
+          is_super_user?: boolean | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "permissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profile: {
+        Row: {
+          branch_id: string | null
+          created_at: string
+          department_id: string | null
+          email: string
+          first_name: string
+          gender: string
+          id: string
+          job_position_id: string | null
+          last_name: string
+          middle_name: string | null
+          user_id: string
+        }
+        Insert: {
+          branch_id?: string | null
+          created_at?: string
+          department_id?: string | null
+          email: string
+          first_name: string
+          gender: string
+          id?: string
+          job_position_id?: string | null
+          last_name: string
+          middle_name?: string | null
+          user_id: string
+        }
+        Update: {
+          branch_id?: string | null
+          created_at?: string
+          department_id?: string | null
+          email?: string
+          first_name?: string
+          gender?: string
+          id?: string
+          job_position_id?: string | null
+          last_name?: string
+          middle_name?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_department_id_fkey"
+            columns: ["department_id"]
+            isOneToOne: false
+            referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_job_position_id_fkey"
+            columns: ["job_position_id"]
+            isOneToOne: false
+            referencedRelation: "job_positions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_types: {
         Row: {
           created_at: string | null
@@ -620,6 +898,45 @@ export type Database = {
         }
         Relationships: []
       }
+      treatment_plan: {
+        Row: {
+          created_at: string
+          id: string
+          note: string
+          patients_id: string
+          taken_by: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          note: string
+          patients_id: string
+          taken_by: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          note?: string
+          patients_id?: string
+          taken_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treatment_plan_patients_id_fkey"
+            columns: ["patients_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treatment_plan_taken_by_fkey1"
+            columns: ["taken_by"]
+            isOneToOne: false
+            referencedRelation: "profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vitals: {
         Row: {
           id: string
@@ -643,47 +960,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      search_appointments:
-        | {
-            Args: Record<PropertyKey, never>
-            Returns: {
-              appointments_type_id: string
-              clinics_id: string
-              created_at: string | null
-              created_by: string
-              duration: unknown | null
-              follow_up: boolean | null
-              id: string
-              is_all_day: boolean | null
-              is_checkedin: boolean | null
-              is_completed: boolean | null
-              is_missed: boolean | null
-              is_waiting: boolean | null
-              patients_id: string
-              specialties_id: string
-            }[]
-          }
-        | {
-            Args: {
-              date_range: unknown
-            }
-            Returns: {
-              appointments_type_id: string
-              clinics_id: string
-              created_at: string | null
-              created_by: string
-              duration: unknown | null
-              follow_up: boolean | null
-              id: string
-              is_all_day: boolean | null
-              is_checkedin: boolean | null
-              is_completed: boolean | null
-              is_missed: boolean | null
-              is_waiting: boolean | null
-              patients_id: string
-              specialties_id: string
-            }[]
-          }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never

@@ -1,19 +1,21 @@
 import { Flex, Heading } from "@radix-ui/themes";
-import { DataTable } from "../../table/DataTable";
+import { useQuery } from "@tanstack/react-query";
+import { hmoPlansQueryOptions } from "../../../actions/queries";
 import { CreateHMOPlanForm } from "../../../forms/config/insurance/HMOPlanForm";
 import {
   hmo_plans_column,
   NewHMOPlanType,
 } from "../../table/columns/insurance/HMO_plans";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { hmoPlansQueryOptions } from "../../../actions/queries";
+import { DataTable } from "../../table/DataTable";
+import PendingComponent from "../../PendingComponent";
 
-export default function HMOPlans() {
-  // const { data } = useLoaderData({ from: "/_layout/dashboard/config/" });
-  const { data } = useSuspenseQuery(hmoPlansQueryOptions);
+export function HMOPlans() {
+  const { data, isPending } = useQuery(hmoPlansQueryOptions);
+
+  if (isPending) return <PendingComponent />;
 
   const all_hmo_pans: NewHMOPlanType[] =
-    data.hmo_plans_data?.map((h) => ({
+    data?.hmo_plans_data?.map((h) => ({
       ...h,
       hmo_companies: {
         name: h.hmo_companies?.name,

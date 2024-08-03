@@ -1,98 +1,117 @@
 import { queryOptions } from "@tanstack/react-query"
-import { getAppointments, getAppointmentTypes, getBranch, getCashPoints, getClinics, getConsultationSpecialties, getConsultationTemplates, getDepartments, getHMOCompanies, getHMOGroups, getHMOPlans, getJobPositions, getPatients, getPatientVitals, getPaymentMethods, getServiceTypes, getSpecialties, getVitals } from "./actions"
+import { getAppointments, getAppointmentTypes, getBranch, getCashPoints, getClinics, getConsultationSpecialties, getConsultationTemplates, getDepartments, getDiagnosis, getExamination, getHistoryTaking, getHMOCompanies, getHMOGroups, getHMOPlans, getJobPositions, getPatients, getPatientVitals, getPaymentMethods, getServiceTypes, getSpecialties, getTreatmentPlan, getVitals } from "./actions"
 
 export const vitalsQueryOptions = queryOptions({
     queryKey: ['vitals'],
-    queryFn: async () => await getVitals(),
+    queryFn: () => getVitals(),
 })
 
 export const patientVitalsQueryOptions = queryOptions({
     queryKey: ['patientVitals'],
-    queryFn: async () => await getPatientVitals(),
+    queryFn: () => getPatientVitals(),
 })
 
 
 export const patientsQueryOptions = queryOptions({
     queryKey: ['patients'],
-    queryFn: async () => await getPatients(),
+    queryFn: () => getPatients(),
 })
 
 
 
 export const specialtiesQueryOptions = queryOptions({
     queryKey: ['specialties'],
-    queryFn: async () => await getSpecialties(),
+    queryFn: () => getSpecialties(),
 })
 
 export const consultationSpecialtiesQueryOptions = queryOptions({
     queryKey: ['consultationSpecialties'],
-    queryFn: async () => await getConsultationSpecialties(),
+    queryFn: () => getConsultationSpecialties(),
 })
 
 export const consultationTemplatesQueryOptions = queryOptions({
     queryKey: ['consultationTemplates'],
-    queryFn: async () => await getConsultationTemplates(),
+    queryFn: () => getConsultationTemplates(),
 })
 
 export const clinicsQueryOptions = queryOptions({
     queryKey: ['clinics'],
-    queryFn: async () => await getClinics(),
+    queryFn: () => getClinics(),
 })
 
 export const appointmentsQueryOptions = queryOptions({
     queryKey: ['appointments'],
-    queryFn: async () => await getAppointments(),
+    queryFn: () => getAppointments(),
 })
 
 export const appointmentsTypesQueryOptions = queryOptions({
     queryKey: ['appointmentsTypes'],
-    queryFn: async () => await getAppointmentTypes(),
+    queryFn: () => getAppointmentTypes(),
 })
 
 
 export const branchQueryOptions = queryOptions({
     queryKey: ['branch'],
-    queryFn: async () => await getBranch(),
+    queryFn: () => getBranch(),
 })
 
 export const jobPositionsQueryOptions = queryOptions({
     queryKey: ['jobPositions'],
-    queryFn: async () => await getJobPositions(),
+    queryFn: () => getJobPositions(),
 })
 
 export const hmoPlansQueryOptions = queryOptions({
     queryKey: ['hmoPlan'],
-    queryFn: async () => await getHMOPlans(),
+    queryFn: () => getHMOPlans(),
 })
 
 export const hmoGroupsQueryOptions = queryOptions({
     queryKey: ['hmoGroups'],
-    queryFn: async () => await getHMOGroups(),
+    queryFn: () => getHMOGroups(),
 })
 
 
 export const hmoCompaniesQueryOptions = queryOptions({
     queryKey: ['hmoCompanies'],
-    queryFn: async () => await getHMOCompanies(),
+    queryFn: () => getHMOCompanies(),
 })
 
+export const historyTakingQueryOptions = queryOptions({
+    queryKey: ['historyTaking'],
+    queryFn: () => getHistoryTaking(),
+})
+
+export const examinationQueryOptions = queryOptions({
+    queryKey: ['examination'],
+    queryFn: () => getExamination(),
+})
+
+export const diagnosisQueryOptions = queryOptions({
+    queryKey: ['diagnosis'],
+    queryFn: () => getDiagnosis(),
+})
+
+export const treatmentPlanQueryOptions = queryOptions({
+    queryKey: ['treatmentPlan'],
+    queryFn: () => getTreatmentPlan(),
+})
 
 export const paymentMethodsQueryOptions = queryOptions({
     queryKey: ['paymentMethod'],
-    queryFn: async () => await getPaymentMethods(),
+    queryFn: () => getPaymentMethods(),
 })
 
 export const cashpointsQueryOptions = queryOptions({
     queryKey: ['cashpoints'],
-    queryFn: async () => await getCashPoints(),
+    queryFn: () => getCashPoints(),
 })
 
 export const serviceTypesQueryOptions = queryOptions({
     queryKey: ['serviceTypes'],
-    queryFn: async () => await getServiceTypes(),
+    queryFn: () => getServiceTypes(),
 })
 
 export const departmentsQueryOptions = queryOptions({
     queryKey: ['departments'],
-    queryFn: async () => await getDepartments(),
+    queryFn: () => getDepartments(),
 })

@@ -1,5 +1,7 @@
 import { toast } from "sonner";
 import supabase from "../supabase/client";
+import supabase_admin from "../supabase/supabase-admin";
+import { checkAuth } from "../lib/utils";
 
 
 
@@ -33,6 +35,16 @@ export const getHMOCompanies = async () => {
     return { hmo_companies_data }
 }
 
+export const getHistoryTaking = async () => {
+    const { data: history_taking_data, error: history_taking_err } = await supabase
+        .from("history_taking")
+        .select("*");
+
+    if (history_taking_err) {
+        toast.error(history_taking_err.message)
+    }
+    return { history_taking_data }
+}
 
 export const getPaymentMethods = async () => {
     const { data: payment_method_data, error: payment_method_err } =
@@ -119,25 +131,59 @@ export const getDepartments = async () => {
 
 
 
+export const getTreatmentPlan = async () => {
+    const { data: plan_data, error: plan_err } = await supabase
+        .from("treatment_plan")
+        .select("*");
 
+    if (plan_err) {
+        toast.error(plan_err.message)
+    }
+    return { plan_data }
+}
 
+export const getDiagnosis = async () => {
+    const { data: diagnosis_data, error: diagnosis_err } = await supabase
+        .from("patient_diagnosis")
+        .select("*");
 
+    if (diagnosis_err) {
+        toast.error(diagnosis_err.message)
+    }
+    return { diagnosis_data }
+}
 
+export const getExamination = async () => {
+    const { data: examination_data, error: examination_err } = await supabase
+        .from("patient_examination")
+        .select("*");
 
+    if (examination_err) {
+        toast.error(examination_err.message)
+    }
+    return { examination_data }
+}
 
+export const getPerms = async () => {
+    const auth = await checkAuth();
+    const { data, error } = await supabase
+        .from("permissions")
+        .select("*")
+        .eq("user_id", `${auth?.id}`)
+        .single();
+    if (error) {
+        toast.error(error.message);
+    }
+    return data
+}
+export const getUsers = async () => {
+    const { data: user_data, error: user_error } = await supabase_admin.auth.admin.listUsers()
 
-
-
-
-
-
-
-
-
-
-
-
-
+    if (user_error) {
+        toast.error(user_error.message)
+    }
+    return { user_data }
+}
 
 export const getPatients = async () => {
     const { data: patient_data, error: patient_error } = await supabase
@@ -147,8 +193,6 @@ export const getPatients = async () => {
     if (patient_error) {
         toast.error(patient_error.message)
     }
-
-
     return { patient_data }
 }
 export const getPatientById = async (id: string) => {
@@ -161,9 +205,6 @@ export const getPatientById = async (id: string) => {
     }
     return { patient_data }
 }
-
-
-
 
 export const getVitals = async () => {
     const { data: vitals_data, error: vitals_error } = await supabase
@@ -179,7 +220,7 @@ export const getVitals = async () => {
 }
 
 export const getPatientVitals = async () => {
-    const { data: patient_vitals_data, error: patient_vitals_err } = await supabase.from("specialties").select("*");
+    const { data: patient_vitals_data, error: patient_vitals_err } = await supabase.from("patient_vitals").select("*");
 
     if (patient_vitals_err) {
         toast.error(patient_vitals_err.message)
@@ -187,9 +228,14 @@ export const getPatientVitals = async () => {
     return { patient_vitals_data }
 }
 
+export const getPatientVitalsById = async (patientId: string) => {
+    const { data: patient_vitals_data, error: patient_vitals_err } = await supabase.from("patient_vitals").select("*").eq('patient', patientId);
 
-
-
+    if (patient_vitals_err) {
+        toast.error(patient_vitals_err.message)
+    }
+    return { patient_vitals_data }
+}
 
 export const getSpecialties = async () => {
     const { data: specialties_data, error: specialties_err } = await supabase.from("specialties").select("*");

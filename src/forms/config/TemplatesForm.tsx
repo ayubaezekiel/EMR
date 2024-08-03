@@ -18,6 +18,13 @@ import {
 } from "../../actions/config/templates";
 import { FieldInfo } from "../../components/FieldInfo";
 import { RichEditor } from "../../components/textEditor/RichTextEditor";
+import { useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import Superscript from "@tiptap/extension-superscript";
+import Subscript from "@tiptap/extension-subscript";
+import Highlight from "@tiptap/extension-highlight";
+import TextAlign from "@tiptap/extension-text-align";
 
 export function CreateConsultationTemplateForm() {
   const [open, onOpenChange] = useState(false);
@@ -36,6 +43,22 @@ export function CreateConsultationTemplateForm() {
       onOpenChange(false);
       queryClient.invalidateQueries({ queryKey: ["consultationTemplates"] });
     },
+  });
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      Superscript,
+      Subscript,
+      Highlight,
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
+    ],
+    onUpdate: ({ editor }) => {
+      setTemplate(editor.getHTML());
+    },
+
+    content: tempalte,
   });
 
   return (
@@ -90,13 +113,7 @@ export function CreateConsultationTemplateForm() {
               children={(field) => (
                 <label htmlFor={field.name} className="flex flex-col">
                   <Text size={"3"}>Content*</Text>
-                  <RichEditor
-                    id={field.name}
-                    content={field.state.value}
-                    onValueChange={({ value }) => {
-                      field.handleChange(value), setTemplate(value);
-                    }}
-                  />
+                  <RichEditor editor={editor} />
                   <FieldInfo field={field} />
                 </label>
               )}
@@ -139,6 +156,22 @@ export function UpdateConsultationTemplateForm({
       onOpenChange(false);
       queryClient.invalidateQueries({ queryKey: ["consultationTemplates"] });
     },
+  });
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      Superscript,
+      Subscript,
+      Highlight,
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
+    ],
+    onUpdate: ({ editor }) => {
+      setTemplate(editor.getHTML());
+    },
+
+    content: tempalte,
   });
 
   return (
@@ -193,13 +226,7 @@ export function UpdateConsultationTemplateForm({
               children={(field) => (
                 <label htmlFor={field.name} className="flex flex-col">
                   <Text size={"3"}>Content*</Text>
-                  <RichEditor
-                    id={field.name}
-                    content={field.state.value}
-                    onValueChange={({ value }) => {
-                      field.handleChange(value), setTemplate(value);
-                    }}
-                  />
+                  <RichEditor editor={editor} />
                   <FieldInfo field={field} />
                 </label>
               )}
