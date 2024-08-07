@@ -18,10 +18,12 @@ import { Route as IndexImport } from './routes/index'
 import { Route as LayoutDashboardBillingImport } from './routes/_layout/dashboard/billing'
 import { Route as LayoutDashboardUsersIndexImport } from './routes/_layout/dashboard/users/index'
 import { Route as LayoutDashboardPatientsIndexImport } from './routes/_layout/dashboard/patients/index'
+import { Route as LayoutDashboardLabIndexImport } from './routes/_layout/dashboard/lab/index'
 import { Route as LayoutDashboardConfigIndexImport } from './routes/_layout/dashboard/config/index'
 import { Route as LayoutDashboardAppointmentsIndexImport } from './routes/_layout/dashboard/appointments/index'
 import { Route as LayoutDashboardUsersUserIdImport } from './routes/_layout/dashboard/users/$userId'
 import { Route as LayoutDashboardPatientsPatientIdImport } from './routes/_layout/dashboard/patients/$patientId'
+import { Route as LayoutDashboardConfigLabImport } from './routes/_layout/dashboard/config/lab'
 import { Route as LayoutDashboardConfigConsultationImport } from './routes/_layout/dashboard/config/consultation'
 import { Route as LayoutDashboardAppointmentsAppointmentIdImport } from './routes/_layout/dashboard/appointments/$appointmentId'
 
@@ -64,6 +66,11 @@ const LayoutDashboardPatientsIndexRoute =
     getParentRoute: () => LayoutRoute,
   } as any)
 
+const LayoutDashboardLabIndexRoute = LayoutDashboardLabIndexImport.update({
+  path: '/dashboard/lab/',
+  getParentRoute: () => LayoutRoute,
+} as any)
+
 const LayoutDashboardConfigIndexRoute = LayoutDashboardConfigIndexImport.update(
   {
     path: '/dashboard/config/',
@@ -89,6 +96,11 @@ const LayoutDashboardPatientsPatientIdRoute =
     path: '/dashboard/patients/$patientId',
     getParentRoute: () => LayoutRoute,
   } as any)
+
+const LayoutDashboardConfigLabRoute = LayoutDashboardConfigLabImport.update({
+  path: '/dashboard/config/lab',
+  getParentRoute: () => LayoutRoute,
+} as any)
 
 const LayoutDashboardConfigConsultationRoute =
   LayoutDashboardConfigConsultationImport.update({
@@ -148,6 +160,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutDashboardConfigConsultationImport
       parentRoute: typeof LayoutImport
     }
+    '/_layout/dashboard/config/lab': {
+      id: '/_layout/dashboard/config/lab'
+      path: '/dashboard/config/lab'
+      fullPath: '/dashboard/config/lab'
+      preLoaderRoute: typeof LayoutDashboardConfigLabImport
+      parentRoute: typeof LayoutImport
+    }
     '/_layout/dashboard/patients/$patientId': {
       id: '/_layout/dashboard/patients/$patientId'
       path: '/dashboard/patients/$patientId'
@@ -176,6 +195,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutDashboardConfigIndexImport
       parentRoute: typeof LayoutImport
     }
+    '/_layout/dashboard/lab/': {
+      id: '/_layout/dashboard/lab/'
+      path: '/dashboard/lab'
+      fullPath: '/dashboard/lab'
+      preLoaderRoute: typeof LayoutDashboardLabIndexImport
+      parentRoute: typeof LayoutImport
+    }
     '/_layout/dashboard/patients/': {
       id: '/_layout/dashboard/patients/'
       path: '/dashboard/patients'
@@ -202,10 +228,12 @@ export const routeTree = rootRoute.addChildren({
     LayoutDashboardIndexLazyRoute,
     LayoutDashboardAppointmentsAppointmentIdRoute,
     LayoutDashboardConfigConsultationRoute,
+    LayoutDashboardConfigLabRoute,
     LayoutDashboardPatientsPatientIdRoute,
     LayoutDashboardUsersUserIdRoute,
     LayoutDashboardAppointmentsIndexRoute,
     LayoutDashboardConfigIndexRoute,
+    LayoutDashboardLabIndexRoute,
     LayoutDashboardPatientsIndexRoute,
     LayoutDashboardUsersIndexRoute,
   }),
@@ -233,10 +261,12 @@ export const routeTree = rootRoute.addChildren({
         "/_layout/dashboard/",
         "/_layout/dashboard/appointments/$appointmentId",
         "/_layout/dashboard/config/consultation",
+        "/_layout/dashboard/config/lab",
         "/_layout/dashboard/patients/$patientId",
         "/_layout/dashboard/users/$userId",
         "/_layout/dashboard/appointments/",
         "/_layout/dashboard/config/",
+        "/_layout/dashboard/lab/",
         "/_layout/dashboard/patients/",
         "/_layout/dashboard/users/"
       ]
@@ -257,6 +287,10 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_layout/dashboard/config/consultation.tsx",
       "parent": "/_layout"
     },
+    "/_layout/dashboard/config/lab": {
+      "filePath": "_layout/dashboard/config/lab.tsx",
+      "parent": "/_layout"
+    },
     "/_layout/dashboard/patients/$patientId": {
       "filePath": "_layout/dashboard/patients/$patientId.tsx",
       "parent": "/_layout"
@@ -271,6 +305,10 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_layout/dashboard/config/": {
       "filePath": "_layout/dashboard/config/index.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/dashboard/lab/": {
+      "filePath": "_layout/dashboard/lab/index.tsx",
       "parent": "/_layout"
     },
     "/_layout/dashboard/patients/": {

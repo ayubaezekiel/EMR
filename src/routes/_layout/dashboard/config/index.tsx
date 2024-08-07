@@ -9,96 +9,26 @@ import {
   Tabs,
 } from "@radix-ui/themes";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  appointmentsTypesQueryOptions,
-  branchQueryOptions,
-  cashpointsQueryOptions,
-  clinicsQueryOptions,
-  departmentsQueryOptions,
-  hmoCompaniesQueryOptions,
-  hmoGroupsQueryOptions,
-  hmoPlansQueryOptions,
-  jobPositionsQueryOptions,
-  paymentMethodsQueryOptions,
-  serviceTypesQueryOptions,
-  specialtiesQueryOptions,
-} from "../../../../actions/queries";
 import { AppointmentType } from "../../../../components/config/AppointmentTypes";
 import { Branch } from "../../../../components/config/Branch";
 import { Cashpoint } from "../../../../components/config/Cashpoint";
 import { Clinics } from "../../../../components/config/Clinics";
 import { Departments } from "../../../../components/config/Departments";
-import HMOCompanies from "../../../../components/config/insurance/HMOCompanies";
+import { HMOCompanies } from "../../../../components/config/insurance/HMOCompanies";
 import { HMOGroups } from "../../../../components/config/insurance/HMOGroups";
+import { HMOPlans } from "../../../../components/config/insurance/HMOPlans";
 import { JobPostion } from "../../../../components/config/JobPosition";
 import { PaymentMethod } from "../../../../components/config/PaymentMethod";
 import { ServiceTypes } from "../../../../components/config/ServiceTypes";
 import { Specialties } from "../../../../components/config/Specialties";
 import { config_services_routes } from "../../../../lib/constants";
-import { QueryClient } from "@tanstack/react-query";
-import { HMOPlans } from "../../../../components/config/insurance/HMOPlans";
-
-const loadData = async (queryClient: QueryClient) => {
-  const { hmo_plans_data } =
-    await queryClient.ensureQueryData(hmoPlansQueryOptions);
-  const { appointment_type_data } = await queryClient.ensureQueryData(
-    appointmentsTypesQueryOptions
-  );
-
-  const { clinics_data } =
-    await queryClient.ensureQueryData(clinicsQueryOptions);
-  const { specialties_data } = await queryClient.ensureQueryData(
-    specialtiesQueryOptions
-  );
-
-  const { cashpoint_data } = await queryClient.ensureQueryData(
-    cashpointsQueryOptions
-  );
-  const { job_positions_data } = await queryClient.ensureQueryData(
-    jobPositionsQueryOptions
-  );
-
-  const { branch_data } = await queryClient.ensureQueryData(branchQueryOptions);
-  const { service_type_data } = await queryClient.ensureQueryData(
-    serviceTypesQueryOptions
-  );
-
-  const { payment_method_data } = await queryClient.ensureQueryData(
-    paymentMethodsQueryOptions
-  );
-  const { department_data } = await queryClient.ensureQueryData(
-    departmentsQueryOptions
-  );
-
-  const { hmo_companies_data } = await queryClient.ensureQueryData(
-    hmoCompaniesQueryOptions
-  );
-  const { hmo_group_data } = await queryClient.ensureQueryData(
-    hmoGroupsQueryOptions
-  );
-  return {
-    appointment_type_data,
-    hmo_plans_data,
-    clinics_data,
-    specialties_data,
-    cashpoint_data,
-    job_positions_data,
-    branch_data,
-    service_type_data,
-    payment_method_data,
-    department_data,
-    hmo_companies_data,
-    hmo_group_data,
-  };
-};
 
 export const Route = createFileRoute("/_layout/dashboard/config/")({
-  loader: ({ context: { queryClient } }) => loadData(queryClient),
   component: () => {
     return (
       <>
         <Heading mb={"3"}>Configuration</Heading>
-        <Tabs.Root defaultValue="insurance" mt={"4"}>
+        <Tabs.Root defaultValue="services" mt={"4"}>
           <Tabs.List>
             <Tabs.Trigger value="settings">Host Settings</Tabs.Trigger>
             <Tabs.Trigger value="services">Services</Tabs.Trigger>

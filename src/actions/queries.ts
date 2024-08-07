@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query"
-import { getAppointments, getAppointmentTypes, getBranch, getCashPoints, getClinics, getConsultationSpecialties, getConsultationTemplates, getDepartments, getDiagnosis, getExamination, getHistoryTaking, getHMOCompanies, getHMOGroups, getHMOPlans, getJobPositions, getPatients, getPatientVitals, getPaymentMethods, getServiceTypes, getSpecialties, getTreatmentPlan, getVitals } from "./actions"
+import { getAppointments, getAppointmentTypes, getBranch, getCashPoints, getClinics, getConsultationSpecialties, getConsultationTemplates, getDepartments, getDiagnosis, getExamination, getHistoryTaking, getHMOCompanies, getHMOGroups, getHMOPlans, getJobPositions, getLabTest, getLabTestCategories, getLabTestParams, getLabTestTemplate, getPatients, getPatientVitals, getPaymentMethods, getRequest, getServiceTypes, getSpecialties, getTreatmentPlan, getVitals } from "./actions"
 
 export const vitalsQueryOptions = queryOptions({
     queryKey: ['vitals'],
@@ -17,7 +17,30 @@ export const patientsQueryOptions = queryOptions({
     queryFn: () => getPatients(),
 })
 
+export const labTestParamsQueryOptions = queryOptions({
+    queryKey: ['labTestParams'],
+    queryFn: () => getLabTestParams(),
+})
 
+export const requestQueryOptions = queryOptions({
+    queryKey: ['requests'],
+    queryFn: () => getRequest(),
+})
+
+export const labTestQueryOptions = queryOptions({
+    queryKey: ['labTest'],
+    queryFn: () => getLabTest(),
+})
+
+export const labTestCatQueryOptions = queryOptions({
+    queryKey: ['labTestCat'],
+    queryFn: () => getLabTestCategories(),
+})
+
+export const labTestTempQueryOptions = queryOptions({
+    queryKey: ['labTestTemp'],
+    queryFn: () => getLabTestTemplate(),
+})
 
 export const specialtiesQueryOptions = queryOptions({
     queryKey: ['specialties'],
@@ -28,6 +51,7 @@ export const consultationSpecialtiesQueryOptions = queryOptions({
     queryKey: ['consultationSpecialties'],
     queryFn: () => getConsultationSpecialties(),
 })
+
 
 export const consultationTemplatesQueryOptions = queryOptions({
     queryKey: ['consultationTemplates'],

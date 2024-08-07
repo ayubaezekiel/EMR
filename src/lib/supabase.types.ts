@@ -19,6 +19,7 @@ export type Database = {
           follow_up: boolean | null
           id: string
           is_all_day: boolean | null
+          is_approved: boolean | null
           is_checkedin: boolean | null
           is_completed: boolean | null
           is_missed: boolean | null
@@ -35,6 +36,7 @@ export type Database = {
           follow_up?: boolean | null
           id?: string
           is_all_day?: boolean | null
+          is_approved?: boolean | null
           is_checkedin?: boolean | null
           is_completed?: boolean | null
           is_missed?: boolean | null
@@ -51,6 +53,7 @@ export type Database = {
           follow_up?: boolean | null
           id?: string
           is_all_day?: boolean | null
+          is_approved?: boolean | null
           is_checkedin?: boolean | null
           is_completed?: boolean | null
           is_missed?: boolean | null
@@ -443,6 +446,119 @@ export type Database = {
         }
         Relationships: []
       }
+      lab_specimen: {
+        Row: {
+          id: string
+          name: string
+        }
+        Insert: {
+          id?: string
+          name: string
+        }
+        Update: {
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      lab_test_category: {
+        Row: {
+          id: string
+          name: string
+        }
+        Insert: {
+          id?: string
+          name: string
+        }
+        Update: {
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      lab_test_parameter: {
+        Row: {
+          data_type: string
+          id: string
+          name: string
+        }
+        Insert: {
+          data_type: string
+          id?: string
+          name: string
+        }
+        Update: {
+          data_type?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      lab_test_template: {
+        Row: {
+          id: string
+          name: string
+          parameter_id: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          parameter_id: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          parameter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_test_template_parameter_id_fkey"
+            columns: ["parameter_id"]
+            isOneToOne: false
+            referencedRelation: "lab_test_parameter"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lab_tests: {
+        Row: {
+          default_price: string | null
+          id: string
+          lab_test_category_id: string
+          name: string
+          template_id: string
+        }
+        Insert: {
+          default_price?: string | null
+          id?: string
+          lab_test_category_id: string
+          name: string
+          template_id: string
+        }
+        Update: {
+          default_price?: string | null
+          id?: string
+          lab_test_category_id?: string
+          name?: string
+          template_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_tests_lab_test_category_id_fkey"
+            columns: ["lab_test_category_id"]
+            isOneToOne: false
+            referencedRelation: "lab_test_category"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_tests_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "lab_test_template"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patient_diagnosis: {
         Row: {
           created_at: string
@@ -673,32 +789,60 @@ export type Database = {
       }
       payments: {
         Row: {
-          ammount: string
-          appointments_id: string
+          amount: string
+          appointment_id: string | null
+          approved_by: string | null
           cash_points_id: string
+          created_at: string | null
           id: string
+          is_appointment: boolean | null
+          is_request: boolean | null
+          patient_id: string
           payments_method_id: string
+          request_id: string | null
+          services: Json | null
         }
         Insert: {
-          ammount: string
-          appointments_id: string
+          amount: string
+          appointment_id?: string | null
+          approved_by?: string | null
           cash_points_id: string
+          created_at?: string | null
           id?: string
+          is_appointment?: boolean | null
+          is_request?: boolean | null
+          patient_id: string
           payments_method_id: string
+          request_id?: string | null
+          services?: Json | null
         }
         Update: {
-          ammount?: string
-          appointments_id?: string
+          amount?: string
+          appointment_id?: string | null
+          approved_by?: string | null
           cash_points_id?: string
+          created_at?: string | null
           id?: string
+          is_appointment?: boolean | null
+          is_request?: boolean | null
+          patient_id?: string
           payments_method_id?: string
+          request_id?: string | null
+          services?: Json | null
         }
         Relationships: [
           {
-            foreignKeyName: "payments_appointments_id_fkey"
-            columns: ["appointments_id"]
+            foreignKeyName: "payments_appointment_id_fkey"
+            columns: ["appointment_id"]
             isOneToOne: false
             referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
@@ -709,10 +853,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "payments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "payments_payments_method_id_fkey"
             columns: ["payments_method_id"]
             isOneToOne: false
             referencedRelation: "payment_methods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
             referencedColumns: ["id"]
           },
         ]
@@ -788,7 +946,7 @@ export type Database = {
           {
             foreignKeyName: "permissions_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -859,6 +1017,72 @@ export type Database = {
           {
             foreignKeyName: "profile_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      requests: {
+        Row: {
+          created_at: string
+          id: string
+          is_antenatal: boolean | null
+          is_approved: boolean | null
+          is_completed: boolean | null
+          is_consumable: boolean | null
+          is_lab: boolean | null
+          is_pharm: boolean | null
+          is_procedure: boolean | null
+          is_radiology: boolean | null
+          is_waiting: boolean | null
+          patients_id: string
+          services: Json | null
+          taken_by: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_antenatal?: boolean | null
+          is_approved?: boolean | null
+          is_completed?: boolean | null
+          is_consumable?: boolean | null
+          is_lab?: boolean | null
+          is_pharm?: boolean | null
+          is_procedure?: boolean | null
+          is_radiology?: boolean | null
+          is_waiting?: boolean | null
+          patients_id: string
+          services?: Json | null
+          taken_by: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_antenatal?: boolean | null
+          is_approved?: boolean | null
+          is_completed?: boolean | null
+          is_consumable?: boolean | null
+          is_lab?: boolean | null
+          is_pharm?: boolean | null
+          is_procedure?: boolean | null
+          is_radiology?: boolean | null
+          is_waiting?: boolean | null
+          patients_id?: string
+          services?: Json | null
+          taken_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_request_patients_id_fkey"
+            columns: ["patients_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_request_taken_by_fkey"
+            columns: ["taken_by"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]

@@ -1,15 +1,16 @@
 import { Card, DataList, Flex, Heading } from "@radix-ui/themes";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { branchQueryOptions } from "../../actions/queries";
 import {
   CreateBranchForm,
   DeleteBranchForm,
   UpdateBranchForm,
 } from "../../forms/config/BranchForm";
+import PendingComponent from "../PendingComponent";
 
 export function Branch() {
-  // const { data } = useLoaderData({ from: "/_layout/dashboard/config/" });
-  const { data } = useSuspenseQuery(branchQueryOptions);
+  const { data, isPending } = useQuery(branchQueryOptions);
+  if (isPending) return <PendingComponent />;
   return (
     <Card>
       <Flex justify={"between"} mb={"4"}>
@@ -17,7 +18,7 @@ export function Branch() {
         <CreateBranchForm />
       </Flex>
       <Card>
-        {data.branch_data?.map((b) => (
+        {data?.branch_data?.map((b) => (
           <div key={b.id}>
             <DataList.Root>
               <DataList.Item>

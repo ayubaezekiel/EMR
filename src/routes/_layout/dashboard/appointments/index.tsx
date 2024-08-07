@@ -15,19 +15,14 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { UserCheck } from "lucide-react";
 import { useState } from "react";
-import { DeleteActionForm } from "../../../../actions/DeleteAction";
 import { changeAppointmentStatus } from "../../../../actions/actions";
-import { deleteAppointmentAction } from "../../../../actions/appointment";
 import {
   appointmentsQueryOptions,
   appointmentsTypesQueryOptions,
 } from "../../../../actions/queries";
 import PendingComponent from "../../../../components/PendingComponent";
 import { DateRangePicker } from "../../../../components/ui/date-range-picker";
-import {
-  CreateAppointmentForm,
-  UpdateAppointmentForm,
-} from "../../../../forms/AppointmentForm";
+import { CreateAppointmentForm } from "../../../../forms/AppointmentForm";
 
 export const Route = createFileRoute("/_layout/dashboard/appointments/")({
   component: () => (
@@ -150,14 +145,14 @@ function AppointmentCard({
 
           <div className="flex gap-2 flex-col">
             <DateRangePicker
-              onUpdate={(values) => {
-                console.log(values);
+              // onUpdate={(values) => {
+              // console.log(values);
 
-                // setFrom(
-                //   format(endOfDay(values.range.from), "yyyy-MM-dd HH:mm")
-                // );
-                // setTo(format(endOfDay(values.range.to!), "yyyy-MM-dd HH:mm"));
-              }}
+              // setFrom(
+              // format(endOfDay(values.range.from), "yyyy-MM-dd HH:mm")
+              // );
+              // setTo(format(endOfDay(values.range.to!), "yyyy-MM-dd HH:mm"));
+              // }}
               align="start"
               locale="en-GB"
               showCompare={false}
@@ -200,24 +195,11 @@ function AppointmentCard({
                       </Text>
                       .
                       <Text size={"1"}>
-                        {new Date(a.created_at!).toUTCString()}
+                        {new Date(a.created_at!).toLocaleString()}
                       </Text>
                     </Flex>
                   </Flex>
                 </Flex>
-
-                <div>
-                  <UpdateAppointmentForm {...a} id={a.id} />
-                  <DeleteActionForm
-                    id={a.id}
-                    warning="Are you sure you want to delete this appointment?"
-                    title="Delete Appointment"
-                    inValidate="appointments"
-                    actionFn={async () => {
-                      await deleteAppointmentAction({ id: a.id });
-                    }}
-                  />
-                </div>
               </Flex>
 
               <Flex direction={"column"} mt={"4"}>
@@ -226,7 +208,7 @@ function AppointmentCard({
                     <Badge radius="full">
                       From:{" "}
                       {a.duration
-                        ? `${new Date(`${a.duration}`.slice(2, 20)).toUTCString()}`
+                        ? `${new Date(`${a.duration}`.slice(2, 20)).toLocaleString()}`
                         : "No date"}
                     </Badge>
                   </div>
@@ -234,7 +216,7 @@ function AppointmentCard({
                     <Badge radius="full" color="red">
                       To:{" "}
                       {a.duration
-                        ? `${new Date(`${a.duration}`.slice(24, 43)).toUTCString()}`
+                        ? `${new Date(`${a.duration}`.slice(24, 43)).toLocaleString()}`
                         : "No date"}
                     </Badge>
                   </div>
@@ -358,24 +340,11 @@ function AppointmentCard({
                       </Text>
                       .
                       <Text size={"1"}>
-                        {new Date(a.created_at!).toUTCString()}
+                        {new Date(a.created_at!).toLocaleString()}
                       </Text>
                     </Flex>
                   </Flex>
                 </Flex>
-
-                <div>
-                  <UpdateAppointmentForm {...a} id={a.id} />
-                  <DeleteActionForm
-                    id={a.id}
-                    warning="Are you sure you want to delete this appointment?"
-                    title="Delete Appointment"
-                    inValidate="appointments"
-                    actionFn={async () => {
-                      await deleteAppointmentAction({ id: a.id });
-                    }}
-                  />
-                </div>
               </Flex>
 
               <Flex direction={"column"} mt={"4"}>
@@ -384,7 +353,7 @@ function AppointmentCard({
                     <Badge radius="full">
                       From:{" "}
                       {a.duration
-                        ? `${new Date(`${a.duration}`.slice(2, 20)).toUTCString()}`
+                        ? `${new Date(`${a.duration}`.slice(2, 20)).toLocaleString()}`
                         : "No date"}
                     </Badge>
                   </div>
@@ -392,7 +361,7 @@ function AppointmentCard({
                     <Badge radius="full" color="red">
                       To:{" "}
                       {a.duration
-                        ? `${new Date(`${a.duration}`.slice(24, 43)).toUTCString()}`
+                        ? `${new Date(`${a.duration}`.slice(24, 43)).toLocaleString()}`
                         : "No date"}
                     </Badge>
                   </div>
@@ -510,24 +479,11 @@ function AppointmentCard({
                       </Text>
                       .
                       <Text size={"1"}>
-                        {new Date(a.created_at!).toUTCString()}
+                        {new Date(a.created_at!).toLocaleString()}
                       </Text>
                     </Flex>
                   </Flex>
                 </Flex>
-
-                <div>
-                  <UpdateAppointmentForm {...a} id={a.id} />
-                  <DeleteActionForm
-                    id={a.id}
-                    warning="Are you sure you want to delete this appointment?"
-                    title="Delete Appointment"
-                    inValidate="appointments"
-                    actionFn={async () => {
-                      await deleteAppointmentAction({ id: a.id });
-                    }}
-                  />
-                </div>
               </Flex>
 
               <Flex direction={"column"} mt={"4"}>
@@ -536,7 +492,7 @@ function AppointmentCard({
                     <Badge radius="full">
                       From:{" "}
                       {a.duration
-                        ? `${new Date(`${a.duration}`.slice(2, 20)).toUTCString()}`
+                        ? `${new Date(`${a.duration}`.slice(2, 20)).toLocaleString()}`
                         : "No date"}
                     </Badge>
                   </div>
@@ -544,7 +500,7 @@ function AppointmentCard({
                     <Badge radius="full" color="red">
                       To:{" "}
                       {a.duration
-                        ? `${new Date(`${a.duration}`.slice(24, 43)).toUTCString()}`
+                        ? `${new Date(`${a.duration}`.slice(24, 43)).toLocaleString()}`
                         : "No date"}
                     </Badge>
                   </div>
@@ -662,24 +618,11 @@ function AppointmentCard({
                       </Text>
                       .
                       <Text size={"1"}>
-                        {new Date(a.created_at!).toUTCString()}
+                        {new Date(a.created_at!).toLocaleString()}
                       </Text>
                     </Flex>
                   </Flex>
                 </Flex>
-
-                <div>
-                  <UpdateAppointmentForm {...a} id={a.id} />
-                  <DeleteActionForm
-                    id={a.id}
-                    warning="Are you sure you want to delete this appointment?"
-                    title="Delete Appointment"
-                    inValidate="appointments"
-                    actionFn={async () => {
-                      await deleteAppointmentAction({ id: a.id });
-                    }}
-                  />
-                </div>
               </Flex>
 
               <Flex direction={"column"} mt={"4"}>
@@ -688,7 +631,7 @@ function AppointmentCard({
                     <Badge radius="full">
                       From:{" "}
                       {a.duration
-                        ? `${new Date(`${a.duration}`.slice(2, 20)).toUTCString()}`
+                        ? `${new Date(`${a.duration}`.slice(2, 20)).toLocaleString()}`
                         : "No date"}
                     </Badge>
                   </div>
@@ -696,7 +639,7 @@ function AppointmentCard({
                     <Badge radius="full" color="red">
                       To:{" "}
                       {a.duration
-                        ? `${new Date(`${a.duration}`.slice(24, 43)).toUTCString()}`
+                        ? `${new Date(`${a.duration}`.slice(24, 43)).toLocaleString()}`
                         : "No date"}
                     </Badge>
                   </div>

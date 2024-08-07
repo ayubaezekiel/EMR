@@ -248,7 +248,7 @@ export function CreateAppointmentForm() {
                       id={field.name}
                       checked={Boolean(field.state.value)}
                       onCheckedChange={(e) => {
-                        field.handleChange(Boolean(e)), console.log(e);
+                        field.handleChange(Boolean(e));
                       }}
                       onBlur={field.handleBlur}
                     />
@@ -271,7 +271,7 @@ export function CreateAppointmentForm() {
                       id={field.name}
                       checked={Boolean(field.state.value)}
                       onCheckedChange={(e) => {
-                        field.handleChange(Boolean(e)), console.log(e);
+                        field.handleChange(Boolean(e));
                       }}
                       onBlur={field.handleBlur}
                     />
@@ -354,8 +354,6 @@ export function UpdateAppointmentForm({
       }
     },
   });
-
-  console.log(form.state.values.duration);
 
   if (isPending || clinicsPending || patientsPending || specialtiesPending)
     return <PendingComponent />;
@@ -549,7 +547,7 @@ export function UpdateAppointmentForm({
                       id={field.name}
                       checked={Boolean(field.state.value)}
                       onCheckedChange={(e) => {
-                        field.handleChange(Boolean(e)), console.log(e);
+                        field.handleChange(Boolean(e));
                       }}
                       onBlur={field.handleBlur}
                     />
@@ -572,7 +570,7 @@ export function UpdateAppointmentForm({
                       id={field.name}
                       checked={Boolean(field.state.value)}
                       onCheckedChange={(e) => {
-                        field.handleChange(Boolean(e)), console.log(e);
+                        field.handleChange(Boolean(e));
                       }}
                       onBlur={field.handleBlur}
                     />
@@ -596,19 +594,4 @@ export function UpdateAppointmentForm({
       </Dialog.Root>
     </div>
   );
-}
-
-{
-  /* <DateRangePicker
-                  label="Appointment duration"
-                  hideTimeZone
-                  visibleMonths={2}
-                  onChange={(e) => {
-                    setFrom(`${e.start}`), setTo(`${e.end}`);
-                  }}
-                  defaultValue={{
-                    start: parseZonedDateTime(`${today}[America/Los_Angeles]`),
-                    end: parseZonedDateTime(`${nextDay}[America/Los_Angeles]`),
-                  }}
-                /> */
 }

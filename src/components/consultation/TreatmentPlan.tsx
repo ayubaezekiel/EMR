@@ -12,16 +12,12 @@ import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Edit } from "lucide-react";
 import { useEffect, useState } from "react";
-import { z } from "zod";
-import {
-  createPatientDiagnosisAction,
-  updatePatientDiagnosisAction,
-} from "../../actions/consultation/actions";
+import { createPatientDiagnosisAction } from "../../actions/consultation/actions";
 import {
   consultationTemplatesQueryOptions,
   treatmentPlanQueryOptions,
 } from "../../actions/queries";
-import { checkAuth } from "../../lib/utils";
+import { getProfile } from "../../lib/utils";
 import { FieldInfo } from "../FieldInfo";
 import PendingComponent from "../PendingComponent";
 import { useStepper } from "../stepper";
@@ -51,7 +47,7 @@ export function TreatmentPlan() {
 function TreatmentPlanForm() {
   const { nextStep } = useStepper();
   const { isLastStep } = useStepper();
-  const [tempalte, setTemplate] = useState("");
+  const [template, setTemplate] = useState("");
   const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
 
   const { appointmentId } = useParams({
@@ -72,35 +68,32 @@ function TreatmentPlanForm() {
       setTemplate(editor.getHTML());
     },
 
-    content: tempalte,
+    content: template,
   });
 
   const form = useForm({
     defaultValues: {
       patients_id: "",
       taken_by: "",
-      note: tempalte,
+      note: template,
     },
     validatorAdapter: zodValidator(),
     onSubmit: async () => {
-      const user = await checkAuth();
+      const prof = await getProfile();
       await createPatientDiagnosisAction({
-        note: `${tempalte}`,
+        note: `${template}`,
         patients_id: appointmentId,
-        taken_by: `${user?.id}`,
+        taken_by: `${prof?.id}`,
       });
       form.reset();
-      queryClient.invalidateQueries({ queryKey: ["diagnosis"] });
+      queryClient.invalidateQueries({ queryKey: ["treatmentPlan"] });
       nextStep();
     },
   });
 
   useEffect(() => {
-    const updateEditor = () => {
-      editor?.commands.setContent(tempalte);
-    };
-    updateEditor();
-  }, [editor, tempalte]);
+    editor?.commands.setContent(template);
+  }, [editor, template]);
 
   if (isPending) return <PendingComponent />;
 
@@ -128,35 +121,40 @@ function TreatmentPlanForm() {
           </Select.Root>
         </div>
         <form.Field
+          defaultValue={template}
           name="note"
-          validators={{
-            onChange: z
-              .string()
-              .min(10, { message: "field must contain some content" }),
-          }}
           children={(field) => (
-            <label htmlFor={field.name} className="flex flex-col">
-              <Text size={"3"}>Note*</Text>
+            <div className="flex flex-col">
+              <Text size={"3"}>
+                Note <Text size={"1"}>(should be atleast 10 characters)</Text>*
+              </Text>
               <RichEditor editor={editor} />
               <FieldInfo field={field} />
-            </label>
+            </div>
           )}
         />
 
-        <StepperFormActions
-          submitComp={
-            <form.Subscribe
-              selector={(state) => [state.canSubmit, state.isSubmitting]}
-              children={([canSubmit, isSubmitting]) => (
-                <Button type="submit" disabled={!canSubmit} size={"4"}>
-                  {isSubmitting && <Spinner />}
-                  {isLastStep ? "Finish" : "Save and Continue"}
-                </Button>
-              )}
-            />
-          }
+        <form.Subscribe
+          selector={(state) => [state.canSubmit, state.isSubmitting]}
+          children={([canSubmit, isSubmitting]) => (
+            <Button
+              type="submit"
+              disabled={!canSubmit || template.length < 10}
+              size={"4"}
+            >
+              {isSubmitting && <Spinner />}
+              Save
+            </Button>
+          )}
         />
       </form>
+      <StepperFormActions
+        submitComp={
+          <Button onClick={nextStep} size={"4"}>
+            {isLastStep ? "Finish" : "Next"}
+          </Button>
+        }
+      />
     </div>
   );
 }
@@ -166,13 +164,33 @@ export function UpdateTreatmentPlanForm({
   ...values
 }: DB["treatment_plan"]["Update"]) {
   const [open, onOpenChange] = useState(false);
-  const [tempalte, setTemplate] = useState(values.note);
+  const [template, setTemplate] = useState(values.note);
   const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
-
-  const queryClient = useQueryClient();
 
   const { appointmentId } = useParams({
     from: "/_layout/dashboard/appointments/$appointmentId",
+  });
+
+  const queryClient = useQueryClient();
+
+  const form = useForm({
+    defaultValues: {
+      id: id,
+      ...values,
+    },
+
+    onSubmit: async () => {
+      const prof = await getProfile();
+
+      UpdateTreatmentPlanForm({
+        id,
+        note: `${template}`,
+        patients_id: appointmentId,
+        taken_by: `${prof?.id}`,
+      });
+      form.reset();
+      queryClient.invalidateQueries({ queryKey: ["treatmentPlan"] });
+    },
   });
 
   const editor = useEditor({
@@ -187,35 +205,12 @@ export function UpdateTreatmentPlanForm({
     onUpdate: ({ editor }) => {
       setTemplate(editor.getHTML());
     },
-
-    content: tempalte,
-  });
-
-  const form = useForm({
-    defaultValues: {
-      ...values,
-      note: tempalte,
-    },
-    validatorAdapter: zodValidator(),
-    onSubmit: async () => {
-      const user = await checkAuth();
-      await updatePatientDiagnosisAction({
-        id: id,
-        note: `${tempalte}`,
-        patients_id: appointmentId,
-        taken_by: `${user?.id}`,
-      });
-      form.reset();
-      queryClient.invalidateQueries({ queryKey: ["diagnosis"] });
-    },
+    content: template,
   });
 
   useEffect(() => {
-    const updateEditor = () => {
-      editor?.commands.setContent(tempalte!);
-    };
-    updateEditor();
-  }, [editor, tempalte]);
+    editor?.commands.setContent(template!);
+  }, [editor, template]);
 
   if (isPending) return <PendingComponent />;
 
@@ -228,56 +223,62 @@ export function UpdateTreatmentPlanForm({
       </Dialog.Trigger>
 
       <Dialog.Content>
-        <Dialog.Title>Update Diagnosis</Dialog.Title>
+        <Dialog.Title>Update Plan</Dialog.Title>
         <Dialog.Description size="2" mb="4">
           Fill out the form information
         </Dialog.Description>
-        <form
-          onSubmit={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-          className="space-y-6"
-        >
-          <div className="flex flex-col gap-1 w-96">
-            <Text size={"3"}>Use a template?</Text>
-            <Select.Root onValueChange={(e) => setTemplate(e)}>
-              <Select.Trigger placeholder="select a template..." />
-              <Select.Content position="popper">
-                {data?.consultation_templates_data?.map((t) => (
-                  <Select.Item key={t.id} value={t.content}>
-                    {t.name}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
-          </div>
-          <form.Field
-            name="note"
-            validators={{
-              onChange: z
-                .string()
-                .min(10, { message: "field must contain some content" }),
+        <div>
+          <form
+            onSubmit={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              form.handleSubmit();
             }}
-            children={(field) => (
-              <label htmlFor={field.name} className="flex flex-col">
-                <Text size={"3"}>Note*</Text>
-                <RichEditor editor={editor} />
-                <FieldInfo field={field} />
-              </label>
-            )}
-          />
+            className="space-y-6"
+          >
+            <div className="flex flex-col gap-1 w-96">
+              <Text size={"3"}>Use a template?</Text>
+              <Select.Root onValueChange={(e) => setTemplate(e)}>
+                <Select.Trigger placeholder="select a template..." />
+                <Select.Content position="popper">
+                  {data?.consultation_templates_data?.map((t) => (
+                    <Select.Item key={t.id} value={t.content}>
+                      {t.name}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
+            </div>
+            <form.Field
+              defaultValue={template}
+              name="note"
+              children={(field) => (
+                <div className="flex flex-col">
+                  <Text size={"3"}>
+                    Note{" "}
+                    <Text size={"1"}>(should be atleast 10 characters)</Text>*
+                  </Text>
+                  <RichEditor editor={editor} />
+                  <FieldInfo field={field} />
+                </div>
+              )}
+            />
 
-          <form.Subscribe
-            selector={(state) => [state.canSubmit, state.isSubmitting]}
-            children={([canSubmit, isSubmitting]) => (
-              <Button type="submit" disabled={!canSubmit} size={"4"}>
-                {isSubmitting && <Spinner />} Update
-              </Button>
-            )}
-          />
-        </form>
+            <form.Subscribe
+              selector={(state) => [state.canSubmit, state.isSubmitting]}
+              children={([canSubmit, isSubmitting]) => (
+                <Button
+                  type="submit"
+                  disabled={!canSubmit || template!.length < 10}
+                  size={"4"}
+                >
+                  {isSubmitting && <Spinner />}
+                  Save
+                </Button>
+              )}
+            />
+          </form>
+        </div>
       </Dialog.Content>
     </Dialog.Root>
   );

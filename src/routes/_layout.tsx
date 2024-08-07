@@ -22,7 +22,6 @@ const Layout = () => {
   useEffect(() => {
     const block = async () => {
       const auth = await checkAuth();
-      console.log(auth?.id);
       if (!auth?.id) {
         navigate({ to: "/", replace: true });
       }
@@ -31,6 +30,7 @@ const Layout = () => {
   }, [navigate]);
 
   if (isPending) return <PendingComponent />;
+
   return (
     <Box>
       <Header user={`${data?.email}`} userId={`${data?.id}`} />

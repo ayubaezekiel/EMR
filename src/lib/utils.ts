@@ -18,3 +18,12 @@ export const checkAuth = async () => {
 
 
 
+export const getProfile = async () => {
+  const user = await checkAuth()
+  const { data, error } = await supabase.from('profile').select('*').eq('user_id', `${user?.id}`).single();
+  if (error) {
+    toast.error(error.message);
+    return null
+  }
+  return data
+}

@@ -1,13 +1,14 @@
 import { Flex, Heading } from "@radix-ui/themes";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { hmoCompaniesQueryOptions } from "../../../actions/queries";
 import { CreateHMOCompaniesForm } from "../../../forms/config/insurance/HMOCompanies";
+import PendingComponent from "../../PendingComponent";
 import { DataTable } from "../../table/DataTable";
 import { hmo_companies_column } from "../../table/columns/insurance/HMO_companies";
 
-export default function HMOCompanies() {
-  // const { data } = useLoaderData({ from: "/_layout/dashboard/config/" });
-  const { data } = useSuspenseQuery(hmoCompaniesQueryOptions);
+export function HMOCompanies() {
+  const { data, isPending } = useQuery(hmoCompaniesQueryOptions);
+  if (isPending) return <PendingComponent />;
   return (
     <div>
       <Flex mb={"3"} justify={"between"}>
@@ -19,7 +20,7 @@ export default function HMOCompanies() {
         filterLabel="filter by name..."
         filterer="name"
         columns={hmo_companies_column}
-        data={data.hmo_companies_data ?? []}
+        data={data?.hmo_companies_data ?? []}
       />
     </div>
   );

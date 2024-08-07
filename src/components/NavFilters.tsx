@@ -8,21 +8,21 @@ import {
   Spinner,
   TextField,
 } from "@radix-ui/themes";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { AlertCircle, Search } from "lucide-react";
-import { patientsQueryOptions } from "../actions/queries";
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { AlertCircle, Search } from "lucide-react";
+import { useState } from "react";
+import { patientsQueryOptions } from "../actions/queries";
+import PendingComponent from "./PendingComponent";
 
 export function NavPatientFilters() {
   const [patient, setPatient] = useState("");
   const [open, onOpenChange] = useState(false);
 
-  const {
-    data: { patient_data },
-  } = useSuspenseQuery(patientsQueryOptions);
+  const { data, isPending } = useQuery(patientsQueryOptions);
+  if (isPending) return <PendingComponent />;
 
-  const filtered_patients = patient_data?.filter(
+  const filtered_patients = data?.patient_data?.filter(
     (p) =>
       p.first_name.toLowerCase().includes(patient.toLowerCase()) ||
       p.middle_name?.toLowerCase().includes(patient.toLowerCase()) ||

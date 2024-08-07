@@ -32,8 +32,6 @@ export function InviteUser() {
         type: "signup",
       });
 
-      console.log(data);
-
       if (error) {
         toast.error(error.message);
       }
