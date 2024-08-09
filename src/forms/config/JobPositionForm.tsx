@@ -83,8 +83,13 @@ export function CreateJobPositionForm() {
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Save
+                  <Button
+                    loading={isSubmitting}
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />
@@ -164,8 +169,13 @@ export function UpdateJobPositionForm({
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Update
+                  <Button
+                    loading={isSubmitting}
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />

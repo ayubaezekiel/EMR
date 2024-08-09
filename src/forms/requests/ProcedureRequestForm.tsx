@@ -15,27 +15,16 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { labTestQueryOptions, patientsQueryOptions } from "../actions/queries";
-import PendingComponent from "../components/PendingComponent";
-import { checkAuth } from "../lib/utils";
-import supabase from "../supabase/client";
+import {
+  labTestQueryOptions,
+  patientsQueryOptions,
+} from "../../actions/queries";
+import PendingComponent from "../../components/PendingComponent";
+import { checkAuth } from "../../lib/utils";
+import supabase from "../../supabase/client";
 
-interface RequestType {
-  isLab?: boolean;
-  isProcedure?: boolean;
-  isPharm?: boolean;
-  isRadiology?: boolean;
-  isAntenatal?: boolean;
-  isConsumable?: boolean;
-}
-export function CreateRequestForm({
-  isAntenatal,
-  isConsumable,
-  isLab,
-  isPharm,
-  isProcedure,
-  isRadiology,
-}: RequestType) {
+export function CreateProcedureRequestForm() {
+  const [isLoading, setIsLoading] = useState(false);
   const { data: lab_test_data, isPending: isLabPending } =
     useQuery(labTestQueryOptions);
 
@@ -47,32 +36,32 @@ export function CreateRequestForm({
   const form = useForm({
     mode: "uncontrolled",
     initialValues: {
-      lab_test: [{ test: "", note: "", is_urgent: false, key: randomId() }],
+      services: [{ service: "", note: "", is_urgent: false, key: randomId() }],
       patients_id: "",
     },
   });
 
   if (patientsPending || isLabPending) return <PendingComponent />;
 
-  const fields = form.getValues().lab_test.map((item, index) => (
+  const fields = form.getValues().services.map((item, index) => (
     <Flex key={item.key} gap={"2"} mt={"4"}>
       <div className="flex flex-col gap-1 w-full">
         <Text size={"3"}>Test*</Text>
         <Select.Root
           required
           size={"3"}
-          key={form.key(`lab_test.${index}.test`)}
+          key={form.key(`services.${index}.service`)}
           onValueChange={(e) =>
-            form.getInputProps(`lab_test.${index}.test`).onChange(e)
+            form.getInputProps(`services.${index}.service`).onChange(e)
           }
         >
-          <Select.Trigger placeholder="select test..." />
+          <Select.Trigger placeholder="select a test..." />
           <Select.Content position="popper">
             {lab_test_data?.lab_test_data?.map((v) => (
               <Select.Item
                 key={v.id}
                 value={JSON.stringify({
-                  test: v.name,
+                  name: v.name,
                   amount: v.default_price,
                 })}
               >
@@ -89,17 +78,17 @@ export function CreateRequestForm({
           required
           size={"3"}
           style={{ flex: 1 }}
-          key={form.key(`lab_test.${index}.note`)}
-          {...form.getInputProps(`lab_test.${index}.note`)}
+          key={form.key(`services.${index}.note`)}
+          {...form.getInputProps(`services.${index}.note`)}
         />
       </div>
       <div className="flex flex-col gap-1 w-40 items-center mt-6">
         <Text size={"1"}>urgent?</Text>
         <Checkbox
           size={"3"}
-          key={form.key(`lab_test.${index}.name`)}
+          key={form.key(`services.${index}.is_urgent`)}
           onCheckedChange={(e) => {
-            form.getInputProps(`lab_test.${index}.value`).onChange(e);
+            form.getInputProps(`services.${index}.is_urgent`).onChange(e);
           }}
         />
       </div>
@@ -108,7 +97,7 @@ export function CreateRequestForm({
           type="button"
           color="red"
           size={"1"}
-          onClick={() => form.removeListItem("lab_test", index)}
+          onClick={() => form.removeListItem("services", index)}
         >
           <Trash size="1rem" />
         </IconButton>
@@ -120,31 +109,27 @@ export function CreateRequestForm({
     <div>
       <Dialog.Root open={open} onOpenChange={onOpenChange}>
         <Dialog.Trigger>
-          <Button>New Request</Button>
+          <Button size={"4"}>New Request</Button>
         </Dialog.Trigger>
 
         <Dialog.Content>
-          <Dialog.Title>Schedule Lab Request</Dialog.Title>
+          <Dialog.Title>Laboratory Request</Dialog.Title>
           <Dialog.Description size="2" mb="4">
             Fill out the form information
           </Dialog.Description>
 
           <form
             onSubmit={form.onSubmit(async (values) => {
-              const user = await checkAuth();
+              setIsLoading(true);
 
+              const user = await checkAuth();
               const { error } = await supabase.from("requests").insert([
                 {
                   patients_id: `${values.patients_id}`,
                   taken_by: `${user?.id}`,
-                  is_lab: isLab,
-                  is_pharm: isPharm,
-                  is_consumable: isConsumable,
-                  is_antenatal: isAntenatal,
-                  is_procedure: isProcedure,
-                  is_radiology: isRadiology,
-                  lab_test: values.lab_test.map((v) => ({
-                    ...JSON.parse(v.test),
+                  is_lab: true,
+                  services: values.services.map((v) => ({
+                    service: JSON.parse(v.service),
                     note: v.note,
                     is_urgent: v.is_urgent,
                   })),
@@ -152,11 +137,13 @@ export function CreateRequestForm({
               ]);
               if (error) {
                 toast.error(error.message);
+                setIsLoading(false);
               } else {
-                form.reset();
-                onOpenChange(false);
                 toast.success("request issued successfully");
+                form.reset();
                 queryClient.invalidateQueries({ queryKey: ["requests"] });
+                setIsLoading(false);
+                onOpenChange(false);
               }
             })}
           >
@@ -195,8 +182,8 @@ export function CreateRequestForm({
                 type="button"
                 variant="soft"
                 onClick={() =>
-                  form.insertListItem("lab_test", {
-                    test: "",
+                  form.insertListItem("services", {
+                    service: "",
                     note: "",
                     is_urgent: false,
                     key: randomId(),
@@ -206,7 +193,12 @@ export function CreateRequestForm({
                 Add more
               </Button>
             </Flex>
-            <Button disabled={!form.isValid()} size={"4"} type="submit">
+            <Button
+              loading={isLoading}
+              disabled={!form.isValid() || isLoading}
+              size={"4"}
+              type="submit"
+            >
               Request
             </Button>
           </form>

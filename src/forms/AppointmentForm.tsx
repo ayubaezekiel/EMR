@@ -11,7 +11,6 @@ import {
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { addDays, format } from "date-fns";
 import { Edit } from "lucide-react";
@@ -25,7 +24,6 @@ import {
 import {
   appointmentsTypesQueryOptions,
   clinicsQueryOptions,
-  consultationSpecialtiesQueryOptions,
   patientsQueryOptions,
 } from "../actions/queries";
 import { FieldInfo } from "../components/FieldInfo";
@@ -39,25 +37,20 @@ export function CreateAppointmentForm() {
   const { data: clinics, isPending: clinicsPending } =
     useQuery(clinicsQueryOptions);
 
-  const { data: specialties, isPending: specialtiesPending } = useQuery(
-    consultationSpecialtiesQueryOptions
-  );
-
   const { data: patients, isPending: patientsPending } =
     useQuery(patientsQueryOptions);
   const [open, onOpenChange] = useState(false);
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
 
   const form = useForm({
     defaultValues: {
-      appointments_type_id: "",
+      appointment_types_id: "",
       clinics_id: "",
       duration: `[${from},${to})`,
       patients_id: "",
-      specialties_id: "",
       follow_up: false,
       is_all_day: false,
     },
@@ -73,24 +66,24 @@ export function CreateAppointmentForm() {
         });
         form.reset();
         onOpenChange(false);
-        navigate({ to: "/dashboard/appointments" });
+
+        queryClient.invalidateQueries({ queryKey: ["appointments"] });
       }
     },
   });
 
-  if (isPending || clinicsPending || patientsPending || specialtiesPending)
+  if (isPending || clinicsPending || patientsPending)
     return <PendingComponent />;
 
   const appointment_type_data = appointment_types?.appointment_type_data;
   const clinics_data = clinics?.clinics_data;
-  const specialties_data = specialties?.consultation_specialties_data;
   const patient_data = patients?.patient_data;
 
   return (
     <div>
       <Dialog.Root open={open} onOpenChange={onOpenChange}>
         <Dialog.Trigger>
-          <Button>New Patient Appointment</Button>
+          <Button size={"4"}>New Patient Appointment</Button>
         </Dialog.Trigger>
 
         <Dialog.Content>
@@ -154,7 +147,7 @@ export function CreateAppointmentForm() {
               )}
             />
             <form.Field
-              name="appointments_type_id"
+              name="appointment_types_id"
               validators={{
                 onChange: z.string(),
               }}
@@ -198,33 +191,6 @@ export function CreateAppointmentForm() {
                       {clinics_data?.map((c) => (
                         <Select.Item key={c.id} value={c.id}>
                           {c.name}
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Root>
-                </div>
-              )}
-            />
-
-            <form.Field
-              name="specialties_id"
-              validators={{
-                onChange: z.string(),
-              }}
-              children={(field) => (
-                <div className="flex flex-col">
-                  <Text size={"3"}>Specialty*</Text>
-                  <Select.Root
-                    size={"3"}
-                    name={field.name}
-                    value={field.state.value}
-                    onValueChange={(e) => field.handleChange(e)}
-                  >
-                    <Select.Trigger placeholder="select specialty..." />
-                    <Select.Content position="popper">
-                      {specialties_data?.map((s) => (
-                        <Select.Item key={s.id} value={s.id}>
-                          {s.name}
                         </Select.Item>
                       ))}
                     </Select.Content>
@@ -284,8 +250,13 @@ export function CreateAppointmentForm() {
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Save
+                  <Button
+                    loading={isSubmitting}
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />
@@ -307,12 +278,10 @@ export function UpdateAppointmentForm({
   const { data: clinics, isPending: clinicsPending } =
     useQuery(clinicsQueryOptions);
 
-  const { data: specialties, isPending: specialtiesPending } = useQuery(
-    consultationSpecialtiesQueryOptions
-  );
-
   const { data: patients, isPending: patientsPending } =
     useQuery(patientsQueryOptions);
+
+  const queryClient = useQueryClient();
 
   const date = new Date();
 
@@ -323,19 +292,17 @@ export function UpdateAppointmentForm({
   const [open, onOpenChange] = useState(false);
   const [from, setFrom] = useState(today);
   const [to, setTo] = useState(nextDay);
-  const queryClient = useQueryClient();
 
   const form = useForm({
     defaultValues: {
       id: id,
       duration: `[${from},${to})`,
-      appointments_type_id: values.appointments_type_id,
+      appointment_types_id: values.appointment_types_id,
       clinics_id: values.clinics_id,
       created_by: values.created_by,
       follow_up: values.follow_up,
       is_all_day: values.follow_up,
       patients_id: values.patients_id,
-      specialties_id: values.specialties_id,
     },
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
@@ -355,12 +322,11 @@ export function UpdateAppointmentForm({
     },
   });
 
-  if (isPending || clinicsPending || patientsPending || specialtiesPending)
+  if (isPending || clinicsPending || patientsPending)
     return <PendingComponent />;
 
   const appointment_type_data = appointment_types?.appointment_type_data;
   const clinics_data = clinics?.clinics_data;
-  const specialties_data = specialties?.consultation_specialties_data;
   const patient_data = patients?.patient_data;
 
   return (
@@ -455,7 +421,7 @@ export function UpdateAppointmentForm({
               )}
             />
             <form.Field
-              name="appointments_type_id"
+              name="appointment_types_id"
               validators={{
                 onChange: z.string(),
               }}
@@ -465,7 +431,7 @@ export function UpdateAppointmentForm({
                   <Select.Root
                     size={"3"}
                     name={field.name}
-                    value={field.state.value}
+                    value={field.state.value!}
                     onValueChange={(e) => field.handleChange(e)}
                   >
                     <Select.Trigger placeholder="select appointment type..." />
@@ -506,32 +472,7 @@ export function UpdateAppointmentForm({
                 </div>
               )}
             />
-            <form.Field
-              name="specialties_id"
-              validators={{
-                onChange: z.string(),
-              }}
-              children={(field) => (
-                <div className="flex flex-col">
-                  <Text size={"3"}>Specialty*</Text>
-                  <Select.Root
-                    size={"3"}
-                    name={field.name}
-                    value={field.state.value}
-                    onValueChange={(e) => field.handleChange(e)}
-                  >
-                    <Select.Trigger placeholder="select specialty..." />
-                    <Select.Content position="popper">
-                      {specialties_data?.map((s) => (
-                        <Select.Item key={s.id} value={s.id}>
-                          {s.name}
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Root>
-                </div>
-              )}
-            />
+
             <div className="flex gap-4 items-center mt-4">
               <form.Field
                 name="follow_up"
@@ -583,8 +524,13 @@ export function UpdateAppointmentForm({
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Save
+                  <Button
+                    loading={isSubmitting}
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />

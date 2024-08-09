@@ -1,15 +1,15 @@
 import { Flex, Heading } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import {
-  consultationSpecialtiesQueryOptions,
+  appointmentsTypesQueryOptions,
   vitalsQueryOptions,
 } from "../../actions/queries";
-import { CreateConsultationSpecialtiesForm } from "../../forms/config/SpecialtiesForm";
 import { CreateVitalsForm } from "../../forms/config/Vitals";
 import PendingComponent from "../PendingComponent";
 import { DataTable } from "../table/DataTable";
-import { consultation_specialties_column } from "../table/columns/specialties";
 import { vitals_column } from "../table/columns/vitals";
+import { CreateAppointmentTypeForm } from "../../forms/config/AppointmentTypeForm";
+import { appointment_type_column } from "../table/columns/appointment_type";
 
 export function Vitals() {
   const { data, isPending } = useQuery(vitalsQueryOptions);
@@ -33,21 +33,21 @@ export function Vitals() {
 }
 
 export function NursingVitatls() {
-  const { data, isPending } = useQuery(consultationSpecialtiesQueryOptions);
+  const { data, isPending } = useQuery(appointmentsTypesQueryOptions);
   if (isPending) return <PendingComponent />;
 
   return (
     <div>
       <Flex mb={"3"} justify={"between"}>
-        <Heading>Consultation Specialties</Heading>
-        <CreateConsultationSpecialtiesForm />
+        <Heading>Appointment Types</Heading>
+        <CreateAppointmentTypeForm />
       </Flex>
 
       <DataTable
         filterLabel="filter by name..."
         filterer="name"
-        columns={consultation_specialties_column}
-        data={data?.consultation_specialties_data ?? []}
+        columns={appointment_type_column}
+        data={data?.appointment_type_data ?? []}
       />
     </div>
   );

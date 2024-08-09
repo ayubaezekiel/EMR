@@ -1,3 +1,4 @@
+import { TextField } from "@radix-ui/themes";
 import React, { useEffect, useRef } from "react";
 
 interface DateInputProps {
@@ -199,8 +200,8 @@ const DateInput: React.FC<DateInputProps> = ({ value, onChange }) => {
     };
 
   return (
-    <div className="flex border rounded-lg items-center text-sm px-1">
-      <input
+    <div className="flex gap-1 rounded-lg items-center text-sm px-1">
+      <TextField.Root
         type="text"
         ref={monthRef}
         max={12}
@@ -217,8 +218,8 @@ const DateInput: React.FC<DateInputProps> = ({ value, onChange }) => {
         className="p-0 outline-none w-6 border-none text-center"
         placeholder="M"
       />
-      <span className="opacity-20 -mx-px">/</span>
-      <input
+      {/* <span className="opacity-20 -mx-px"> - </span> */}
+      <TextField.Root
         type="text"
         ref={dayRef}
         max={31}
@@ -235,8 +236,8 @@ const DateInput: React.FC<DateInputProps> = ({ value, onChange }) => {
         className="p-0 outline-none w-7 border-none text-center"
         placeholder="D"
       />
-      <span className="opacity-20 -mx-px">/</span>
-      <input
+      {/* <span className="opacity-20 -mx-px"> - </span> */}
+      <TextField.Root
         type="text"
         ref={yearRef}
         max={9999}

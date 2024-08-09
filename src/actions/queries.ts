@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query"
-import { getAppointments, getAppointmentTypes, getBranch, getCashPoints, getClinics, getConsultationSpecialties, getConsultationTemplates, getDepartments, getDiagnosis, getExamination, getHistoryTaking, getHMOCompanies, getHMOGroups, getHMOPlans, getJobPositions, getLabTest, getLabTestCategories, getLabTestParams, getLabTestTemplate, getPatients, getPatientVitals, getPaymentMethods, getRequest, getServiceTypes, getSpecialties, getTreatmentPlan, getVitals } from "./actions"
+import { getAppointments, getAppointmentTypes, getBranch, getCashPoints, getClinics, getConsultationTemplates, getDepartments, getDiagnosis, getDrugOrGeneric, getDrugOrGenericBrand, getExamination, getHistoryTaking, getHMOCompanies, getHMOGroups, getHMOPlans, getImaging, getImagingCategories, getImagingTemplate, getJobPositions, getLabTest, getLabTestCategories, getLabTestParams, getLabTestTemplate, getPatients, getPatientVitals, getPaymentMethods, getRequest, getSpecialties, getTreatmentPlan, getVitals } from "./actions"
 
 export const vitalsQueryOptions = queryOptions({
     queryKey: ['vitals'],
@@ -37,6 +37,21 @@ export const labTestCatQueryOptions = queryOptions({
     queryFn: () => getLabTestCategories(),
 })
 
+export const imagingCatQueryOptions = queryOptions({
+    queryKey: ['imagingCat'],
+    queryFn: () => getImagingCategories(),
+})
+
+export const imagingTempQueryOptions = queryOptions({
+    queryKey: ['imagingTemp'],
+    queryFn: () => getImagingTemplate(),
+})
+
+export const imagingQueryOptions = queryOptions({
+    queryKey: ['imaging'],
+    queryFn: () => getImaging(),
+})
+
 export const labTestTempQueryOptions = queryOptions({
     queryKey: ['labTestTemp'],
     queryFn: () => getLabTestTemplate(),
@@ -45,11 +60,6 @@ export const labTestTempQueryOptions = queryOptions({
 export const specialtiesQueryOptions = queryOptions({
     queryKey: ['specialties'],
     queryFn: () => getSpecialties(),
-})
-
-export const consultationSpecialtiesQueryOptions = queryOptions({
-    queryKey: ['consultationSpecialties'],
-    queryFn: () => getConsultationSpecialties(),
 })
 
 
@@ -130,11 +140,15 @@ export const cashpointsQueryOptions = queryOptions({
     queryFn: () => getCashPoints(),
 })
 
-export const serviceTypesQueryOptions = queryOptions({
-    queryKey: ['serviceTypes'],
-    queryFn: () => getServiceTypes(),
+export const drugOrGenericQueryOptions = queryOptions({
+    queryKey: ['drugOrGeneric'],
+    queryFn: () => getDrugOrGeneric(),
 })
 
+export const drugOrGenericBrandQueryOptions = queryOptions({
+    queryKey: ['brand'],
+    queryFn: () => getDrugOrGenericBrand(),
+})
 export const departmentsQueryOptions = queryOptions({
     queryKey: ['departments'],
     queryFn: () => getDepartments(),

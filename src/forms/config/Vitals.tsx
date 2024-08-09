@@ -14,7 +14,7 @@ import {
 import { useForm } from "@tanstack/react-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { AlertCircle, Edit, PlusCircle, Trash } from "lucide-react";
+import { AlertCircle, Edit, Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -25,9 +25,9 @@ import {
 } from "../../actions/config/vitals";
 import { vitalsQueryOptions } from "../../actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
+import PendingComponent from "../../components/PendingComponent";
 import { Label } from "../../components/ui/label";
 import supabase from "../../supabase/client";
-import PendingComponent from "../../components/PendingComponent";
 
 export function CreateVitalsForm() {
   const [open, onOpenChange] = useState(false);
@@ -113,8 +113,13 @@ export function CreateVitalsForm() {
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Save
+                  <Button
+                    loading={isSubmitting}
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />
@@ -212,8 +217,13 @@ export function UpdateVitalsForm({ id, ...values }: DB["vitals"]["Update"]) {
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Update
+                  <Button
+                    loading={isSubmitting}
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />
@@ -309,8 +319,8 @@ export function CreatePatientVitalsForm({ patientId }: { patientId: string }) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Trigger>
-        <Button>
-          <PlusCircle /> Record Patient Vitals
+        <Button variant="soft" radius="full">
+          Record Vitals
         </Button>
       </Dialog.Trigger>
       <Dialog.Content>
@@ -515,8 +525,13 @@ export function UpdatePatientVitalsForm({
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Update
+                  <Button
+                    loading={isSubmitting}
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />

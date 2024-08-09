@@ -22,3 +22,15 @@ export const updateBranchAction = async (values: BranchType['Update']) => {
     }
 
 }
+
+
+export const deleteBranchAction = async ({ id }: { id: string }) => {
+    if (id) {
+        const { error } = await supabase.from("branch").delete().eq('id', id);
+        if (error) {
+            toast.error(error.message);
+        }
+        toast.success("branch deleted successfully");
+    }
+
+}

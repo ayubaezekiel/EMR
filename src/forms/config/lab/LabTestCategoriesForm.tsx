@@ -81,8 +81,13 @@ export function CreateLabCategoriesForm() {
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Save
+                  <Button
+                    loading={isSubmitting}
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />
@@ -163,8 +168,13 @@ export function UpdateLabCategoriesForm({
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Save
+                  <Button
+                    loading={isSubmitting}
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />

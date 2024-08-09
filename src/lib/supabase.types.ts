@@ -9,9 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      appointment_types: {
+        Row: {
+          created_at: string | null
+          default_price: string | null
+          follow_up_price: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          default_price?: string | null
+          follow_up_price?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          default_price?: string | null
+          follow_up_price?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
-          appointments_type_id: string
+          appointment_types_id: string | null
           clinics_id: string
           created_at: string | null
           created_by: string
@@ -25,10 +49,9 @@ export type Database = {
           is_missed: boolean | null
           is_waiting: boolean | null
           patients_id: string
-          specialties_id: string
         }
         Insert: {
-          appointments_type_id: string
+          appointment_types_id?: string | null
           clinics_id: string
           created_at?: string | null
           created_by: string
@@ -42,10 +65,9 @@ export type Database = {
           is_missed?: boolean | null
           is_waiting?: boolean | null
           patients_id: string
-          specialties_id: string
         }
         Update: {
-          appointments_type_id?: string
+          appointment_types_id?: string | null
           clinics_id?: string
           created_at?: string | null
           created_by?: string
@@ -59,14 +81,13 @@ export type Database = {
           is_missed?: boolean | null
           is_waiting?: boolean | null
           patients_id?: string
-          specialties_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "appointments_appointments_type_id_fkey"
-            columns: ["appointments_type_id"]
+            foreignKeyName: "appointments_appointment_types_id_fkey"
+            columns: ["appointment_types_id"]
             isOneToOne: false
-            referencedRelation: "appointments_types"
+            referencedRelation: "appointment_types"
             referencedColumns: ["id"]
           },
           {
@@ -90,32 +111,7 @@ export type Database = {
             referencedRelation: "patients"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "appointments_specialties_id_fkey"
-            columns: ["specialties_id"]
-            isOneToOne: false
-            referencedRelation: "consultation_specialties"
-            referencedColumns: ["id"]
-          },
         ]
-      }
-      appointments_types: {
-        Row: {
-          created_at: string | null
-          id: string
-          name: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          name: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          name?: string
-        }
-        Relationships: []
       }
       branch: {
         Row: {
@@ -145,7 +141,6 @@ export type Database = {
           created_at: string | null
           id: string
           name: string
-          service_type_id: string
         }
         Insert: {
           branch_id: string
@@ -153,7 +148,6 @@ export type Database = {
           created_at?: string | null
           id?: string
           name: string
-          service_type_id: string
         }
         Update: {
           branch_id?: string
@@ -161,7 +155,6 @@ export type Database = {
           created_at?: string | null
           id?: string
           name?: string
-          service_type_id?: string
         }
         Relationships: [
           {
@@ -176,13 +169,6 @@ export type Database = {
             columns: ["clinics_id"]
             isOneToOne: false
             referencedRelation: "clinics"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cash_points_service_type_id_fkey"
-            columns: ["service_type_id"]
-            isOneToOne: false
-            referencedRelation: "service_types"
             referencedColumns: ["id"]
           },
         ]
@@ -200,30 +186,6 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
-          id?: string
-          name?: string
-        }
-        Relationships: []
-      }
-      consultation_specialties: {
-        Row: {
-          created_at: string | null
-          default_price: string | null
-          follow_up_price: string | null
-          id: string
-          name: string
-        }
-        Insert: {
-          created_at?: string | null
-          default_price?: string | null
-          follow_up_price?: string | null
-          id?: string
-          name: string
-        }
-        Update: {
-          created_at?: string | null
-          default_price?: string | null
-          follow_up_price?: string | null
           id?: string
           name?: string
         }
@@ -266,6 +228,72 @@ export type Database = {
         Relationships: []
       }
       document_types: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      drug_or_generic: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          default_price: string
+          drug_or_generic_brand_id: string
+          id: string
+          is_consumable: boolean | null
+          name: string
+          quantity: number
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          default_price: string
+          drug_or_generic_brand_id: string
+          id?: string
+          is_consumable?: boolean | null
+          name: string
+          quantity: number
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          default_price?: string
+          drug_or_generic_brand_id?: string
+          id?: string
+          is_consumable?: boolean | null
+          name?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drug_or_generic_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drug_or_generic_drug_or_generic_brand_id_fkey"
+            columns: ["drug_or_generic_brand_id"]
+            isOneToOne: false
+            referencedRelation: "drug_or_generic_brand"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drug_or_generic_brand: {
         Row: {
           created_at: string | null
           id: string
@@ -427,6 +455,68 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      imaging: {
+        Row: {
+          default_price: string | null
+          id: string
+          imaging_category_id: string
+          name: string
+        }
+        Insert: {
+          default_price?: string | null
+          id?: string
+          imaging_category_id: string
+          name: string
+        }
+        Update: {
+          default_price?: string | null
+          id?: string
+          imaging_category_id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "imaging_imaging_category_id_fkey"
+            columns: ["imaging_category_id"]
+            isOneToOne: false
+            referencedRelation: "imaging_category"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      imaging_category: {
+        Row: {
+          id: string
+          name: string
+        }
+        Insert: {
+          id?: string
+          name: string
+        }
+        Update: {
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      imaging_templates: {
+        Row: {
+          id: string
+          note: string
+          title: string
+        }
+        Insert: {
+          id?: string
+          note: string
+          title: string
+        }
+        Update: {
+          id?: string
+          note?: string
+          title?: string
+        }
+        Relationships: []
       }
       job_positions: {
         Row: {
@@ -1088,24 +1178,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      service_types: {
-        Row: {
-          created_at: string | null
-          id: string
-          name: string
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          name: string
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          name?: string
-        }
-        Relationships: []
       }
       specialties: {
         Row: {

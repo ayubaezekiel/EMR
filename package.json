@@ -58,6 +58,7 @@
     "framer-motion": "^11.3.17",
     "lucide-react": "^0.408.0",
     "nigeria-states-lgas": "^0.0.2",
+    "novel": "^0.5.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",

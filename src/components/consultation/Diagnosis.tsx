@@ -128,9 +128,15 @@ function DiagnosisForm() {
           children={(field) => (
             <div className="flex flex-col">
               <Text size={"3"}>
-                Note <Text size={"1"}>(should be atleast 10 characters)</Text>*
+                Note
+                <Text size={"1"}> (should be atleast 10 characters)</Text>*
               </Text>
-              <RichEditor editor={editor} />
+              <RichEditor
+                onChange={(value) => {
+                  field.handleChange(value);
+                }}
+                initialValue={field.state.value!}
+              />
               <FieldInfo field={field} />
             </div>
           )}

@@ -1,9 +1,8 @@
 import { Checkbox } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
-import {
-  DeletePaymentMethodForm,
-  UpdatePaymentMethodForm,
-} from "../../../forms/config/PaymentMethodForm";
+import { deletePaymentMethodAction } from "../../../actions/config/payment-method";
+import { DeleteActionForm } from "../../../actions/DeleteAction";
+import { UpdatePaymentMethodForm } from "../../../forms/config/PaymentMethodForm";
 
 export const payment_method_column: ColumnDef<PaymentMethodType["Row"]>[] = [
   {
@@ -43,7 +42,16 @@ export const payment_method_column: ColumnDef<PaymentMethodType["Row"]>[] = [
       return (
         <div className="flex gap-4">
           <UpdatePaymentMethodForm {...method} />
-          <DeletePaymentMethodForm id={method.id} />
+          <DeleteActionForm
+            id={method.id}
+            inValidate="paymentMethod"
+            title="Delete Service"
+            warning="Are you sure? this payment method will be parmanently deleted from the
+          database."
+            actionFn={async () =>
+              await deletePaymentMethodAction({ id: method.id })
+            }
+          />
         </div>
       );
     },

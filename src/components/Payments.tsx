@@ -80,7 +80,13 @@ export const ApprovePayments = ({
       } else {
         toast.success("payment approved successfully");
         onOpenChange(false);
-        queryClient.invalidateQueries({ queryKey: ["appointments"] });
+        if (is_appointment) {
+          queryClient.invalidateQueries({
+            queryKey: ["appointments"],
+          });
+        } else {
+          queryClient.invalidateQueries({ queryKey: ["requests"] });
+        }
       }
     },
   });

@@ -18,14 +18,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { UserCheck, X } from "lucide-react";
 import { changeLabRequestStatus } from "../../../../actions/actions";
 import PendingComponent from "../../../../components/PendingComponent";
-import { CreateRequestForm } from "../../../../forms/RequestForm";
+
 import { requestQueryOptions } from "../../../../actions/queries";
+import { CreateLabRequestForm } from "../../../../forms/requests/LabRequestForm";
 
 export const Route = createFileRoute("/_layout/dashboard/lab/")({
   component: () => (
     <div>
       <>
-        <Heading mb={"3"}>Lab Requests</Heading>
+        <Heading mb={"3"}>Laboratory Requests</Heading>
         <LabRequest />
       </>
     </div>
@@ -37,7 +38,7 @@ const LabRequest = () => {
     <div>
       <Card variant="ghost" my={"3"} style={{ background: "var(--accent-2)" }}>
         <div className="flex justify-between flex-col gap-2 md:flex-row">
-          <CreateRequestForm isLab />
+          <CreateLabRequestForm />
 
           <div className="flex gap-2 flex-col">
             <DateRangePicker />
@@ -113,8 +114,8 @@ function LabRequestCard({ isCompleted, isWaiting }: LabRequestStatus) {
               <Flex direction={"column"} mt={"4"} height={"100px"}>
                 <div className="flex flex-wrap gap-2 mt-4">
                   {JSON.parse(JSON.stringify(a.services)).map(
-                    (d: { test: string; note: string }) => (
-                      <Badge key={d.note}>{d.test}</Badge>
+                    (d: { note: string; service: { name: string } }) => (
+                      <Badge key={d.note}>{d.service.name}</Badge>
                     )
                   )}
                 </div>
@@ -164,9 +165,10 @@ function LabRequestCard({ isCompleted, isWaiting }: LabRequestStatus) {
                       </Dialog.Close>
                     </div>
                     {JSON.parse(JSON.stringify(a.services)).map(
-                      (d: { test: string; note: string }) => (
+                      (d: { note: string; service: { name: string } }) => (
                         <Card my={"4"} key={d.note}>
-                          {d.note}
+                          <Badge mb={"2"}>{d.service.name}</Badge>{" "}
+                          <Card>{d.note}</Card>
                         </Card>
                       )
                     )}

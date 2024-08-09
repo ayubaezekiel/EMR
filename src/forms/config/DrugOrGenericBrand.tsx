@@ -1,26 +1,19 @@
-import {
-  Button,
-  Dialog,
-  Flex,
-  Spinner,
-  Text,
-  TextField,
-} from "@radix-ui/themes";
+import { Button, Dialog, Flex, Text, TextField } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import {
-  createServiceTypeAction,
-  updateServiceTypeAction,
-} from "../../actions/config/service-types";
+  createBrandAction,
+  updateBrandAction,
+} from "../../actions/config/brand";
 import { FieldInfo } from "../../components/FieldInfo";
 
-export function CreateServiceTypeForm() {
+export function CreateBrandForm() {
   const [open, onOpenChange] = useState(false);
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const form = useForm({
     defaultValues: {
@@ -28,10 +21,10 @@ export function CreateServiceTypeForm() {
     },
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
-      await createServiceTypeAction(value);
+      await createBrandAction(value);
       form.reset();
       onOpenChange(false);
-      navigate({ to: "/dashboard/config" });
+      queryClient.invalidateQueries({ queryKey: ["brand"] });
     },
   });
 
@@ -43,7 +36,7 @@ export function CreateServiceTypeForm() {
         </Dialog.Trigger>
 
         <Dialog.Content>
-          <Dialog.Title>New Service Type</Dialog.Title>
+          <Dialog.Title>New Drug/generic</Dialog.Title>
           <Dialog.Description size="2" mb="4">
             Fill out the form information
           </Dialog.Description>
@@ -63,7 +56,7 @@ export function CreateServiceTypeForm() {
                   .min(3, { message: "field must be atleast 3 characters" }),
               }}
               children={(field) => (
-                <label htmlFor={field.name}>
+                <label htmlFor={field.name} className="flex flex-col">
                   <Text size={"3"}>Name*</Text>
                   <TextField.Root
                     name={field.name}
@@ -76,12 +69,18 @@ export function CreateServiceTypeForm() {
                 </label>
               )}
             />
+
             <Flex gap="3" mt="4" justify="end">
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Save
+                  <Button
+                    type="submit"
+                    loading={isSubmitting}
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />
@@ -93,12 +92,12 @@ export function CreateServiceTypeForm() {
   );
 }
 
-export function UpdateServiceTypeForm({
+export function UpdateBrandForm({
   id,
   ...values
-}: DB["service_types"]["Update"]) {
+}: DB["drug_or_generic_brand"]["Update"]) {
   const [open, onOpenChange] = useState(false);
-  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const form = useForm({
     defaultValues: {
@@ -107,11 +106,11 @@ export function UpdateServiceTypeForm({
     },
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
-      await updateServiceTypeAction(value);
+      await updateBrandAction(value);
       form.reset();
       onOpenChange(false);
 
-      navigate({ to: "/dashboard/config" });
+      queryClient.invalidateQueries({ queryKey: ["brand"] });
     },
   });
 
@@ -125,7 +124,7 @@ export function UpdateServiceTypeForm({
         </Dialog.Trigger>
 
         <Dialog.Content>
-          <Dialog.Title>Update service type</Dialog.Title>
+          <Dialog.Title>Update Drug/generic</Dialog.Title>
           <Dialog.Description size="2" mb="4">
             Fill out the form information
           </Dialog.Description>
@@ -144,7 +143,7 @@ export function UpdateServiceTypeForm({
                   .min(3, { message: "field must be atleast 3 characters" }),
               }}
               children={(field) => (
-                <label htmlFor={field.name}>
+                <label htmlFor={field.name} className="flex flex-col">
                   <Text size={"3"}>Name*</Text>
                   <TextField.Root
                     name={field.name}
@@ -157,12 +156,18 @@ export function UpdateServiceTypeForm({
                 </label>
               )}
             />
+
             <Flex gap="3" mt="4" justify="end">
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Update
+                  <Button
+                    type="submit"
+                    loading={isSubmitting}
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />

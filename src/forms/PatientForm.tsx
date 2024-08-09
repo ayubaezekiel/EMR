@@ -66,11 +66,11 @@ export function PatientForm() {
     <div>
       <Dialog.Root open={open} onOpenChange={onOpenChange}>
         <Dialog.Trigger>
-          <Button>New Patient File</Button>
+          <Button size={"4"}>New Patient File</Button>
         </Dialog.Trigger>
 
         <Dialog.Content maxWidth="auto" maxHeight="auto">
-          <Dialog.Title>New patient file</Dialog.Title>
+          <Dialog.Title>New Patient File</Dialog.Title>
           <Dialog.Description size="2" mb="4">
             Fill out your information on the form
           </Dialog.Description>
@@ -505,8 +505,13 @@ export function PatientForm() {
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Save
+                  <Button
+                    loading={isSubmitting}
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />
@@ -1000,8 +1005,13 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Save
+                  <Button
+                    loading={isSubmitting}
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />

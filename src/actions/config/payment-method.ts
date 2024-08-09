@@ -26,3 +26,15 @@ export const updatePaymentMethodAction = async (
     toast.success("payment method updated successfully");
   }
 };
+
+export const deletePaymentMethodAction = async ({ id }: { id: string }) => {
+  if (id) {
+    const { error } = await supabase.from("payment_methods").delete().eq('id', id);
+    if (error) {
+      toast.error(error.message);
+    }
+    toast.success("payment method deleted successfully");
+
+  }
+
+}

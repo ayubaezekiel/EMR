@@ -1,9 +1,10 @@
 import { Card, DataList, Flex, Heading } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
+import { DeleteActionForm } from "../../actions/DeleteAction";
+import { deleteBranchAction } from "../../actions/config/branch";
 import { branchQueryOptions } from "../../actions/queries";
 import {
   CreateBranchForm,
-  DeleteBranchForm,
   UpdateBranchForm,
 } from "../../forms/config/BranchForm";
 import PendingComponent from "../PendingComponent";
@@ -39,7 +40,14 @@ export function Branch() {
             </DataList.Root>
             <Flex justify={"end"} gap={"2"} mt={"4"}>
               <UpdateBranchForm {...b} />
-              <DeleteBranchForm id={b.id} />
+              <DeleteActionForm
+                inValidate="branch"
+                title="Delete Branch"
+                warning="Are you sure? this branch will be parmanently deleted from the
+          database."
+                actionFn={async () => await deleteBranchAction({ id: b.id })}
+                id={b.id}
+              />
             </Flex>
           </div>
         ))}

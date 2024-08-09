@@ -3,6 +3,7 @@ import supabase from "../supabase/client";
 import supabase_admin from "../supabase/supabase-admin";
 import { checkAuth } from "../lib/utils";
 
+
 export const getHMOPlans = async () => {
   const { data: hmo_plans_data, error: hmo_plans_error } = await supabase
     .from("hmo_plans")
@@ -85,15 +86,26 @@ export const getBranch = async () => {
   return { branch_data };
 };
 
-export const getServiceTypes = async () => {
-  const { data: service_type_data, error: service_type_err } = await supabase
-    .from("service_types")
-    .select("*");
-  if (service_type_err) {
-    toast.error(service_type_err.message);
+export const getDrugOrGeneric = async () => {
+  const { data: drug_or_generic_data, error: drug_or_generic_err } = await supabase
+    .from("drug_or_generic")
+    .select("*,drug_or_generic_brand(name)");
+  if (drug_or_generic_err) {
+    toast.error(drug_or_generic_err.message);
   }
-  return { service_type_data };
+  return { drug_or_generic_data };
 };
+
+export const getDrugOrGenericBrand = async () => {
+  const { data: drug_or_generic_brand_data, error: drug_or_generic_brand_err } = await supabase
+    .from("drug_or_generic_brand")
+    .select("*");
+  if (drug_or_generic_brand_err) {
+    toast.error(drug_or_generic_brand_err.message);
+  }
+  return { drug_or_generic_brand_data };
+};
+
 
 export const getDepartments = async () => {
   const { data: department_data, error: department_err } = await supabase
@@ -277,16 +289,33 @@ export const getLabTestCategories = async () => {
   }
   return { lab_test_categories_data }
 }
-export const getConsultationSpecialties = async () => {
-  const { data: consultation_specialties_data, error: specialties_err } =
-    await supabase.from("consultation_specialties").select("*");
 
-  if (specialties_err) {
-    toast.error(specialties_err.message);
+export const getImaging = async () => {
+  const { data: imaging_data, error: imaging_err } = await supabase.from("imaging").select("*");
+
+  if (imaging_err) {
+    toast.error(imaging_err.message)
   }
-  return { consultation_specialties_data };
-};
+  return { imaging_data }
+}
 
+export const getImagingCategories = async () => {
+  const { data: imaging_categories_data, error: imaging_categories_err } = await supabase.from("imaging_category").select("*");
+
+  if (imaging_categories_err) {
+    toast.error(imaging_categories_err.message)
+  }
+  return { imaging_categories_data }
+}
+
+export const getImagingTemplate = async () => {
+  const { data: imaging_temp_data, error: imaging_temp_err } = await supabase.from("imaging_templates").select("*");
+
+  if (imaging_temp_err) {
+    toast.error(imaging_temp_err.message)
+  }
+  return { imaging_temp_data }
+}
 export const getConsultationTemplates = async () => {
   const { data: consultation_templates_data, error: templates_err } =
     await supabase.from("consultation_templates").select("*");
@@ -309,7 +338,7 @@ export const getClinics = async () => {
 
 export const getAppointmentTypes = async () => {
   const { data: appointment_type_data, error: appointment_type_error } =
-    await supabase.from("appointments_types").select("*");
+    await supabase.from("appointment_types").select("*");
 
   if (appointment_type_error) {
     toast.error(appointment_type_error.message);
@@ -321,7 +350,7 @@ export const getAppointments = async () => {
   const { data: appointment_data, error: appointment_error } = await supabase
     .from("appointments")
     .select(
-      `*,patients(id,first_name,middle_name,last_name),clinics(name),consultation_specialties(id,name,default_price,follow_up_price),appointments_types(id,name)`
+      `*,patients(id,first_name,middle_name,last_name),clinics(name),appointment_types(id,name,default_price,follow_up_price)`
     );
 
   if (appointment_error) {

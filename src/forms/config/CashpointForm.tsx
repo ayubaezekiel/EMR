@@ -3,7 +3,6 @@ import {
   Dialog,
   Flex,
   Select,
-  Spinner,
   Text,
   TextField,
 } from "@radix-ui/themes";
@@ -17,11 +16,7 @@ import {
   createCashpointAction,
   updateCashpointAction,
 } from "../../actions/config/cashpoint";
-import {
-  branchQueryOptions,
-  clinicsQueryOptions,
-  serviceTypesQueryOptions,
-} from "../../actions/queries";
+import { branchQueryOptions, clinicsQueryOptions } from "../../actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
 import PendingComponent from "../../components/PendingComponent";
 
@@ -32,9 +27,6 @@ export function CreateCashpointForm() {
     useQuery(branchQueryOptions);
   const { data: clinics, isPending: isClinicsPending } =
     useQuery(clinicsQueryOptions);
-  const { data: service_type, isPending: isServiceTypePending } = useQuery(
-    serviceTypesQueryOptions
-  );
   const queryClient = useQueryClient();
 
   const form = useForm({
@@ -42,7 +34,6 @@ export function CreateCashpointForm() {
       name: "",
       branch_id: "",
       clinics_id: "",
-      service_type_id: "",
     },
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
@@ -53,8 +44,7 @@ export function CreateCashpointForm() {
     },
   });
 
-  if (isClinicsPending || isBranchPending || isServiceTypePending)
-    return <PendingComponent />;
+  if (isClinicsPending || isBranchPending) return <PendingComponent />;
 
   return (
     <div>
@@ -151,39 +141,17 @@ export function CreateCashpointForm() {
                 </div>
               )}
             />
-            <form.Field
-              name="service_type_id"
-              validators={{
-                onChange: z
-                  .string()
-                  .min(3, { message: "field must be atleast 3 characters" }),
-              }}
-              children={(field) => (
-                <div className="flex flex-col">
-                  <Text size={"3"}>Service Type*</Text>
-                  <Select.Root
-                    name={field.name}
-                    value={field.state.value}
-                    onValueChange={(e) => field.handleChange(e)}
-                  >
-                    <Select.Trigger placeholder="select service type..." />
-                    <Select.Content position="popper">
-                      {service_type?.service_type_data?.map((s) => (
-                        <Select.Item key={s.id} value={s.id}>
-                          {s.name}
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Root>
-                </div>
-              )}
-            />
             <Flex gap="3" mt="4" justify="end">
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Save
+                  <Button
+                    loading={isSubmitting}
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />
@@ -198,16 +166,13 @@ export function CreateCashpointForm() {
 export function UpdateCashpointForm({
   id,
   ...values
-}: CashpointType["Update"]) {
+}: DB["cash_points"]["Update"]) {
   const [open, onOpenChange] = useState(false);
 
   const { data: branch, isPending: isBranchPending } =
     useQuery(branchQueryOptions);
   const { data: clinics, isPending: isClinicsPending } =
     useQuery(clinicsQueryOptions);
-  const { data: service_type, isPending: isServiceTypePending } = useQuery(
-    serviceTypesQueryOptions
-  );
   const queryClient = useQueryClient();
 
   const form = useForm({
@@ -225,8 +190,7 @@ export function UpdateCashpointForm({
     },
   });
 
-  if (isClinicsPending || isBranchPending || isServiceTypePending)
-    return <PendingComponent />;
+  if (isClinicsPending || isBranchPending) return <PendingComponent />;
 
   return (
     <div>
@@ -324,39 +288,18 @@ export function UpdateCashpointForm({
                 </div>
               )}
             />
-            <form.Field
-              name="service_type_id"
-              validators={{
-                onChange: z
-                  .string()
-                  .min(3, { message: "field must be atleast 3 characters" }),
-              }}
-              children={(field) => (
-                <div className="flex flex-col">
-                  <Text size={"3"}>Service Type*</Text>
-                  <Select.Root
-                    name={field.name}
-                    value={field.state.value}
-                    onValueChange={(e) => field.handleChange(e)}
-                  >
-                    <Select.Trigger placeholder="select service type..." />
-                    <Select.Content position="popper">
-                      {service_type?.service_type_data?.map((s) => (
-                        <Select.Item key={s.id} value={s.id}>
-                          {s.name}
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Root>
-                </div>
-              )}
-            />
+
             <Flex gap="3" mt="4" justify="end">
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Save
+                  <Button
+                    loading={isSubmitting}
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />

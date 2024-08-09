@@ -9,7 +9,8 @@ import {
   Tabs,
 } from "@radix-ui/themes";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AppointmentType } from "../../../../components/config/AppointmentTypes";
+// import { AppointmentType } from "../../../../components/config/AppointmentTypes";
+import { AppointmentType } from "../../../../components/config/AppointmentType";
 import { Branch } from "../../../../components/config/Branch";
 import { Cashpoint } from "../../../../components/config/Cashpoint";
 import { Clinics } from "../../../../components/config/Clinics";
@@ -19,7 +20,6 @@ import { HMOGroups } from "../../../../components/config/insurance/HMOGroups";
 import { HMOPlans } from "../../../../components/config/insurance/HMOPlans";
 import { JobPostion } from "../../../../components/config/JobPosition";
 import { PaymentMethod } from "../../../../components/config/PaymentMethod";
-import { ServiceTypes } from "../../../../components/config/ServiceTypes";
 import { Specialties } from "../../../../components/config/Specialties";
 import { config_services_routes } from "../../../../lib/constants";
 
@@ -137,38 +137,15 @@ export const Route = createFileRoute("/_layout/dashboard/config/")({
             </Tabs.Content>
 
             <Tabs.Content value="data">
-              <div className="grid gap-4 md:grid-cols-2 mt-4">
-                <div>
-                  <PaymentMethod />
-                </div>
-                <div>
-                  <ServiceTypes />
-                </div>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2 mt-4">
-                <div>
-                  <JobPostion />
-                </div>
-                <div>
-                  <Cashpoint />
-                </div>
-              </div>
+              <AppointmentType />
 
               <div className="grid gap-4 md:grid-cols-2 mt-4">
-                <div>
-                  <AppointmentType />
-                </div>
-                <div>
-                  <Clinics />
-                </div>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2 mt-4">
-                <div>
-                  <Specialties />
-                </div>
-                <div>
-                  <Departments />
-                </div>
+                <PaymentMethod />
+                <Cashpoint />
+                <JobPostion />
+                <Clinics />
+                <Specialties />
+                <Departments />
               </div>
             </Tabs.Content>
           </Box>

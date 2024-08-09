@@ -3,7 +3,6 @@ import {
   Button,
   Dialog,
   Flex,
-  Spinner,
   Text,
   TextField,
 } from "@radix-ui/themes";
@@ -14,12 +13,12 @@ import { Edit, Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { FieldInfo } from "../../components/FieldInfo";
-import supabase from "../../supabase/client";
 import {
   createDepartmentAction,
   updateDepartmentAction,
 } from "../../actions/config/department";
+import { FieldInfo } from "../../components/FieldInfo";
+import supabase from "../../supabase/client";
 
 export function CreateDepartmentForm() {
   const [open, onOpenChange] = useState(false);
@@ -83,8 +82,13 @@ export function CreateDepartmentForm() {
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Save
+                  <Button
+                    loading={isSubmitting}
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />
@@ -99,7 +103,7 @@ export function CreateDepartmentForm() {
 export function UpdateDepartmentForm({
   id,
   ...values
-}: DepartmentType["Update"]) {
+}: DB["departments"]["Update"]) {
   const [open, onOpenChange] = useState(false);
   const navigate = useNavigate();
 
@@ -164,8 +168,13 @@ export function UpdateDepartmentForm({
               <form.Subscribe
                 selector={(state) => [state.canSubmit, state.isSubmitting]}
                 children={([canSubmit, isSubmitting]) => (
-                  <Button type="submit" disabled={!canSubmit} size={"4"}>
-                    {isSubmitting && <Spinner />} Update
+                  <Button
+                    loading={isSubmitting}
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting}
+                    size={"4"}
+                  >
+                    Save
                   </Button>
                 )}
               />
@@ -176,7 +185,6 @@ export function UpdateDepartmentForm({
     </div>
   );
 }
-
 export function DeleteDepartmentForm({ id }: { id: string }) {
   const navigate = useNavigate();
   const form = useForm({
