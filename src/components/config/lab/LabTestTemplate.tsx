@@ -6,21 +6,21 @@ import { DataTable } from "../../table/DataTable";
 import { lab_test_temp_column } from "../../table/columns/lab_test";
 
 export function LabTestTemplate() {
-  const { data } = useQuery(labTestTempQueryOptions);
+	const { data } = useQuery(labTestTempQueryOptions);
 
-  return (
-    <div>
-      <Flex mb={"3"} justify={"between"}>
-        <Heading>Lab Test Templates</Heading>
-        <CreateLabTemplateForm />
-      </Flex>
+	return (
+		<div>
+			<Flex mb={"3"} justify={"between"}>
+				<Heading>Lab Test Templates</Heading>
+				<CreateLabTemplateForm />
+			</Flex>
 
-      <DataTable
-        filterLabel="filter by name..."
-        filterer="name"
-        columns={lab_test_temp_column}
-        data={data?.lab_test_template_data ?? []}
-      />
-    </div>
-  );
+			<DataTable
+				filterLabel="filter by name..."
+				filterer="name"
+				columns={lab_test_temp_column}
+				data={data?.lab_test_template_data ?? []}
+			/>
+		</div>
+	);
 }

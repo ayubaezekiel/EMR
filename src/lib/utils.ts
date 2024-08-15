@@ -4,26 +4,28 @@ import { twMerge } from "tailwind-merge";
 import supabase from "../supabase/client";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+	return twMerge(clsx(inputs));
 }
 
 export const checkAuth = async () => {
-  const { data, error } = await supabase.auth.getSession();
-  if (error) {
-    toast.error(error.message);
-    return null
-  }
-  return data.session?.user
+	const { data, error } = await supabase.auth.getSession();
+	if (error) {
+		toast.error(error.message);
+		return null;
+	}
+	return data.session?.user;
 };
 
-
-
 export const getProfile = async () => {
-  const user = await checkAuth()
-  const { data, error } = await supabase.from('profile').select('*').eq('user_id', `${user?.id}`).single();
-  if (error) {
-    toast.error(error.message);
-    return null
-  }
-  return data
-}
+	const user = await checkAuth();
+	const { data, error } = await supabase
+		.from("profile")
+		.select("*")
+		.eq("user_id", `${user?.id}`)
+		.single();
+	if (error) {
+		toast.error(error.message);
+		return null;
+	}
+	return data;
+};

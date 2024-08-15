@@ -7,22 +7,22 @@ import { drug_or_generic_brand_column } from "../table/columns/drug_or_generic";
 import { DataTable } from "../table/DataTable";
 
 export function DrugOrGenericBrand() {
-  const { data, isPending } = useQuery(drugOrGenericBrandQueryOptions);
-  if (isPending) return <PendingComponent />;
+	const { data, isPending } = useQuery(drugOrGenericBrandQueryOptions);
+	if (isPending) return <PendingComponent />;
 
-  return (
-    <div>
-      <Flex mb={"3"} justify={"between"}>
-        <Heading>Brands</Heading>
-        <CreateBrandForm />
-      </Flex>
+	return (
+		<div>
+			<Flex mb={"3"} justify={"between"}>
+				<Heading>Brands</Heading>
+				<CreateBrandForm />
+			</Flex>
 
-      <DataTable
-        filterLabel="filter by name..."
-        filterer="name"
-        columns={drug_or_generic_brand_column}
-        data={data?.drug_or_generic_brand_data ?? []}
-      />
-    </div>
-  );
+			<DataTable
+				filterLabel="filter by name..."
+				filterer="name"
+				columns={drug_or_generic_brand_column}
+				data={data?.drug_or_generic_brand_data ?? []}
+			/>
+		</div>
+	);
 }

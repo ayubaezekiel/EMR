@@ -14,70 +14,70 @@ import TextAlign from "@tiptap/extension-text-align";
 import { useEffect } from "react";
 
 interface EditorProp {
-  initialValue: string;
-  onChange: (value: string) => void;
+	initialValue: string;
+	onChange: (value: string) => void;
 }
 export function RichEditor({ onChange, initialValue }: EditorProp) {
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Underline,
-      Superscript,
-      Subscript,
-      Highlight,
-      TextAlign.configure({ types: ["heading", "paragraph"] }),
-    ],
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
-    },
-    content: initialValue,
-  });
+	const editor = useEditor({
+		extensions: [
+			StarterKit,
+			Underline,
+			Superscript,
+			Subscript,
+			Highlight,
+			TextAlign.configure({ types: ["heading", "paragraph"] }),
+		],
+		onUpdate: ({ editor }) => {
+			onChange(editor.getHTML());
+		},
+		content: initialValue,
+	});
 
-  useEffect(() => {
-    editor?.commands.setContent(initialValue);
-  }, [editor, initialValue]);
+	useEffect(() => {
+		editor?.commands.setContent(initialValue);
+	}, [editor, initialValue]);
 
-  return (
-    <MantineProvider>
-      <RichTextEditor editor={editor} classNames={{ root: "rich-text-class" }}>
-        <RichTextEditor.Toolbar sticky stickyOffset={60}>
-          <RichTextEditor.ControlsGroup>
-            <RichTextEditor.Bold />
-            <RichTextEditor.Italic />
-            <RichTextEditor.Underline />
+	return (
+		<MantineProvider>
+			<RichTextEditor editor={editor} classNames={{ root: "rich-text-class" }}>
+				<RichTextEditor.Toolbar sticky stickyOffset={60}>
+					<RichTextEditor.ControlsGroup>
+						<RichTextEditor.Bold />
+						<RichTextEditor.Italic />
+						<RichTextEditor.Underline />
 
-            <RichTextEditor.ClearFormatting />
-          </RichTextEditor.ControlsGroup>
+						<RichTextEditor.ClearFormatting />
+					</RichTextEditor.ControlsGroup>
 
-          <RichTextEditor.ControlsGroup>
-            <RichTextEditor.H1 />
-            <RichTextEditor.H2 />
-            <RichTextEditor.H3 />
-            <RichTextEditor.H4 />
-          </RichTextEditor.ControlsGroup>
+					<RichTextEditor.ControlsGroup>
+						<RichTextEditor.H1 />
+						<RichTextEditor.H2 />
+						<RichTextEditor.H3 />
+						<RichTextEditor.H4 />
+					</RichTextEditor.ControlsGroup>
 
-          <RichTextEditor.ControlsGroup>
-            <RichTextEditor.Hr />
-            <RichTextEditor.BulletList />
-            <RichTextEditor.OrderedList />
-            <RichTextEditor.Subscript />
-            <RichTextEditor.Superscript />
-          </RichTextEditor.ControlsGroup>
+					<RichTextEditor.ControlsGroup>
+						<RichTextEditor.Hr />
+						<RichTextEditor.BulletList />
+						<RichTextEditor.OrderedList />
+						<RichTextEditor.Subscript />
+						<RichTextEditor.Superscript />
+					</RichTextEditor.ControlsGroup>
 
-          <RichTextEditor.ControlsGroup>
-            <RichTextEditor.AlignLeft />
-            <RichTextEditor.AlignCenter />
-            <RichTextEditor.AlignJustify />
-            <RichTextEditor.AlignRight />
-          </RichTextEditor.ControlsGroup>
+					<RichTextEditor.ControlsGroup>
+						<RichTextEditor.AlignLeft />
+						<RichTextEditor.AlignCenter />
+						<RichTextEditor.AlignJustify />
+						<RichTextEditor.AlignRight />
+					</RichTextEditor.ControlsGroup>
 
-          <RichTextEditor.ControlsGroup>
-            <RichTextEditor.Undo />
-            <RichTextEditor.Redo />
-          </RichTextEditor.ControlsGroup>
-        </RichTextEditor.Toolbar>
-        <RichTextEditor.Content />
-      </RichTextEditor>
-    </MantineProvider>
-  );
+					<RichTextEditor.ControlsGroup>
+						<RichTextEditor.Undo />
+						<RichTextEditor.Redo />
+					</RichTextEditor.ControlsGroup>
+				</RichTextEditor.Toolbar>
+				<RichTextEditor.Content />
+			</RichTextEditor>
+		</MantineProvider>
+	);
 }

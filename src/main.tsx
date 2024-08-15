@@ -14,29 +14,29 @@ import { NextUIProvider } from "@nextui-org/react";
 const queryClient = new QueryClient();
 
 const router = createRouter({
-  routeTree,
-  defaultPreload: "intent",
+	routeTree,
+	defaultPreload: "intent",
 });
 
 declare module "@tanstack/react-router" {
-  interface Register {
-    router: typeof router;
-  }
+	interface Register {
+		router: typeof router;
+	}
 }
 
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
-  root.render(
-    <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <NextUIProvider>
-          <Theme accentColor="grass" panelBackground="solid">
-            <Toaster richColors />
-            <RouterProvider router={router} />
-          </Theme>
-        </NextUIProvider>
-      </QueryClientProvider>
-    </StrictMode>
-  );
+	const root = ReactDOM.createRoot(rootElement);
+	root.render(
+		<StrictMode>
+			<QueryClientProvider client={queryClient}>
+				<NextUIProvider>
+					<Theme accentColor="grass" panelBackground="solid">
+						<Toaster richColors />
+						<RouterProvider router={router} />
+					</Theme>
+				</NextUIProvider>
+			</QueryClientProvider>
+		</StrictMode>,
+	);
 }

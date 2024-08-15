@@ -7,22 +7,22 @@ import { job_position_column } from "../table/columns/job_position";
 import PendingComponent from "../PendingComponent";
 
 export function JobPostion() {
-  const { data, isPending } = useQuery(jobPositionsQueryOptions);
-  if (isPending) return <PendingComponent />;
+	const { data, isPending } = useQuery(jobPositionsQueryOptions);
+	if (isPending) return <PendingComponent />;
 
-  return (
-    <div>
-      <Flex mb={"3"} justify={"between"}>
-        <Heading>Job Position</Heading>
-        <CreateJobPositionForm />
-      </Flex>
+	return (
+		<div>
+			<Flex mb={"3"} justify={"between"}>
+				<Heading>Job Position</Heading>
+				<CreateJobPositionForm />
+			</Flex>
 
-      <DataTable
-        filterLabel="filter by name..."
-        filterer="name"
-        columns={job_position_column}
-        data={data?.job_positions_data ?? []}
-      />
-    </div>
-  );
+			<DataTable
+				filterLabel="filter by name..."
+				filterer="name"
+				columns={job_position_column}
+				data={data?.job_positions_data ?? []}
+			/>
+		</div>
+	);
 }

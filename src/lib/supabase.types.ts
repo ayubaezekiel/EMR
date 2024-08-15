@@ -9,6 +9,112 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admissions: {
+        Row: {
+          admitted_by: string | null
+          beds_id: string | null
+          created_at: string | null
+          dischard_date: string | null
+          id: string
+          is_critical: boolean | null
+          patient_id: string
+          wards_id: string
+        }
+        Insert: {
+          admitted_by?: string | null
+          beds_id?: string | null
+          created_at?: string | null
+          dischard_date?: string | null
+          id?: string
+          is_critical?: boolean | null
+          patient_id: string
+          wards_id: string
+        }
+        Update: {
+          admitted_by?: string | null
+          beds_id?: string | null
+          created_at?: string | null
+          dischard_date?: string | null
+          id?: string
+          is_critical?: boolean | null
+          patient_id?: string
+          wards_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admissions_admitted_by_fkey"
+            columns: ["admitted_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admissions_beds_id_fkey"
+            columns: ["beds_id"]
+            isOneToOne: false
+            referencedRelation: "beds"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admissions_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admissions_wards_id_fkey"
+            columns: ["wards_id"]
+            isOneToOne: false
+            referencedRelation: "wards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      anaesthesia: {
+        Row: {
+          anaesthesia_type_id: string | null
+          default_price: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          anaesthesia_type_id?: string | null
+          default_price?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          anaesthesia_type_id?: string | null
+          default_price?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "anaesthesia_anaesthesia_type_id_fkey"
+            columns: ["anaesthesia_type_id"]
+            isOneToOne: false
+            referencedRelation: "anaesthesia_type"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      anaesthesia_type: {
+        Row: {
+          id: string
+          title: string
+        }
+        Insert: {
+          id?: string
+          title: string
+        }
+        Update: {
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
       appointment_types: {
         Row: {
           created_at: string | null
@@ -109,6 +215,38 @@ export type Database = {
             columns: ["patients_id"]
             isOneToOne: false
             referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      beds: {
+        Row: {
+          default_price: string
+          id: string
+          is_available: boolean | null
+          name: string
+          ward_id: string
+        }
+        Insert: {
+          default_price: string
+          id?: string
+          is_available?: boolean | null
+          name: string
+          ward_id: string
+        }
+        Update: {
+          default_price?: string
+          id?: string
+          is_available?: boolean | null
+          name?: string
+          ward_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beds_ward_id_fkey"
+            columns: ["ward_id"]
+            isOneToOne: false
+            referencedRelation: "wards"
             referencedColumns: ["id"]
           },
         ]
@@ -308,6 +446,24 @@ export type Database = {
           created_at?: string | null
           id?: string
           name?: string
+        }
+        Relationships: []
+      }
+      fluid_routes: {
+        Row: {
+          id: string
+          name: string
+          type: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          type: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          type?: string
         }
         Relationships: []
       }
@@ -1042,6 +1198,76 @@ export type Database = {
           },
         ]
       }
+      procedure: {
+        Row: {
+          anaesthesia_id: string
+          id: string
+          is_theatre: boolean | null
+          name: string
+          procedure_category_id: string
+          procedure_price: string | null
+          surgeon_price: string | null
+          theatre_id: string | null
+        }
+        Insert: {
+          anaesthesia_id: string
+          id?: string
+          is_theatre?: boolean | null
+          name: string
+          procedure_category_id: string
+          procedure_price?: string | null
+          surgeon_price?: string | null
+          theatre_id?: string | null
+        }
+        Update: {
+          anaesthesia_id?: string
+          id?: string
+          is_theatre?: boolean | null
+          name?: string
+          procedure_category_id?: string
+          procedure_price?: string | null
+          surgeon_price?: string | null
+          theatre_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "procedure_anaesthesia_id_fkey"
+            columns: ["anaesthesia_id"]
+            isOneToOne: false
+            referencedRelation: "anaesthesia"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "procedure_procedure_category_id_fkey"
+            columns: ["procedure_category_id"]
+            isOneToOne: false
+            referencedRelation: "procedure_category"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "procedure_theatre_id_fkey"
+            columns: ["theatre_id"]
+            isOneToOne: false
+            referencedRelation: "theatre"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      procedure_category: {
+        Row: {
+          id: string
+          name: string
+        }
+        Insert: {
+          id?: string
+          name: string
+        }
+        Update: {
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       profile: {
         Row: {
           branch_id: string | null
@@ -1194,6 +1420,24 @@ export type Database = {
         }
         Relationships: []
       }
+      theatre: {
+        Row: {
+          default_price: string
+          id: string
+          name: string
+        }
+        Insert: {
+          default_price: string
+          id?: string
+          name: string
+        }
+        Update: {
+          default_price?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       treatment_plan: {
         Row: {
           created_at: string
@@ -1248,6 +1492,27 @@ export type Database = {
           id?: string
           name?: string
           unit?: string | null
+        }
+        Relationships: []
+      }
+      wards: {
+        Row: {
+          default_price: string
+          id: string
+          is_labor: boolean | null
+          name: string
+        }
+        Insert: {
+          default_price: string
+          id?: string
+          is_labor?: boolean | null
+          name: string
+        }
+        Update: {
+          default_price?: string
+          id?: string
+          is_labor?: boolean | null
+          name?: string
         }
         Relationships: []
       }

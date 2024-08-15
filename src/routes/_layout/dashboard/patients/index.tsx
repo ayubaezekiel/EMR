@@ -7,26 +7,26 @@ import { DataTable } from "../../../../components/table/DataTable";
 import { patients } from "../../../../components/table/columns/patients";
 
 export const Route = createFileRoute("/_layout/dashboard/patients/")({
-  component: () => (
-    <>
-      <Heading mb={"3"}>Patients</Heading>
-      <PatientTable />
-    </>
-  ),
+	component: () => (
+		<>
+			<Heading mb={"3"}>Patients</Heading>
+			<PatientTable />
+		</>
+	),
 });
 
 const PatientTable = () => {
-  const { data, isPending } = useQuery(patientsQueryOptions);
-  if (isPending) return <PendingComponent />;
+	const { data, isPending } = useQuery(patientsQueryOptions);
+	if (isPending) return <PendingComponent />;
 
-  return (
-    <div>
-      <DataTable
-        filterLabel="filter names...."
-        filterer="patients"
-        columns={patients}
-        data={data?.patient_data ?? []}
-      />
-    </div>
-  );
+	return (
+		<div>
+			<DataTable
+				filterLabel="filter names...."
+				filterer="patients"
+				columns={patients}
+				data={data?.patient_data ?? []}
+			/>
+		</div>
+	);
 };

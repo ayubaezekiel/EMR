@@ -9,43 +9,43 @@ import { User } from "@supabase/supabase-js";
 import { users_column } from "../../../../components/table/columns/users";
 
 export const Route = createFileRoute("/_layout/dashboard/users/")({
-  component: () => (
-    <div>
-      <Card
-        variant="ghost"
-        my={"4"}
-        style={{
-          background: "var(--accent-3)",
-        }}
-      >
-        <Flex justify={"between"} align={"center"}>
-          <Heading>Users</Heading>
-          <InviteUser />
-        </Flex>
-      </Card>
-      <AllUsers />
-    </div>
-  ),
+	component: () => (
+		<div>
+			<Card
+				variant="ghost"
+				my={"4"}
+				style={{
+					background: "var(--accent-3)",
+				}}
+			>
+				<Flex justify={"between"} align={"center"}>
+					<Heading>Users</Heading>
+					<InviteUser />
+				</Flex>
+			</Card>
+			<AllUsers />
+		</div>
+	),
 });
 
 const AllUsers = () => {
-  const { data: users_data, isPending: isUsersPending } = useQuery({
-    queryKey: ["users"],
-    queryFn: () => getUsers(),
-  });
+	const { data: users_data, isPending: isUsersPending } = useQuery({
+		queryKey: ["users"],
+		queryFn: () => getUsers(),
+	});
 
-  if (isUsersPending) return <PendingComponent />;
+	if (isUsersPending) return <PendingComponent />;
 
-  const all_users: User[] = users_data?.user_data.users ?? [];
+	const all_users: User[] = users_data?.user_data.users ?? [];
 
-  return (
-    <div>
-      <DataTable
-        columns={users_column}
-        data={all_users}
-        filterLabel="filter by email..."
-        filterer="email"
-      />
-    </div>
-  );
+	return (
+		<div>
+			<DataTable
+				columns={users_column}
+				data={all_users}
+				filterLabel="filter by email..."
+				filterer="email"
+			/>
+		</div>
+	);
 };

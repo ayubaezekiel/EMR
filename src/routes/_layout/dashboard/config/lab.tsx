@@ -5,15 +5,15 @@ import { LabTestParams } from "../../../../components/config/lab/LabTestParams";
 import { LabTests } from "../../../../components/config/lab/LabTest";
 
 export const Route = createFileRoute("/_layout/dashboard/config/lab")({
-  component: () => (
-    <div className="flex flex-col gap-10">
-      <LabTests />
+	component: () => (
+		<div className="flex flex-col gap-10">
+			<LabTests />
 
-      <div className="grid gap-4 md:grid-cols-2 mt-4">
-        <LabTestCategories />
-        <LabTestTemplate />
-        <LabTestParams />
-      </div>
-    </div>
-  ),
+			<div className="grid gap-4 md:grid-cols-2 mt-4">
+				<LabTestCategories />
+				<LabTestTemplate />
+				<LabTestParams />
+			</div>
+		</div>
+	),
 });

@@ -7,22 +7,22 @@ import { appointment_type_column } from "../table/columns/appointment_type";
 import { CreateAppointmentTypeForm } from "../../forms/config/AppointmentTypeForm";
 
 export function AppointmentType() {
-  const { data, isPending } = useQuery(appointmentsTypesQueryOptions);
-  if (isPending) return <PendingComponent />;
+	const { data, isPending } = useQuery(appointmentsTypesQueryOptions);
+	if (isPending) return <PendingComponent />;
 
-  return (
-    <div>
-      <Flex mb={"3"} justify={"between"}>
-        <Heading>Appointment Types</Heading>
-        <CreateAppointmentTypeForm />
-      </Flex>
+	return (
+		<div>
+			<Flex mb={"3"} justify={"between"}>
+				<Heading>Appointment Types</Heading>
+				<CreateAppointmentTypeForm />
+			</Flex>
 
-      <DataTable
-        filterLabel="filter by name..."
-        filterer="name"
-        columns={appointment_type_column}
-        data={data?.appointment_type_data ?? []}
-      />
-    </div>
-  );
+			<DataTable
+				filterLabel="filter by name..."
+				filterer="name"
+				columns={appointment_type_column}
+				data={data?.appointment_type_data ?? []}
+			/>
+		</div>
+	);
 }

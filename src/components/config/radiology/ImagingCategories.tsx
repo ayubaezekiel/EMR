@@ -6,21 +6,21 @@ import { DataTable } from "../../table/DataTable";
 import { imaging_cat_column } from "../../table/columns/radiology";
 
 export function ImagingCategories() {
-  const { data } = useQuery(imagingCatQueryOptions);
+	const { data } = useQuery(imagingCatQueryOptions);
 
-  return (
-    <div>
-      <Flex mb={"3"} justify={"between"}>
-        <Heading>Imaging Categories</Heading>
-        <CreateImagingCategoriesForm />
-      </Flex>
+	return (
+		<div>
+			<Flex mb={"3"} justify={"between"}>
+				<Heading>Imaging Categories</Heading>
+				<CreateImagingCategoriesForm />
+			</Flex>
 
-      <DataTable
-        filterLabel="filter by name..."
-        filterer="name"
-        columns={imaging_cat_column}
-        data={data?.imaging_categories_data ?? []}
-      />
-    </div>
-  );
+			<DataTable
+				filterLabel="filter by name..."
+				filterer="name"
+				columns={imaging_cat_column}
+				data={data?.imaging_categories_data ?? []}
+			/>
+		</div>
+	);
 }
