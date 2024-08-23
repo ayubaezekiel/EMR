@@ -1,11 +1,12 @@
-import { Button, Checkbox } from "@radix-ui/themes";
+import { Button, Card, Checkbox } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { DeleteActionForm } from "../../../../actions/DeleteAction";
 import { deletePlanAction } from "../../../../actions/consultation/actions";
 import { UpdateTreatmentPlanForm } from "../../../consultation/TreatmentPlan";
+import { SharedConsultationTypes } from "../../../consultation/SharedTypes";
 
-export const treatment_plan_column: ColumnDef<DB["treatment_plan"]["Row"]>[] = [
+export const treatment_plan_column: ColumnDef<SharedConsultationTypes>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -46,17 +47,21 @@ export const treatment_plan_column: ColumnDef<DB["treatment_plan"]["Row"]>[] = [
 		),
 	},
 	{
-		accessorKey: "taken_by",
+		accessorKey: "profile",
 		header: "Recorded By",
 		cell: ({ row }) => (
-			<div className="capitalize">{row.getValue("taken_by")}</div>
+			<div className="capitalize">{row.getValue("profile")}</div>
 		),
 	},
 	{
 		accessorKey: "note",
 		header: "Note",
 		cell: ({ row }) => (
-			<div dangerouslySetInnerHTML={{ __html: row.getValue("note") }} />
+			<div className="md:max-w-[50rem] mx-auto">
+				<Card>
+					<div dangerouslySetInnerHTML={{ __html: row.getValue("note") }} />
+				</Card>
+			</div>
 		),
 	},
 	{
@@ -67,7 +72,14 @@ export const treatment_plan_column: ColumnDef<DB["treatment_plan"]["Row"]>[] = [
 
 			return (
 				<div className="flex gap-4">
-					<UpdateTreatmentPlanForm {...plan} />
+					<UpdateTreatmentPlanForm
+						patients_id={plan.patient_id}
+						taken_by={plan.created_by}
+						created_at={plan.created_at}
+						id={plan.id}
+						note={plan.note}
+						is_admission={plan.is_admission}
+					/>
 					<DeleteActionForm
 						id={plan.id}
 						inValidate="treatmentPlan"

@@ -88,6 +88,18 @@ export const getHistoryTaking = async () => {
 	return { history_taking_data };
 };
 
+export const getHistoryTakingById = async (patientId: string) => {
+	const { data: history_taking_data, error: history_taking_err } =
+		await supabase
+			.from("history_taking")
+			.select("*,profile(*)")
+			.eq("patients_id", patientId);
+
+	if (history_taking_err) {
+		toast.error(history_taking_err.message);
+	}
+	return { history_taking_data };
+};
 export const getPaymentMethods = async () => {
 	const { data: payment_method_data, error: payment_method_err } =
 		await supabase.from("payment_methods").select("*");
@@ -170,6 +182,18 @@ export const getTreatmentPlan = async () => {
 	return { plan_data };
 };
 
+export const getTreatmentPlanById = async (patientId: string) => {
+	const { data: plan_data, error: plan_err } = await supabase
+		.from("treatment_plan")
+		.select("*,profile(*)")
+		.eq("patients_id", patientId);
+
+	if (plan_err) {
+		toast.error(plan_err.message);
+	}
+	return { plan_data };
+};
+
 export const getDiagnosis = async () => {
 	const { data: diagnosis_data, error: diagnosis_err } = await supabase
 		.from("patient_diagnosis")
@@ -181,10 +205,34 @@ export const getDiagnosis = async () => {
 	return { diagnosis_data };
 };
 
+export const getDiagnosisById = async (patientId: string) => {
+	const { data: diagnosis_data, error: diagnosis_err } = await supabase
+		.from("patient_diagnosis")
+		.select("*,profile(*)")
+		.eq("patients_id", patientId);
+
+	if (diagnosis_err) {
+		toast.error(diagnosis_err.message);
+	}
+	return { diagnosis_data };
+};
+
 export const getExamination = async () => {
 	const { data: examination_data, error: examination_err } = await supabase
 		.from("patient_examination")
 		.select("*");
+
+	if (examination_err) {
+		toast.error(examination_err.message);
+	}
+	return { examination_data };
+};
+
+export const getExaminationById = async (patientId: string) => {
+	const { data: examination_data, error: examination_err } = await supabase
+		.from("patient_examination")
+		.select("*,profile(*)")
+		.eq("patients_id", patientId);
 
 	if (examination_err) {
 		toast.error(examination_err.message);

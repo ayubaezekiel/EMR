@@ -1,11 +1,12 @@
-import { Button, Checkbox } from "@radix-ui/themes";
+import { Button, Card, Checkbox } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { DeleteActionForm } from "../../../../actions/DeleteAction";
 import { deleteHistoryTakingAction } from "../../../../actions/consultation/actions";
 import { UpdateHistoryTakingForm } from "../../../consultation/HistoryTaking";
+import { SharedConsultationTypes } from "../../../consultation/SharedTypes";
 
-export const history_taking_column: ColumnDef<DB["history_taking"]["Row"]>[] = [
+export const history_taking_column: ColumnDef<SharedConsultationTypes>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -46,17 +47,21 @@ export const history_taking_column: ColumnDef<DB["history_taking"]["Row"]>[] = [
 		),
 	},
 	{
-		accessorKey: "taken_by",
+		accessorKey: "profile",
 		header: "Recorded By",
 		cell: ({ row }) => (
-			<div className="capitalize">{row.getValue("taken_by")}</div>
+			<div className="capitalize">{row.getValue("profile")}</div>
 		),
 	},
 	{
 		accessorKey: "note",
 		header: "Note",
 		cell: ({ row }) => (
-			<div dangerouslySetInnerHTML={{ __html: row.getValue("note") }} />
+			<div className="md:max-w-[50rem] mx-auto">
+				<Card>
+					<div dangerouslySetInnerHTML={{ __html: row.getValue("note") }} />
+				</Card>
+			</div>
 		),
 	},
 	{
@@ -67,7 +72,14 @@ export const history_taking_column: ColumnDef<DB["history_taking"]["Row"]>[] = [
 
 			return (
 				<div className="flex gap-4">
-					<UpdateHistoryTakingForm {...history} />
+					<UpdateHistoryTakingForm
+						patients_id={history.patient_id}
+						taken_by={history.created_by}
+						created_at={history.created_at}
+						id={history.id}
+						note={history.note}
+						is_admission={history.is_admission}
+					/>
 					<DeleteActionForm
 						id={history.id}
 						inValidate="historyTaking"

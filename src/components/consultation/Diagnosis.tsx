@@ -1,38 +1,54 @@
 import { Button, Dialog, Select, Spinner, Text } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
 import { Edit } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { getDiagnosisById } from "../../actions/actions";
 import {
 	createPatientDiagnosisAction,
 	updatePatientDiagnosisAction,
 } from "../../actions/consultation/actions";
-import {
-	consultationTemplatesQueryOptions,
-	diagnosisQueryOptions,
-} from "../../actions/queries";
+import { consultationTemplatesQueryOptions } from "../../actions/queries";
 import { getProfile } from "../../lib/utils";
 import { FieldInfo } from "../FieldInfo";
 import PendingComponent from "../PendingComponent";
 import { DataTable } from "../table/DataTable";
 import { patient_diagnosis_column } from "../table/columns/consultation/diagnosis";
 import { RichEditor } from "../textEditor/RichTextEditor";
+import { SharedConsultationTypes } from "./SharedTypes";
 
 export function Diagnosis({
 	isAdmission,
 	patientId,
 }: { isAdmission: boolean; patientId: string }) {
-	const { data, isPending } = useQuery(diagnosisQueryOptions);
+	const { data, isPending } = useQuery({
+		queryFn: () => getDiagnosisById(patientId),
+		queryKey: ["diagnosis"],
+	});
+
+	const diagnosis_data: SharedConsultationTypes[] =
+		useMemo(
+			() =>
+				data?.diagnosis_data?.map((d) => ({
+					created_by: d.taken_by,
+					created_at: d.created_at,
+					id: d.id,
+					note: d.note,
+					patient_id: d.patients_id,
+					profile: `${d.profile?.first_name} ${d.profile?.middle_name ?? ""} ${d.profile?.last_name}`,
+					is_admission: Boolean(d.is_admission),
+				})),
+			[data?.diagnosis_data],
+		) ?? [];
 	if (isPending) return <PendingComponent />;
 
 	return (
 		<div>
-			<DiagnosisForm patientId={patientId} isAdmission={isAdmission} />
+			<CreateDiagnosisForm patientId={patientId} isAdmission={isAdmission} />
 			<div>
 				<DataTable
 					columns={patient_diagnosis_column}
-					data={data?.diagnosis_data ?? []}
+					data={diagnosis_data}
 					filterLabel="search by name..."
 					filterer="name"
 				/>
@@ -40,7 +56,7 @@ export function Diagnosis({
 		</div>
 	);
 }
-function DiagnosisForm({
+export function CreateDiagnosisForm({
 	isAdmission,
 	patientId,
 }: { isAdmission: boolean; patientId: string }) {
@@ -139,11 +155,6 @@ export function UpdateDiagnosisForm({
 	const [open, onOpenChange] = useState(false);
 	const [template, setTemplate] = useState(values.note);
 	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
-
-	const { patientId } = useParams({
-		from: "/_layout/dashboard/appointments/$patientId",
-	});
-
 	const queryClient = useQueryClient();
 
 	const form = useForm({
@@ -157,7 +168,7 @@ export function UpdateDiagnosisForm({
 			await updatePatientDiagnosisAction({
 				id,
 				note: `${template}`,
-				patients_id: patientId,
+				patients_id: values.patients_id,
 				taken_by: `${prof?.id}`,
 			});
 			form.reset();

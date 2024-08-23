@@ -1,4 +1,4 @@
-import { Checkbox } from "@radix-ui/themes";
+import { Card, Checkbox } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
 import { DeleteActionForm } from "../../../../actions/DeleteAction";
 import { deleteAdmissionReportsAction } from "../../../../actions/config/admission";
@@ -47,7 +47,7 @@ export const nursing_report_column: ColumnDef<NursingReportProps>[] = [
 	},
 	{
 		accessorKey: "profile",
-		header: "Created By",
+		header: "Recorded By",
 		cell: ({ row }) => (
 			<div className="capitalize">{row.getValue("profile")}</div>
 		),
@@ -55,9 +55,13 @@ export const nursing_report_column: ColumnDef<NursingReportProps>[] = [
 
 	{
 		accessorKey: "note",
-		header: "Note",
+		header: () => <div className="text-center">Note</div>,
 		cell: ({ row }) => (
-			<div dangerouslySetInnerHTML={{ __html: row.getValue("note") }} />
+			<div className="md:max-w-[50rem] mx-auto">
+				<Card>
+					<div dangerouslySetInnerHTML={{ __html: row.getValue("note") }} />
+				</Card>
+			</div>
 		),
 	},
 

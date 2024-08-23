@@ -46,7 +46,7 @@ export function RecordsAndTaskForm({
 			});
 			form.reset();
 			onOpenChange(false);
-			queryClient.invalidateQueries({ queryKey: ["nursingReport"] });
+			queryClient.invalidateQueries({ queryKey: ["nursingReports"] });
 		},
 	});
 
@@ -147,7 +147,7 @@ export function UpdateRecordsAndTaskForm(
 			});
 			form.reset();
 			onOpenChange(false);
-			queryClient.invalidateQueries({ queryKey: ["nursingReport"] });
+			queryClient.invalidateQueries({ queryKey: ["nursingReports"] });
 		},
 	});
 
@@ -156,7 +156,7 @@ export function UpdateRecordsAndTaskForm(
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
 			<Dialog.Trigger>
-				<Button size={"4"} variant="ghost">
+				<Button variant="ghost">
 					<Edit size={16} />
 				</Button>
 			</Dialog.Trigger>

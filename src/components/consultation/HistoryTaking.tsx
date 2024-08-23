@@ -1,39 +1,58 @@
 import { Button, Dialog, Select, Spinner, Text } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
 	createHistoryTakingAction,
 	updateHistoryTakingAction,
 } from "../../actions/consultation/actions";
-import {
-	consultationTemplatesQueryOptions,
-	historyTakingQueryOptions,
-} from "../../actions/queries";
+import { consultationTemplatesQueryOptions } from "../../actions/queries";
 import { getProfile } from "../../lib/utils";
 import { FieldInfo } from "../FieldInfo";
 import PendingComponent from "../PendingComponent";
 import { DataTable } from "../table/DataTable";
 import { history_taking_column } from "../table/columns/consultation/history_taking";
 import { RichEditor } from "../textEditor/RichTextEditor";
+import { getHistoryTakingById } from "../../actions/actions";
+import { SharedConsultationTypes } from "./SharedTypes";
 
 export function HistoryTaking({
 	isAdmission,
 	patientId,
 }: { isAdmission: boolean; patientId: string }) {
-	const { data, isPending } = useQuery(historyTakingQueryOptions);
+	const { data, isPending } = useQuery({
+		queryFn: () => getHistoryTakingById(patientId),
+		queryKey: ["historyTaking", patientId],
+	});
+
+	const history_data: SharedConsultationTypes[] =
+		useMemo(
+			() =>
+				data?.history_taking_data?.map((d) => ({
+					created_by: d.taken_by,
+					created_at: d.created_at,
+					id: d.id,
+					note: d.note,
+					patient_id: d.patients_id,
+					profile: `${d.profile?.first_name} ${d.profile?.middle_name ?? ""} ${d.profile?.last_name}`,
+					is_admission: Boolean(d.is_admission),
+				})),
+			[data?.history_taking_data],
+		) ?? [];
 	if (isPending) return <PendingComponent />;
 
 	return (
 		<div>
-			<HistoryTakingForm patientId={patientId} isAdmission={isAdmission} />
+			<CreateHistoryTakingForm
+				patientId={patientId}
+				isAdmission={isAdmission}
+			/>
 			<div>
 				<DataTable
 					columns={history_taking_column}
-					data={data?.history_taking_data ?? []}
+					data={history_data}
 					filterLabel="search by name..."
 					filterer="name"
 				/>
@@ -41,7 +60,7 @@ export function HistoryTaking({
 		</div>
 	);
 }
-function HistoryTakingForm({
+export function CreateHistoryTakingForm({
 	isAdmission,
 	patientId,
 }: { isAdmission: boolean; patientId: string }) {
@@ -138,10 +157,6 @@ export function UpdateHistoryTakingForm({
 	const [template, setTemplate] = useState(values.note);
 	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
 
-	const { patientId } = useParams({
-		from: "/_layout/dashboard/appointments/$patientId",
-	});
-
 	const queryClient = useQueryClient();
 
 	const form = useForm({
@@ -155,7 +170,7 @@ export function UpdateHistoryTakingForm({
 			await updateHistoryTakingAction({
 				id: id,
 				note: `${template}`,
-				patients_id: patientId,
+				patients_id: values.patients_id,
 				taken_by: `${prof?.id}`,
 			});
 			form.reset();
