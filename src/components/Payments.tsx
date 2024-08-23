@@ -27,10 +27,12 @@ interface PaymentActionType {
 	amount: string;
 	services: [{ name: string; amount: string }];
 	appointmentId?: string;
+	admissionId?: string;
 	requestId?: string;
 	is_appointment?: boolean;
 	is_request?: boolean;
 	isApproved?: boolean;
+	isAdmission?: boolean;
 }
 export const ApprovePayments = ({
 	amount,
@@ -41,6 +43,8 @@ export const ApprovePayments = ({
 	is_request,
 	is_appointment,
 	isApproved,
+	isAdmission,
+	admissionId,
 }: PaymentActionType) => {
 	const { isPending: isPaymentMethodPending, data: payment_method_data } =
 		useQuery(paymentMethodsQueryOptions);
@@ -57,6 +61,8 @@ export const ApprovePayments = ({
 			cash_points_id: "",
 			is_appointment: is_appointment,
 			is_request: is_request,
+			admissions_id: admissionId,
+			is_admission: isAdmission,
 			appointment_id: appointmentId,
 			request_id: requestId,
 			services: services,
@@ -67,13 +73,10 @@ export const ApprovePayments = ({
 			const user = await checkAuth();
 			const { error } = await supabase
 				.from("payments")
-				.insert([
-					{
-						approved_by: `${user?.id}`,
-
-						...value,
-					},
-				])
+				.insert({
+					approved_by: `${user?.id}`,
+					...value,
+				})
 				.select();
 			if (error) {
 				toast.error(error.message);
@@ -84,8 +87,9 @@ export const ApprovePayments = ({
 					queryClient.invalidateQueries({
 						queryKey: ["appointments"],
 					});
-				} else {
-					queryClient.invalidateQueries({ queryKey: ["requests"] });
+				}
+				if (isAdmission) {
+					queryClient.invalidateQueries({ queryKey: ["admissions"] });
 				}
 			}
 		},

@@ -2,15 +2,8 @@ import { Button, Dialog, Select, Spinner, Text } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
-import Highlight from "@tiptap/extension-highlight";
-import { Subscript } from "@tiptap/extension-subscript";
-import Superscript from "@tiptap/extension-superscript";
-import TextAlign from "@tiptap/extension-text-align";
-import Underline from "@tiptap/extension-underline";
-import { useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import { Edit } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
 	createPatientDiagnosisAction,
 	updatePatientDiagnosisAction,
@@ -22,19 +15,20 @@ import {
 import { getProfile } from "../../lib/utils";
 import { FieldInfo } from "../FieldInfo";
 import PendingComponent from "../PendingComponent";
-import { useStepper } from "../stepper";
 import { DataTable } from "../table/DataTable";
 import { patient_diagnosis_column } from "../table/columns/consultation/diagnosis";
 import { RichEditor } from "../textEditor/RichTextEditor";
-import { StepperFormActions } from "./StepperFormAction";
 
-export function Diagnosis() {
+export function Diagnosis({
+	isAdmission,
+	patientId,
+}: { isAdmission: boolean; patientId: string }) {
 	const { data, isPending } = useQuery(diagnosisQueryOptions);
 	if (isPending) return <PendingComponent />;
 
 	return (
 		<div>
-			<DiagnosisForm />
+			<DiagnosisForm patientId={patientId} isAdmission={isAdmission} />
 			<div>
 				<DataTable
 					columns={patient_diagnosis_column}
@@ -46,15 +40,12 @@ export function Diagnosis() {
 		</div>
 	);
 }
-function DiagnosisForm() {
-	const { nextStep } = useStepper();
-	const { isLastStep } = useStepper();
+function DiagnosisForm({
+	isAdmission,
+	patientId,
+}: { isAdmission: boolean; patientId: string }) {
 	const [template, setTemplate] = useState("");
 	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
-
-	const { appointmentId } = useParams({
-		from: "/_layout/dashboard/appointments/$appointmentId",
-	});
 
 	const queryClient = useQueryClient();
 
@@ -69,33 +60,14 @@ function DiagnosisForm() {
 			const prof = await getProfile();
 			await createPatientDiagnosisAction({
 				note: `${template}`,
-				patients_id: appointmentId,
+				patients_id: patientId,
 				taken_by: `${prof?.id}`,
+				is_admission: isAdmission,
 			});
 			form.reset();
 			queryClient.invalidateQueries({ queryKey: ["diagnosis"] });
-			nextStep();
 		},
 	});
-
-	const editor = useEditor({
-		extensions: [
-			StarterKit,
-			Underline,
-			Superscript,
-			Subscript,
-			Highlight,
-			TextAlign.configure({ types: ["heading", "paragraph"] }),
-		],
-		onUpdate: ({ editor }) => {
-			setTemplate(editor.getHTML());
-		},
-		content: template,
-	});
-
-	useEffect(() => {
-		editor?.commands.setContent(template);
-	}, [editor, template]);
 
 	if (isPending) return <PendingComponent />;
 
@@ -156,13 +128,6 @@ function DiagnosisForm() {
 					)}
 				/>
 			</form>
-			<StepperFormActions
-				submitComp={
-					<Button onClick={nextStep} size={"4"}>
-						{isLastStep ? "Finish" : "Next"}
-					</Button>
-				}
-			/>
 		</div>
 	);
 }
@@ -170,13 +135,13 @@ function DiagnosisForm() {
 export function UpdateDiagnosisForm({
 	id,
 	...values
-}: DB["patient_diagnosis"]["Update"]) {
+}: DB["patient_diagnosis"]["Update"] & { isAdmission: boolean }) {
 	const [open, onOpenChange] = useState(false);
 	const [template, setTemplate] = useState(values.note);
 	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
 
-	const { appointmentId } = useParams({
-		from: "/_layout/dashboard/appointments/$appointmentId",
+	const { patientId } = useParams({
+		from: "/_layout/dashboard/appointments/$patientId",
 	});
 
 	const queryClient = useQueryClient();
@@ -192,32 +157,13 @@ export function UpdateDiagnosisForm({
 			await updatePatientDiagnosisAction({
 				id,
 				note: `${template}`,
-				patients_id: appointmentId,
+				patients_id: patientId,
 				taken_by: `${prof?.id}`,
 			});
 			form.reset();
 			queryClient.invalidateQueries({ queryKey: ["diagnosis"] });
 		},
 	});
-
-	const editor = useEditor({
-		extensions: [
-			StarterKit,
-			Underline,
-			Superscript,
-			Subscript,
-			Highlight,
-			TextAlign.configure({ types: ["heading", "paragraph"] }),
-		],
-		onUpdate: ({ editor }) => {
-			setTemplate(editor.getHTML());
-		},
-		content: template,
-	});
-
-	useEffect(() => {
-		editor?.commands.setContent(template!);
-	}, [editor, template]);
 
 	if (isPending) return <PendingComponent />;
 
@@ -265,7 +211,10 @@ export function UpdateDiagnosisForm({
 										Note{" "}
 										<Text size={"1"}>(should be atleast 10 characters)</Text>*
 									</Text>
-									<RichEditor editor={editor} />
+									<RichEditor
+										initialValue={field.state.value!}
+										onChange={(e) => field.handleChange(e)}
+									/>
 									<FieldInfo field={field} />
 								</div>
 							)}

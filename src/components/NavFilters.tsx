@@ -13,14 +13,12 @@ import { Link } from "@tanstack/react-router";
 import { AlertCircle, Search } from "lucide-react";
 import { useState } from "react";
 import { patientsQueryOptions } from "../actions/queries";
-import PendingComponent from "./PendingComponent";
 
 export function NavPatientFilters() {
 	const [patient, setPatient] = useState("");
 	const [open, onOpenChange] = useState(false);
 
 	const { data, isPending } = useQuery(patientsQueryOptions);
-	if (isPending) return <PendingComponent />;
 
 	const filtered_patients = data?.patient_data?.filter(
 		(p) =>
@@ -47,7 +45,7 @@ export function NavPatientFilters() {
 									<Search />
 								</TextField.Slot>
 							</TextField.Root>
-							{patient.length < 3 ? (
+							{patient.length < 3 || isPending ? (
 								<div className="flex justify-center mt-4">
 									<Spinner />
 								</div>

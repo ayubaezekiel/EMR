@@ -1,44 +1,54 @@
-import { Button, Card, Flex } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
-import { getPatientVitalsById } from "../../actions/actions";
-import PendingComponent from "../PendingComponent";
-import { useStepper } from "../stepper";
+import { Badge, Card } from "@radix-ui/themes";
+import { CreateAntenatalRequestForm } from "../../forms/requests/AntenatalRequestForm";
+import { CreateConsumableRequestForm } from "../../forms/requests/ConsumableRequestForm";
+import { CreateLabRequestForm } from "../../forms/requests/LabRequestForm";
+import { CreatePharmRequestForm } from "../../forms/requests/PharmRequestForm";
+import { CreateProcedureRequestForm } from "../../forms/requests/ProcedureRequestForm";
+import { CreateRadiologyRequestForm } from "../../forms/requests/RadioloyRequestForm";
 
-export function IssueRequests() {
-	const { nextStep, prevStep } = useStepper();
-
-	const { appointmentId } = useParams({
-		from: "/_layout/dashboard/appointments/$appointmentId",
-	});
-	const { data, isPending } = useQuery({
-		queryFn: () => getPatientVitalsById(appointmentId),
-		queryKey: ["patientVitalsById"],
-	});
-
-	if (isPending) return <PendingComponent />;
+export function IssueRequests({ patientId }: { patientId: string }) {
 	return (
 		<div>
 			<Card my={"6"}>
 				<div className="grid gap-3 md:grid-cols-3">
-					<Button size={"4"}>Issue Laboratory Request</Button>
-					<Button size={"4"}>Issue Pharmacy Request</Button>
-					<Button size={"4"}>Issue Radiology Request</Button>
-					<Button size={"4"}>Issue Antenatal Request</Button>
-					<Button size={"4"}>Issue Consumable Request</Button>
-					<Button size={"4"}>Issue Procedure Request</Button>
+					<Card>
+						<Badge color="red" mb={"5"}>
+							Issue Laboratory Request
+						</Badge>
+						<CreateLabRequestForm patientId={patientId} />
+					</Card>
+					<Card>
+						<Badge color="red" mb={"5"}>
+							Issue Pharmacy Request
+						</Badge>
+						<CreatePharmRequestForm patientId={patientId} />
+					</Card>
+					<Card>
+						<Badge color="red" mb={"5"}>
+							Issue Radiology Request
+						</Badge>
+						<CreateRadiologyRequestForm patientId={patientId} />
+					</Card>
+					<Card>
+						<Badge color="red" mb={"5"}>
+							Issue Antenatal Request
+						</Badge>
+						<CreateAntenatalRequestForm />
+					</Card>
+					<Card>
+						<Badge color="red" mb={"5"}>
+							Issue Consumable Request
+						</Badge>
+						<CreateConsumableRequestForm patientId={patientId} />
+					</Card>
+					<Card>
+						<Badge color="red" mb={"5"}>
+							Issue Procedure Request
+						</Badge>
+						<CreateProcedureRequestForm patientId={patientId} />
+					</Card>
 				</div>
 			</Card>
-
-			<Flex justify={"end"} gap={"2"}>
-				<Button variant="soft" type="button" onClick={prevStep} size={"4"}>
-					Prev
-				</Button>
-
-				<Button type="submit" onClick={nextStep} size={"4"}>
-					Reset
-				</Button>
-			</Flex>
 		</div>
 	);
 }

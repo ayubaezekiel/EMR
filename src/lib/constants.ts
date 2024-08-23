@@ -1,5 +1,6 @@
 import {
 	Beaker,
+	Bed,
 	BedDouble,
 	BookA,
 	Building2,
@@ -58,12 +59,12 @@ export const services_routes = [
 		link_title: "Manage",
 		icon: BedDouble,
 	},
-	// {
-	//   route: "/dashboard/antenatal/",
-	//   name: "Antenatal",
-	//   link_title: "Manage",
-	//   icon: Bed,
-	// },
+	{
+		route: "/dashboard/consultations",
+		name: "Consultation Requests",
+		link_title: "Manage",
+		icon: Bed,
+	},
 	{
 		route: "/dashboard/procedures/",
 		name: "Medical Procedures",

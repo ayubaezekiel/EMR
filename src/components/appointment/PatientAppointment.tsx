@@ -1,82 +1,34 @@
 import {
 	Avatar,
 	Badge,
-	Button,
 	Callout,
 	Card,
 	Flex,
 	Strong,
 	Text,
 } from "@radix-ui/themes";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { FileQuestion, UserCheck } from "lucide-react";
-import { useMemo } from "react";
-import { changeAppointmentStatus } from "../../actions/actions";
-import { appointmentsQueryOptions } from "../../actions/queries";
+import supabase from "../../supabase/client";
 import PendingComponent from "../PendingComponent";
-import { ConfirmAppointmentUpdate } from "./ConfirmAppointmentUpdate";
 
-export function AppointmentCheckedIn({
-	type,
-	to,
-	from,
-	searchName,
-}: {
-	type: string;
-	to: string;
-	from: string;
-	searchName: string;
-}) {
-	const queryClient = useQueryClient();
+export function PatientAppointments({ patientId }: { patientId: string }) {
+	const { data: appointments, isPending: isAppointmentPending } = useQuery({
+		queryFn: async () => {
+			const { data } = await supabase
+				.from("appointments")
+				.select("*,patients(*),appointment_types(*),clinics(*)")
+				.eq("patients_id", patientId);
+			return data;
+		},
+		queryKey: ["appointmentsById"],
+	});
 
-	const { data: appointments, isPending: isAppointmentPending } = useQuery(
-		appointmentsQueryOptions,
-	);
+	const appointment_data = appointments;
 
-	const appointment_data_checkedIn = useMemo(
-		() =>
-			appointments?.appointment_data?.filter((a) => {
-				if (searchName.length > 3 && type.length > 3) {
-					return (
-						a.appointment_types?.name.toLowerCase() === type.toLowerCase() &&
-						`${a.patients?.first_name} ${a.patients?.middle_name} ${a.patients?.last_name}`
-							.replace(/\s/g, "")
-							.toLowerCase()
-							.includes(searchName.replace(/\s/g, "").toLowerCase()) &&
-						a.is_checkedin === true
-					);
-				}
-				if (type.length > 3) {
-					return (
-						a.appointment_types?.name.toLowerCase() === type.toLowerCase() &&
-						a.is_checkedin === true
-					);
-				}
-				if (searchName.length > 3) {
-					return (
-						`${a.patients?.first_name} ${a.patients?.middle_name} ${a.patients?.last_name}`
-							.replace(/\s/g, "")
-							.toLowerCase()
-							.includes(searchName.replace(/\s/g, "").toLowerCase()) &&
-						a.is_checkedin === true
-					);
-				}
-				if (
-					`[${from}, ${to})`.length > 10 &&
-					`[${from}, ${to})` !== "[2000-01-01 15:00, 2000-01-01 16:00)"
-				) {
-					return a.is_checkedin === true;
-					// filteredDateTimeData.filter((f) => f.is_checkedin === true);
-					// appointmentsFiltered?.filter((f) => f.is_checkedin === true);
-				}
-				return a.is_checkedin === true;
-			}),
-		[appointments?.appointment_data, searchName, from, to, type],
-	);
 	if (isAppointmentPending) return <PendingComponent />;
 
-	return appointment_data_checkedIn?.length === 0 ? (
+	return appointment_data?.length === 0 ? (
 		<Flex justify={"center"}>
 			<Callout.Root mt={"9"}>
 				<Callout.Icon>
@@ -87,7 +39,7 @@ export function AppointmentCheckedIn({
 		</Flex>
 	) : (
 		<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-			{appointment_data_checkedIn?.map((a) => (
+			{appointment_data?.map((a) => (
 				<Card key={a.id}>
 					<Flex justify={"between"}>
 						<Flex gap={"2"} align={"center"}>
@@ -164,7 +116,7 @@ export function AppointmentCheckedIn({
 							</div>
 						</Flex>
 					</Flex>
-					<Flex justify={"between"} mt={"4"}>
+					{/* <Flex justify={"between"} mt={"4"}>
 						<ConfirmAppointmentUpdate
 							id={a.id}
 							title="Move To Waiting?"
@@ -224,14 +176,11 @@ export function AppointmentCheckedIn({
 							}}
 						/>
 						<Button asChild size={"2"} radius="full">
-							<Link
-								to={`/dashboard/appointments/${a.patients_id}`}
-								search={{ admission: false }}
-							>
+							<Link to={`/dashboard/appointments/${a.patients_id}`}>
 								Attend
 							</Link>
 						</Button>
-					</Flex>
+					</Flex> */}
 				</Card>
 			))}
 		</div>

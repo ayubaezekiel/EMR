@@ -1,12 +1,16 @@
-import { Button, Checkbox } from "@radix-ui/themes";
+import { Badge, Button, Card, Checkbox, Flex } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
 import { DeleteActionForm } from "../../../actions/DeleteAction";
-import { deleteVitalsAction } from "../../../actions/config/vitals";
+import {
+	deletePatientVitalsAction,
+	deleteVitalsAction,
+} from "../../../actions/config/vitals";
 import {
 	UpdatePatientVitalsForm,
 	UpdateVitalsForm,
 } from "../../../forms/config/Vitals";
 import { ArrowUpDown } from "lucide-react";
+import { VitalsProps } from "../../consultation/PatientVitals";
 
 export const vitals_column: ColumnDef<DB["vitals"]["Row"]>[] = [
 	{
@@ -64,7 +68,7 @@ export const vitals_column: ColumnDef<DB["vitals"]["Row"]>[] = [
 	},
 ];
 
-export const patient_vitals_column: ColumnDef<DB["patient_vitals"]["Row"]>[] = [
+export const patient_vitals_column: ColumnDef<VitalsProps>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -105,22 +109,30 @@ export const patient_vitals_column: ColumnDef<DB["patient_vitals"]["Row"]>[] = [
 		),
 	},
 	{
-		accessorKey: "name",
-		header: "Name",
-		cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
-	},
-	{
-		accessorKey: "value",
-		header: "Value",
+		accessorKey: "profile",
+		header: () => <div className="text-center">Vitals</div>,
 		cell: ({ row }) => (
-			<div className="capitalize">{row.getValue("value")}</div>
+			<div>
+				Recoreded By - <Badge>{row.getValue("profile")}</Badge>
+				<div className="grid md:grid-cols-4 gap-2 mt-2">
+					{JSON.parse(JSON.stringify(row.original.vitals)).map(
+						(v: { name: string; value: string; unit: string }) => (
+							<Card>
+								<Flex justify={"between"} align={"center"}>
+									{v.name}
+									<Badge color="red" size={"3"}>
+										{v.value}
+										{v.unit}
+									</Badge>
+								</Flex>
+							</Card>
+						),
+					)}
+				</div>
+			</div>
 		),
 	},
-	{
-		accessorKey: "unit",
-		header: "Unit",
-		cell: ({ row }) => <div className="capitalize">{row.getValue("unit")}</div>,
-	},
+
 	{
 		id: "actions",
 		enableHiding: false,
@@ -136,7 +148,9 @@ export const patient_vitals_column: ColumnDef<DB["patient_vitals"]["Row"]>[] = [
 						title="Delete Patient Vitals"
 						warning="Are you sure? this vitals will be parmanently deleted from the
           database."
-						actionFn={async () => await deleteVitalsAction({ id: vitals.id })}
+						actionFn={async () =>
+							await deletePatientVitalsAction({ id: vitals.id })
+						}
 					/>
 				</div>
 			);

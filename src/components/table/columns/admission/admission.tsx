@@ -3,7 +3,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { CheckCircle, X } from "lucide-react";
 import { DeleteActionForm } from "../../../../actions/DeleteAction";
 import { deleteAdmissionAction } from "../../../../actions/config/admission";
-import { UpdateAdmissionForm } from "../../../../forms/config/admission/AdmissionForm";
+import { UpdateAdmissionForm } from "../../../../forms/admission/AdmissionForm";
 
 export const admission_column: ColumnDef<DB["admissions"]["Row"]>[] = [
 	{

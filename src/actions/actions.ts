@@ -6,7 +6,7 @@ import { checkAuth } from "../lib/utils";
 export const getAdmissions = async () => {
 	const { data: admissions_data, error: admissions_error } = await supabase
 		.from("admissions")
-		.select("*,patients(*)");
+		.select("*,patients(*),beds(*),wards(*)");
 
 	if (admissions_error) {
 		toast.error(admissions_error.message);
@@ -249,6 +249,28 @@ export const getVitals = async () => {
 	return { vitals_data };
 };
 
+export const getNursingReportsById = async (patientId: string) => {
+	const { data: nursing_report_data, error } = await supabase
+		.from("nursing_report")
+		.select("*,profile(*)")
+		.eq("patient_id", patientId);
+
+	if (error) {
+		toast.error(error.message);
+	}
+	return { nursing_report_data };
+};
+
+export const getNursingReports = async () => {
+	const { data: nursing_report_data, error } = await supabase
+		.from("nursing_report")
+		.select("*,profile(*)");
+
+	if (error) {
+		toast.error(error.message);
+	}
+	return { nursing_report_data };
+};
 export const getPatientVitals = async () => {
 	const { data: patient_vitals_data, error: patient_vitals_err } =
 		await supabase.from("patient_vitals").select("*");
@@ -261,7 +283,10 @@ export const getPatientVitals = async () => {
 
 export const getPatientVitalsById = async (patientId: string) => {
 	const { data: patient_vitals_data, error: patient_vitals_err } =
-		await supabase.from("patient_vitals").select("*").eq("patient", patientId);
+		await supabase
+			.from("patient_vitals")
+			.select("*,profile(*)")
+			.eq("patient_id", patientId);
 
 	if (patient_vitals_err) {
 		toast.error(patient_vitals_err.message);
@@ -342,6 +367,17 @@ export const getProcedures = async () => {
 		toast.error(procedure_err.message);
 	}
 	return { procedure_data };
+};
+
+export const getConsultations = async () => {
+	const { data: consultation_data, error: consultation_err } = await supabase
+		.from("admission_consultations")
+		.select("*,admissions(*,patients(*),wards(*),beds(*))");
+
+	if (consultation_err) {
+		toast.error(consultation_err.message);
+	}
+	return { consultation_data };
 };
 
 export const getTheatres = async () => {

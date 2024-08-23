@@ -3,15 +3,8 @@ import { useForm } from "@tanstack/react-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import Highlight from "@tiptap/extension-highlight";
-import { Subscript } from "@tiptap/extension-subscript";
-import Superscript from "@tiptap/extension-superscript";
-import TextAlign from "@tiptap/extension-text-align";
-import Underline from "@tiptap/extension-underline";
-import { useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import { Edit } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
 	createHistoryTakingAction,
 	updateHistoryTakingAction,
@@ -23,19 +16,20 @@ import {
 import { getProfile } from "../../lib/utils";
 import { FieldInfo } from "../FieldInfo";
 import PendingComponent from "../PendingComponent";
-import { useStepper } from "../stepper";
 import { DataTable } from "../table/DataTable";
 import { history_taking_column } from "../table/columns/consultation/history_taking";
 import { RichEditor } from "../textEditor/RichTextEditor";
-import { StepperFormActions } from "./StepperFormAction";
 
-export function HistoryTaking() {
+export function HistoryTaking({
+	isAdmission,
+	patientId,
+}: { isAdmission: boolean; patientId: string }) {
 	const { data, isPending } = useQuery(historyTakingQueryOptions);
 	if (isPending) return <PendingComponent />;
 
 	return (
 		<div>
-			<HistoryTakingForm />
+			<HistoryTakingForm patientId={patientId} isAdmission={isAdmission} />
 			<div>
 				<DataTable
 					columns={history_taking_column}
@@ -47,15 +41,12 @@ export function HistoryTaking() {
 		</div>
 	);
 }
-function HistoryTakingForm() {
-	const { nextStep } = useStepper();
-	const { isLastStep } = useStepper();
+function HistoryTakingForm({
+	isAdmission,
+	patientId,
+}: { isAdmission: boolean; patientId: string }) {
 	const [template, setTemplate] = useState("");
 	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
-
-	const { appointmentId } = useParams({
-		from: "/_layout/dashboard/appointments/$appointmentId",
-	});
 
 	const queryClient = useQueryClient();
 
@@ -70,33 +61,14 @@ function HistoryTakingForm() {
 			const prof = await getProfile();
 			await createHistoryTakingAction({
 				note: `${template}`,
-				patients_id: appointmentId,
+				patients_id: patientId,
 				taken_by: `${prof?.id}`,
+				is_admission: isAdmission,
 			});
 			form.reset();
 			queryClient.invalidateQueries({ queryKey: ["historyTaking"] });
-			nextStep();
 		},
 	});
-
-	const editor = useEditor({
-		extensions: [
-			StarterKit,
-			Underline,
-			Superscript,
-			Subscript,
-			Highlight,
-			TextAlign.configure({ types: ["heading", "paragraph"] }),
-		],
-		onUpdate: ({ editor }) => {
-			setTemplate(editor.getHTML());
-		},
-		content: template,
-	});
-
-	useEffect(() => {
-		editor?.commands.setContent(template);
-	}, [editor, template]);
 
 	if (isPending) return <PendingComponent />;
 
@@ -131,7 +103,10 @@ function HistoryTakingForm() {
 							<Text size={"3"}>
 								Note <Text size={"1"}>(should be atleast 10 characters)</Text>*
 							</Text>
-							<RichEditor editor={editor} />
+							<RichEditor
+								initialValue={field.state.value!}
+								onChange={(e) => field.handleChange(e)}
+							/>
 							<FieldInfo field={field} />
 						</div>
 					)}
@@ -151,13 +126,6 @@ function HistoryTakingForm() {
 					)}
 				/>
 			</form>
-			<StepperFormActions
-				submitComp={
-					<Button onClick={nextStep} size={"4"}>
-						{isLastStep ? "Finish" : "Next"}
-					</Button>
-				}
-			/>
 		</div>
 	);
 }
@@ -170,26 +138,11 @@ export function UpdateHistoryTakingForm({
 	const [template, setTemplate] = useState(values.note);
 	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
 
-	const { appointmentId } = useParams({
-		from: "/_layout/dashboard/appointments/$appointmentId",
+	const { patientId } = useParams({
+		from: "/_layout/dashboard/appointments/$patientId",
 	});
 
 	const queryClient = useQueryClient();
-	const editor = useEditor({
-		extensions: [
-			StarterKit,
-			Underline,
-			Superscript,
-			Subscript,
-			Highlight,
-			TextAlign.configure({ types: ["heading", "paragraph"] }),
-		],
-		onUpdate: ({ editor }) => {
-			setTemplate(editor.getHTML());
-		},
-
-		content: template,
-	});
 
 	const form = useForm({
 		defaultValues: {
@@ -202,7 +155,7 @@ export function UpdateHistoryTakingForm({
 			await updateHistoryTakingAction({
 				id: id,
 				note: `${template}`,
-				patients_id: appointmentId,
+				patients_id: patientId,
 				taken_by: `${prof?.id}`,
 			});
 			form.reset();
@@ -210,10 +163,6 @@ export function UpdateHistoryTakingForm({
 			onOpenChange(false);
 		},
 	});
-
-	useEffect(() => {
-		editor?.commands.setContent(template!);
-	}, [editor, template]);
 
 	if (isPending) return <PendingComponent />;
 
@@ -261,7 +210,10 @@ export function UpdateHistoryTakingForm({
 										Note{" "}
 										<Text size={"1"}>(should be atleast 10 characters)</Text>*
 									</Text>
-									<RichEditor editor={editor} />
+									<RichEditor
+										initialValue={field.state.value!}
+										onChange={(e) => field.handleChange(e)}
+									/>
 									<FieldInfo field={field} />
 								</div>
 							)}

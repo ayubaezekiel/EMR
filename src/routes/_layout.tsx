@@ -1,16 +1,15 @@
 import { Box, Heading, Section } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import {
-	createFileRoute,
 	Outlet,
+	createFileRoute,
 	redirect,
 	useNavigate,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Header } from "../components/Header";
-import PendingComponent from "../components/PendingComponent";
 import { Sidebar } from "../components/SideBar";
 import { checkAuth } from "../lib/utils";
-import { useEffect } from "react";
 
 const Layout = () => {
 	const navigate = useNavigate();
@@ -29,11 +28,13 @@ const Layout = () => {
 		block();
 	}, [navigate]);
 
-	if (isPending) return <PendingComponent />;
-
 	return (
 		<Box>
-			<Header user={`${data?.email}`} userId={`${data?.id}`} />
+			<Header
+				isPending={isPending}
+				user={`${data?.email}`}
+				userId={`${data?.id}`}
+			/>
 			<aside className="lg:flex w-72 hidden justify-start  fixed inset-y-0">
 				<Sidebar />
 			</aside>

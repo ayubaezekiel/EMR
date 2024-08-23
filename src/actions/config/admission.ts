@@ -58,6 +58,61 @@ export const createAdmissionAction = async (
 	}
 };
 
+export const createAdmissionReportsAction = async (
+	values: DB["nursing_report"]["Insert"],
+) => {
+	const { error } = await supabase.from("nursing_report").insert(values);
+	if (error) {
+		toast.error(error.message);
+	} else {
+		toast.success("record created successfully");
+	}
+};
+
+export const createConsultationAction = async (
+	values: DB["admission_consultations"]["Insert"],
+) => {
+	const { error } = await supabase
+		.from("admission_consultations")
+		.insert(values);
+	if (error) {
+		toast.error(error.message);
+	} else {
+		toast.success("consultation created successfully");
+	}
+};
+export const updateAdmissionReportsAction = async (
+	values: DB["nursing_report"]["Update"],
+) => {
+	if (values.id) {
+		const { error } = await supabase
+			.from("nursing_report")
+			.update(values)
+			.eq("id", values.id);
+		if (error) {
+			toast.error(error.message);
+		} else {
+			toast.success("record updated successfully");
+		}
+	}
+};
+
+export const updateConsultationAction = async (
+	values: DB["admission_consultations"]["Update"],
+) => {
+	if (values.id) {
+		const { error } = await supabase
+			.from("admission_consultations")
+			.update(values)
+			.eq("id", values.id);
+		if (error) {
+			toast.error(error.message);
+		} else {
+			toast.success("consultation updated successfully");
+		}
+	}
+};
+
 export const updateAdmissionAction = async (
 	values: DB["admissions"]["Update"],
 ) => {
@@ -100,7 +155,18 @@ export const updateFluidRoutesAction = async (
 		}
 	}
 };
-
+export const deleteAdmissionReportsAction = async ({ id }: { id: string }) => {
+	if (id) {
+		const { error } = await supabase
+			.from("nursing_report")
+			.delete()
+			.eq("id", id);
+		if (error) {
+			toast.error(error.message);
+		}
+		toast.success("record deleted successfully");
+	}
+};
 export const deleteAdmissionAction = async ({ id }: { id: string }) => {
 	if (id) {
 		const { error } = await supabase.from("admissions").delete().eq("id", id);
@@ -137,5 +203,18 @@ export const deleteBedAction = async ({ id }: { id: string }) => {
 			toast.error(error.message);
 		}
 		toast.success("bed  deleted successfully");
+	}
+};
+
+export const deleteConsultationAction = async ({ id }: { id: string }) => {
+	if (id) {
+		const { error } = await supabase
+			.from("admission_consultations")
+			.delete()
+			.eq("id", id);
+		if (error) {
+			toast.error(error.message);
+		}
+		toast.success("consultation deleted successfully");
 	}
 };

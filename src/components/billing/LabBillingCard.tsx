@@ -2,6 +2,7 @@ import { Badge, Card, Flex, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { requestQueryOptions } from "../../actions/queries";
+import { UpdateLabRequestForm } from "../../forms/requests/LabRequestForm";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";
 import PendingComponent from "../PendingComponent";
@@ -25,14 +26,16 @@ export function LabBillingCard() {
 			<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
 				{lab_data_filtered?.map((a) => (
 					<Card key={a.id}>
-						<PatientCardHeader
-							createdAt={a.created_at}
-							firstName={a.patients?.first_name as string}
-							lastName={a.patients?.last_name as string}
-							patientId={a.patients_id}
-							middleName={a.patients?.middle_name as string}
-						/>
-
+						<Flex justify={"between"}>
+							<PatientCardHeader
+								createdAt={a.created_at}
+								firstName={a.patients?.first_name as string}
+								lastName={a.patients?.last_name as string}
+								patientId={a.patients_id}
+								middleName={a.patients?.middle_name as string}
+							/>
+							<UpdateLabRequestForm {...a} />
+						</Flex>
 						<Flex direction={"column"} mt={"4"} height={"100px"}>
 							<div className="flex flex-wrap gap-2 mt-4">
 								{JSON.parse(JSON.stringify(a.services)).map(
@@ -50,7 +53,7 @@ export function LabBillingCard() {
 						</Flex>
 						<Flex justify={"end"} align={"center"} mt={"4"}>
 							<ApprovePayments
-								isApproved={a.is_approved!}
+								isApproved={Boolean(a.is_approved)}
 								is_request
 								is_appointment={false}
 								requestId={a.id}
@@ -63,13 +66,11 @@ export function LabBillingCard() {
 										amount: d.service.amount,
 									}),
 								)}
-								amount={JSON.parse(JSON.stringify(a.services)).reduce(
-									(
-										prev: { service: { name: string; amount: string } },
-										curr: { service: { name: string; amount: string } },
-									) =>
-										Number(prev.service.amount) + Number(curr.service.amount),
-								)}
+								amount={JSON.parse(JSON.stringify(a.services))
+									.map((d: { service: { amount: string } }) => d.service.amount)
+									.reduce(
+										(prev: string, curr: string) => Number(prev) + Number(curr),
+									)}
 								patientId={a.patients_id}
 							/>
 						</Flex>

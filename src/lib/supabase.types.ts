@@ -9,6 +9,38 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admission_consultations: {
+        Row: {
+          admission_id: string
+          created_at: string | null
+          id: string
+          is_completed: boolean | null
+          note: string
+        }
+        Insert: {
+          admission_id: string
+          created_at?: string | null
+          id?: string
+          is_completed?: boolean | null
+          note: string
+        }
+        Update: {
+          admission_id?: string
+          created_at?: string | null
+          id?: string
+          is_completed?: boolean | null
+          note?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admission_consultations_admission_id_fkey"
+            columns: ["admission_id"]
+            isOneToOne: false
+            referencedRelation: "admissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admissions: {
         Row: {
           admitted_by: string | null
@@ -16,7 +48,10 @@ export type Database = {
           created_at: string | null
           dischard_date: string | null
           id: string
+          is_active: boolean | null
+          is_approved: boolean | null
           is_critical: boolean | null
+          is_discharged: boolean | null
           patient_id: string
           wards_id: string
         }
@@ -26,7 +61,10 @@ export type Database = {
           created_at?: string | null
           dischard_date?: string | null
           id?: string
+          is_active?: boolean | null
+          is_approved?: boolean | null
           is_critical?: boolean | null
+          is_discharged?: boolean | null
           patient_id: string
           wards_id: string
         }
@@ -36,7 +74,10 @@ export type Database = {
           created_at?: string | null
           dischard_date?: string | null
           id?: string
+          is_active?: boolean | null
+          is_approved?: boolean | null
           is_critical?: boolean | null
+          is_discharged?: boolean | null
           patient_id?: string
           wards_id?: string
         }
@@ -471,6 +512,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_admission: boolean | null
           note: string
           patients_id: string
           taken_by: string
@@ -478,6 +520,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          is_admission?: boolean | null
           note: string
           patients_id: string
           taken_by: string
@@ -485,6 +528,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          is_admission?: boolean | null
           note?: string
           patients_id?: string
           taken_by?: string
@@ -805,10 +849,53 @@ export type Database = {
           },
         ]
       }
+      nursing_report: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          id: string
+          is_progress_note: boolean | null
+          note: string
+          patient_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          id?: string
+          is_progress_note?: boolean | null
+          note: string
+          patient_id: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          is_progress_note?: boolean | null
+          note?: string
+          patient_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nursing_report_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "nursing_report_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patient_diagnosis: {
         Row: {
           created_at: string
           id: string
+          is_admission: boolean | null
           note: string
           patients_id: string
           taken_by: string
@@ -816,6 +903,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          is_admission?: boolean | null
           note: string
           patients_id: string
           taken_by: string
@@ -823,6 +911,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          is_admission?: boolean | null
           note?: string
           patients_id?: string
           taken_by?: string
@@ -848,6 +937,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_admission: boolean | null
           note: string
           patients_id: string
           taken_by: string
@@ -855,6 +945,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          is_admission?: boolean | null
           note: string
           patients_id: string
           taken_by: string
@@ -862,6 +953,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          is_admission?: boolean | null
           note?: string
           patients_id?: string
           taken_by?: string
@@ -887,34 +979,31 @@ export type Database = {
         Row: {
           date_created: string
           id: string
-          name: string
-          patient: string | null
+          is_admission: boolean | null
+          patient_id: string | null
           taken_by: string | null
-          unit: string | null
-          value: string | null
+          vitals: Json | null
         }
         Insert: {
           date_created?: string
           id?: string
-          name: string
-          patient?: string | null
+          is_admission?: boolean | null
+          patient_id?: string | null
           taken_by?: string | null
-          unit?: string | null
-          value?: string | null
+          vitals?: Json | null
         }
         Update: {
           date_created?: string
           id?: string
-          name?: string
-          patient?: string | null
+          is_admission?: boolean | null
+          patient_id?: string | null
           taken_by?: string | null
-          unit?: string | null
-          value?: string | null
+          vitals?: Json | null
         }
         Relationships: [
           {
-            foreignKeyName: "patient_vitals_patient_fkey"
-            columns: ["patient"]
+            foreignKeyName: "patient_vitals_patient_id_fkey"
+            columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
             referencedColumns: ["id"]
@@ -1035,12 +1124,14 @@ export type Database = {
       }
       payments: {
         Row: {
+          admissions_id: string | null
           amount: string
           appointment_id: string | null
           approved_by: string | null
           cash_points_id: string
           created_at: string | null
           id: string
+          is_admission: boolean | null
           is_appointment: boolean | null
           is_request: boolean | null
           patient_id: string
@@ -1049,12 +1140,14 @@ export type Database = {
           services: Json | null
         }
         Insert: {
+          admissions_id?: string | null
           amount: string
           appointment_id?: string | null
           approved_by?: string | null
           cash_points_id: string
           created_at?: string | null
           id?: string
+          is_admission?: boolean | null
           is_appointment?: boolean | null
           is_request?: boolean | null
           patient_id: string
@@ -1063,12 +1156,14 @@ export type Database = {
           services?: Json | null
         }
         Update: {
+          admissions_id?: string | null
           amount?: string
           appointment_id?: string | null
           approved_by?: string | null
           cash_points_id?: string
           created_at?: string | null
           id?: string
+          is_admission?: boolean | null
           is_appointment?: boolean | null
           is_request?: boolean | null
           patient_id?: string
@@ -1077,6 +1172,13 @@ export type Database = {
           services?: Json | null
         }
         Relationships: [
+          {
+            foreignKeyName: "payments_admissions_id_fkey"
+            columns: ["admissions_id"]
+            isOneToOne: false
+            referencedRelation: "admissions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "payments_appointment_id_fkey"
             columns: ["appointment_id"]
@@ -1442,6 +1544,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_admission: boolean | null
           note: string
           patients_id: string
           taken_by: string
@@ -1449,6 +1552,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          is_admission?: boolean | null
           note: string
           patients_id: string
           taken_by: string
@@ -1456,6 +1560,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          is_admission?: boolean | null
           note?: string
           patients_id?: string
           taken_by?: string

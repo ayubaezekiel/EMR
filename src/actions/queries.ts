@@ -9,6 +9,7 @@ import {
 	getBranch,
 	getCashPoints,
 	getClinics,
+	getConsultations,
 	getConsultationTemplates,
 	getDepartments,
 	getDiagnosis,
@@ -28,6 +29,7 @@ import {
 	getLabTestCategories,
 	getLabTestParams,
 	getLabTestTemplate,
+	getNursingReports,
 	getPatients,
 	getPatientVitals,
 	getPaymentMethods,
@@ -69,6 +71,11 @@ export const patientVitalsQueryOptions = queryOptions({
 	queryFn: () => getPatientVitals(),
 });
 
+export const nursingReportQueryOptions = queryOptions({
+	queryKey: ["nursingReports"],
+	queryFn: () => getNursingReports(),
+});
+
 export const patientsQueryOptions = queryOptions({
 	queryKey: ["patients"],
 	queryFn: () => getPatients(),
@@ -106,6 +113,11 @@ export const procedureCatQueryOptions = queryOptions({
 export const proceduresQueryOptions = queryOptions({
 	queryKey: ["procedure"],
 	queryFn: () => getProcedures(),
+});
+
+export const consultationQueryOptions = queryOptions({
+	queryKey: ["consultations"],
+	queryFn: () => getConsultations(),
 });
 
 export const anaesthesiaQueryOptions = queryOptions({

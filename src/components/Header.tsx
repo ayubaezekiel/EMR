@@ -37,7 +37,11 @@ const nav_items = [
 	{ icon: BookCheck, route: "/dashboard/billing", tip: "Billing" },
 ];
 
-export function Header({ user, userId }: { user: string; userId: string }) {
+export function Header({
+	user,
+	userId,
+	isPending,
+}: { user: string; userId: string; isPending: boolean }) {
 	const [open, onOpenChange] = useState(false);
 
 	const navigate = useNavigate();
@@ -147,7 +151,9 @@ export function Header({ user, userId }: { user: string; userId: string }) {
 						</IconButton>
 					</DropdownMenu.Trigger>
 					<DropdownMenu.Content variant="soft">
-						<DropdownMenu.Label>{user ?? <Spinner />}</DropdownMenu.Label>
+						<DropdownMenu.Label>
+							{isPending ? <Spinner /> : user}
+						</DropdownMenu.Label>
 						<DropdownMenu.Item asChild>
 							<Link to={`/dashboard/users/${userId}`}>Update Profile</Link>
 						</DropdownMenu.Item>

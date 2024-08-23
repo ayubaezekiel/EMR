@@ -54,7 +54,7 @@ export function CreateBedForm() {
 				</Dialog.Trigger>
 
 				<Dialog.Content>
-					<Dialog.Title>New Anaesthesia</Dialog.Title>
+					<Dialog.Title>New Bed</Dialog.Title>
 					<Dialog.Description size="2" mb="4">
 						Fill out the form information
 					</Dialog.Description>
@@ -121,8 +121,8 @@ export function CreateBedForm() {
 							{(field) => (
 								<div className="flex flex-col">
 									<Text size={"3"}>Ward*</Text>
-									<Select.Root>
-										<Select.Trigger placeholder="select type..." />
+									<Select.Root onValueChange={(e) => field.handleChange(e)}>
+										<Select.Trigger placeholder="select ward..." />
 										<Select.Content>
 											{wards_data?.wards_data?.map((w) => (
 												<Select.Item key={w.id} value={w.id}>
@@ -142,7 +142,7 @@ export function CreateBedForm() {
 							}}
 						>
 							{(field) => (
-								<div className="flex flex-col">
+								<div className="flex gap-2 items-center mt-4">
 									<Text size={"3"}>Is Available?</Text>
 									<Checkbox
 										name={field.name}
@@ -212,7 +212,7 @@ export function UpdateBedForm({ id, ...values }: DB["beds"]["Update"]) {
 				</Dialog.Trigger>
 
 				<Dialog.Content>
-					<Dialog.Title>Update Anaesthesia</Dialog.Title>
+					<Dialog.Title>Update Bed</Dialog.Title>
 					<Dialog.Description size="2" mb="4">
 						Fill out the form information
 					</Dialog.Description>
@@ -278,8 +278,8 @@ export function UpdateBedForm({ id, ...values }: DB["beds"]["Update"]) {
 							{(field) => (
 								<div className="flex flex-col">
 									<Text size={"3"}>Ward*</Text>
-									<Select.Root>
-										<Select.Trigger placeholder="select type..." />
+									<Select.Root onValueChange={(e) => field.handleChange(e)}>
+										<Select.Trigger placeholder="select ward..." />
 										<Select.Content>
 											{wards_data?.wards_data?.map((w) => (
 												<Select.Item key={w.id} value={w.id}>
@@ -299,7 +299,7 @@ export function UpdateBedForm({ id, ...values }: DB["beds"]["Update"]) {
 							}}
 						>
 							{(field) => (
-								<div className="flex flex-col">
+								<div className="flex gap-2 items-center mt-4">
 									<Text size={"3"}>Is Available?</Text>
 									<Checkbox
 										name={field.name}

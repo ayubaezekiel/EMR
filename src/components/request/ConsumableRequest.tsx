@@ -1,19 +1,21 @@
 import {
 	Badge,
 	Button,
+	Callout,
 	Card,
 	Dialog,
 	Flex,
 	IconButton,
 } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
-import { X } from "lucide-react";
+import { Eye, FileQuestion, Printer, X } from "lucide-react";
 import { useMemo } from "react";
+import { changeRequestStatus } from "../../actions/actions";
 import { requestQueryOptions } from "../../actions/queries";
 import { ConfirmRequestStatusUpdate } from "../../forms/requests/ConfirmRequestStatusUpdate";
+import { useRequestById } from "../../lib/hooks";
 import { PatientCardHeader } from "../PatientCardHeader";
 import PendingComponent from "../PendingComponent";
-import { changeRequestStatus } from "../../actions/actions";
 
 export function ConsumableRequestWaitingCard() {
 	const { data: request_data, isPending: isRequestPending } =
@@ -51,7 +53,7 @@ export function ConsumableRequestWaitingCard() {
 					</Flex>
 					<Flex justify={"between"} mt={"4"}>
 						<ConfirmRequestStatusUpdate
-							inValidate="pharm"
+							inValidate="requests"
 							id={a.id}
 							title="Move To Waiting?"
 							triggleLabel="Waiting"
@@ -66,7 +68,7 @@ export function ConsumableRequestWaitingCard() {
 							}}
 						/>
 						<ConfirmRequestStatusUpdate
-							inValidate="pharm"
+							inValidate="requests"
 							id={a.id}
 							title="Mark As Missed?"
 							triggleLabel="Complete"
@@ -118,7 +120,8 @@ export function ConsumableRequestCompletedCard() {
 		useQuery(requestQueryOptions);
 
 	const pharm_request_completed = useMemo(
-		() => request_data?.request_data?.filter((a) => a.is_completed && a.is_lab),
+		() =>
+			request_data?.request_data?.filter((a) => a.is_completed && a.is_pharm),
 		[request_data?.request_data],
 	);
 
@@ -146,7 +149,7 @@ export function ConsumableRequestCompletedCard() {
 					</Flex>
 					<Flex justify={"between"} mt={"4"}>
 						<ConfirmRequestStatusUpdate
-							inValidate="pharm"
+							inValidate="requests"
 							id={a.id}
 							title="Move To Waiting?"
 							triggleLabel="Waiting"
@@ -161,7 +164,7 @@ export function ConsumableRequestCompletedCard() {
 							}}
 						/>
 						<ConfirmRequestStatusUpdate
-							inValidate="pharm"
+							inValidate="requests"
 							id={a.id}
 							title="Mark As Missed?"
 							triggleLabel="Complete"
@@ -227,3 +230,120 @@ const ProcessLabRequest = (data: DB["requests"]["Row"]) => {
 		</div>
 	);
 };
+
+export function PatientConsumableRequestCard({
+	patientId,
+}: { patientId: string }) {
+	const { request_data, isRequestPending } = useRequestById({ patientId });
+
+	const consumable_data_filtered = useMemo(
+		() => request_data?.filter((a) => a.is_consumable),
+		[request_data],
+	);
+
+	if (isRequestPending) return <PendingComponent />;
+
+	return (
+		<div className="w-full">
+			{consumable_data_filtered?.length === 0 ? (
+				<Flex justify={"center"}>
+					<Callout.Root mt={"9"}>
+						<Callout.Icon>
+							<FileQuestion />
+						</Callout.Icon>
+						<Callout.Text ml={"1"}>No result found</Callout.Text>
+					</Callout.Root>
+				</Flex>
+			) : (
+				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
+					{consumable_data_filtered?.map((a) => (
+						<Card key={a.id}>
+							<Flex justify={"between"}>
+								<PatientCardHeader
+									createdAt={a.created_at}
+									firstName={a.patients?.first_name as string}
+									lastName={a.patients?.last_name as string}
+									patientId={a.patients_id}
+									middleName={a.patients?.middle_name as string}
+								/>
+							</Flex>
+							<Flex direction={"column"} mt={"4"} height={"100px"}>
+								<div className="flex flex-wrap gap-2 mt-4">
+									{JSON.parse(JSON.stringify(a.services)).map(
+										(d: {
+											note: string;
+											consumable: { name: string; amount: string };
+										}) => (
+											<Badge key={d.note}>{d.consumable.name}</Badge>
+										),
+									)}
+								</div>
+							</Flex>
+							<div className="flex gap-2">
+								{!a.is_waiting && !a.is_completed && (
+									<Badge color="red">
+										pending payment
+										<span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+									</Badge>
+								)}
+								{a.is_waiting && (
+									<Badge color="amber">
+										waiting
+										<span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+									</Badge>
+								)}
+								{a.is_completed && (
+									<Badge>
+										completed
+										<span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+									</Badge>
+								)}
+							</div>
+							<Flex justify={"end"} align={"center"} mt={"4"}>
+								<Dialog.Root>
+									<Dialog.Trigger>
+										<Button variant={"soft"} size={"2"} radius="full">
+											<Eye /> View Notes
+										</Button>
+									</Dialog.Trigger>
+									<Dialog.Content>
+										<div className="flex justify-between">
+											<Dialog.Title>Notes</Dialog.Title>
+											<Dialog.Close>
+												<IconButton variant="ghost">
+													<X />
+												</IconButton>
+											</Dialog.Close>
+										</div>
+										{JSON.parse(JSON.stringify(a.services)).map(
+											(d: {
+												note: string;
+												quantity: string;
+												consumable: { name: string; amount: string };
+											}) => (
+												<Card my={"4"} key={d.note}>
+													<Flex gap={"2"}>
+														<Badge>{d.consumable.name}</Badge>
+														<Badge>Qauntity: {d.quantity}</Badge>
+													</Flex>
+
+													<Card mt={"2"}>{d.note}</Card>
+												</Card>
+											),
+										)}
+
+										<Flex justify={"end"}>
+											<Button>
+												Print <Printer />
+											</Button>
+										</Flex>
+									</Dialog.Content>
+								</Dialog.Root>
+							</Flex>
+						</Card>
+					))}
+				</div>
+			)}
+		</div>
+	);
+}

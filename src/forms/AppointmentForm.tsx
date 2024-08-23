@@ -5,7 +5,6 @@ import {
 	Dialog,
 	Flex,
 	Select,
-	Spinner,
 	Text,
 	TextField,
 } from "@radix-ui/themes";
@@ -333,8 +332,8 @@ export function UpdateAppointmentForm({
 		<div>
 			<Dialog.Root open={open} onOpenChange={onOpenChange}>
 				<Dialog.Trigger>
-					<Button variant="ghost">
-						<Edit size={16} />
+					<Button size={"1"} color="red" variant="ghost">
+						<Edit />
 					</Button>
 				</Dialog.Trigger>
 

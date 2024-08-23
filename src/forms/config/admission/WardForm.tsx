@@ -82,14 +82,12 @@ export function CreateWardForm() {
 						<form.Field
 							name="default_price"
 							validators={{
-								onChange: z
-									.string()
-									.min(3, { message: "field must be atleast 3 characters" }),
+								onChange: z.string().min(1, { message: "required" }),
 							}}
 						>
 							{(field) => (
 								<label htmlFor={field.name} className="flex flex-col">
-									<Text size={"3"}>Name*</Text>
+									<Text size={"3"}>Default Price*</Text>
 									<TextField.Root
 										name={field.name}
 										id={field.name}
@@ -108,7 +106,7 @@ export function CreateWardForm() {
 							}}
 						>
 							{(field) => (
-								<div className="flex flex-col">
+								<div className="flex items-center gap-2 mt-4">
 									<Text size={"3"}>With Labor?</Text>
 									<Checkbox
 										name={field.name}
@@ -210,14 +208,12 @@ export function UpdateWardForm({ id, ...values }: DB["wards"]["Update"]) {
 						<form.Field
 							name="default_price"
 							validators={{
-								onChange: z
-									.string()
-									.min(3, { message: "field must be atleast 3 characters" }),
+								onChange: z.string().min(1, { message: "required" }),
 							}}
 						>
 							{(field) => (
 								<label htmlFor={field.name} className="flex flex-col">
-									<Text size={"3"}>Name*</Text>
+									<Text size={"3"}>Default Price*</Text>
 									<TextField.Root
 										name={field.name}
 										id={field.name}
@@ -232,13 +228,11 @@ export function UpdateWardForm({ id, ...values }: DB["wards"]["Update"]) {
 						<form.Field
 							name="is_labor"
 							validators={{
-								onChange: z
-									.string()
-									.min(3, { message: "field must be atleast 3 characters" }),
+								onChange: z.boolean().optional(),
 							}}
 						>
 							{(field) => (
-								<div className="flex flex-col">
+								<div className="flex gap-2 mt-4 items-center">
 									<Text size={"3"}>With Labor?</Text>
 									<Checkbox
 										name={field.name}

@@ -206,7 +206,7 @@ export function AppointmentWaiting({
 							}}
 						/>
 
-						<Button asChild disabled={a.is_checkedin!} size={"2"} radius="full">
+						<Button asChild disabled={!a.is_checkedin} size={"2"} radius="full">
 							<Link to={`/dashboard/appointments/${a.patients_id}`}>
 								Attend
 							</Link>

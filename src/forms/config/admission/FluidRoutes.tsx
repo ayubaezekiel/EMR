@@ -89,7 +89,7 @@ export function CreateFluidRoutesForm() {
 							{(field) => (
 								<div className="flex flex-col">
 									<Text size={"3"}>Type*</Text>
-									<Select.Root>
+									<Select.Root onValueChange={(e) => field.handleChange(e)}>
 										<Select.Trigger placeholder="select type..." />
 										<Select.Content>
 											<Select.Item value="OUTPUT">Output</Select.Item>
@@ -200,7 +200,7 @@ export function UpdateFluidRoutesForm({
 							{(field) => (
 								<div className="flex flex-col">
 									<Text size={"3"}>Type*</Text>
-									<Select.Root>
+									<Select.Root onValueChange={(e) => field.handleChange(e)}>
 										<Select.Trigger placeholder="select type..." />
 										<Select.Content>
 											<Select.Item value="OUTPUT">Output</Select.Item>

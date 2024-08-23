@@ -3,13 +3,11 @@ import {
 	Dialog,
 	Flex,
 	Select,
-	Spinner,
 	Text,
 	TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
@@ -24,7 +22,7 @@ import supabase from "../supabase/client";
 export function PatientForm() {
 	const [myStates, setMyState] = useState<string[] | undefined>([]);
 	const [open, onOpenChange] = useState(false);
-	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 
 	const { data, isPending } = useQuery(hmoPlansQueryOptions);
 
@@ -55,8 +53,7 @@ export function PatientForm() {
 				await patientAction({ ...value, created_by: data.session.user.id });
 				form.reset();
 				onOpenChange(false);
-			} else {
-				navigate({ to: "/", replace: true });
+				queryClient.invalidateQueries({ queryKey: ["patientById"] });
 			}
 		},
 	});
@@ -528,6 +525,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 
 	const { data, isPending } = useQuery(hmoPlansQueryOptions);
+	const queryClient = useQueryClient();
 
 	const form = useForm({
 		defaultValues: {
@@ -555,6 +553,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
 			await updatePatientAction(value);
 			form.reset();
 			onOpenChange(false);
+			queryClient.invalidateQueries({ queryKey: ["patientById"] });
 		},
 	});
 
@@ -564,8 +563,8 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
 		<div>
 			<Dialog.Root open={open} onOpenChange={onOpenChange}>
 				<Dialog.Trigger>
-					<Button variant="ghost">
-						<Edit size={16} />
+					<Button variant="ghost" color="red">
+						<Edit />
 					</Button>
 				</Dialog.Trigger>
 

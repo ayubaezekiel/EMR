@@ -5,14 +5,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { appointmentsTypesQueryOptions } from "../../../actions/queries";
 
+import PendingComponent from "../../../components/PendingComponent";
+import { AdmissionBillingCard } from "../../../components/billing/AdmissionBillingCard";
 import { AppointmentBillingCards } from "../../../components/billing/AppointmentBillingCard";
+import { ConsumableBillingCard } from "../../../components/billing/ConsumableBillingCard";
 import { LabBillingCard } from "../../../components/billing/LabBillingCard";
 import { PharmBillingCard } from "../../../components/billing/PharmBillingCard";
-import PendingComponent from "../../../components/PendingComponent";
-import { PatientForm } from "../../../forms/PatientForm";
-import { RadiologyBillingCard } from "../../../components/billing/RadiologyBillingCard";
-import { ConsumableBillingCard } from "../../../components/billing/ConsumableBillingCard";
 import { ProcedureBillingCard } from "../../../components/billing/ProcedureBillingCard";
+import { RadiologyBillingCard } from "../../../components/billing/RadiologyBillingCard";
+import { PatientForm } from "../../../forms/PatientForm";
 
 export const Route = createFileRoute("/_layout/dashboard/billing")({
 	component: () => (
@@ -30,6 +31,8 @@ const Billing = () => {
 
 	if (isAppointmentTypePending) return <PendingComponent />;
 
+	const default_app_type = appointment_type?.appointment_type_data?.at(0)?.id;
+
 	return (
 		<div>
 			<Card variant="ghost" my={"4"} style={{ background: "var(--accent-2)" }}>
@@ -41,14 +44,6 @@ const Billing = () => {
 							label="Event duration"
 							hideTimeZone
 							visibleMonths={2}
-							// defaultValue={{
-							//   start: parseZonedDateTime(
-							//     "2024-04-01T00:45[America/Los_Angeles]"
-							//   ),
-							//   end: parseZonedDateTime(
-							//     "2024-04-08T11:15[America/Los_Angeles]"
-							//   ),
-							// }}
 						/>
 					</div>
 				</div>
@@ -63,18 +58,21 @@ const Billing = () => {
 					Appointments
 				</SegmentedControl.Item>
 				<SegmentedControl.Item value="requests">Requests</SegmentedControl.Item>
+				<SegmentedControl.Item value="admissions">
+					Admissions
+				</SegmentedControl.Item>
 			</SegmentedControl.Root>
 			{segment === "appointments" && (
-				<Tabs.Root
-					defaultValue={appointment_type?.appointment_type_data![0].id}
-				>
+				<Tabs.Root defaultValue={default_app_type}>
 					<Tabs.List>
 						{appointment_type?.appointment_type_data?.map((t) => (
-							<Tabs.Trigger value={t.id}>{t.name}</Tabs.Trigger>
+							<Tabs.Trigger key={t.id} value={t.id}>
+								{t.name}
+							</Tabs.Trigger>
 						))}
 					</Tabs.List>
 					{appointment_type?.appointment_type_data?.map((t) => (
-						<Tabs.Content value={t.id} mt={"2"}>
+						<Tabs.Content key={t.id} value={t.id} mt={"2"}>
 							<AppointmentBillingCards typeName={t.name} type={t.id} />
 						</Tabs.Content>
 					))}
@@ -90,6 +88,9 @@ const Billing = () => {
 							Consumable Requests
 						</Tabs.Trigger>
 						<Tabs.Trigger value={"procedure"}>Procedure Requests</Tabs.Trigger>
+						{/* <Tabs.Trigger value={"consultation"}>
+							Consultation Requests
+						</Tabs.Trigger> */}
 					</Tabs.List>
 					<Tabs.Content value={"lab"} mt={"2"}>
 						<LabBillingCard />
@@ -106,8 +107,12 @@ const Billing = () => {
 					<Tabs.Content value={"procedure"} mt={"2"}>
 						<ProcedureBillingCard />
 					</Tabs.Content>
+					{/* <Tabs.Content value={"consultation"} mt={"2"}>
+						<ConsultationBillingCard />
+					</Tabs.Content> */}
 				</Tabs.Root>
 			)}
+			{segment === "admissions" && <AdmissionBillingCard />}
 		</div>
 	);
 };

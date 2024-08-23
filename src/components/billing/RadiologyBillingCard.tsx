@@ -6,6 +6,7 @@ import { requestQueryOptions } from "../../actions/queries";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";
 import PendingComponent from "../PendingComponent";
+import { UpdateRadiologyRequestForm } from "../../forms/requests/RadioloyRequestForm";
 
 export function RadiologyBillingCard() {
 	const { data: request_data, isPending: isRadiologyPending } =
@@ -37,13 +38,16 @@ export function RadiologyBillingCard() {
 				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
 					{radiology_data_filtered?.map((a) => (
 						<Card key={a.id}>
-							<PatientCardHeader
-								createdAt={a.created_at}
-								firstName={a.patients?.first_name as string}
-								lastName={a.patients?.last_name as string}
-								patientId={a.patients_id}
-								middleName={a.patients?.middle_name as string}
-							/>
+							<Flex justify={"between"}>
+								<PatientCardHeader
+									createdAt={a.created_at}
+									firstName={a.patients?.first_name as string}
+									lastName={a.patients?.last_name as string}
+									patientId={a.patients_id}
+									middleName={a.patients?.middle_name as string}
+								/>
+								<UpdateRadiologyRequestForm {...a} />
+							</Flex>
 
 							<Flex direction={"column"} mt={"4"} height={"100px"}>
 								<div className="flex flex-wrap gap-2 mt-4">

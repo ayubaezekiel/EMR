@@ -2,6 +2,7 @@ import { Badge, Card, Flex, Strong, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { appointmentsQueryOptions } from "../../actions/queries";
+import { UpdateAppointmentForm } from "../../forms/AppointmentForm";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";
 import PendingComponent from "../PendingComponent";
@@ -31,14 +32,16 @@ export function AppointmentBillingCards({
 			<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
 				{appointment_data_pending?.map((a) => (
 					<Card key={a.id}>
-						<PatientCardHeader
-							createdAt={a.created_at!}
-							firstName={a.patients?.first_name as string}
-							lastName={a.patients?.last_name as string}
-							patientId={a.patients_id}
-							middleName={a.patients?.middle_name as string}
-						/>
-
+						<Flex justify={"between"}>
+							<PatientCardHeader
+								createdAt={a.created_at!}
+								firstName={a.patients?.first_name as string}
+								lastName={a.patients?.last_name as string}
+								patientId={a.patients_id}
+								middleName={a.patients?.middle_name as string}
+							/>
+							<UpdateAppointmentForm {...a} />
+						</Flex>
 						<Flex direction={"column"} mt={"4"}>
 							<Flex gap={"2"} mb={"4"} direction={"column"} justify={"end"}>
 								{a.is_all_day ? (

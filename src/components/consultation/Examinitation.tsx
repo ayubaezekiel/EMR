@@ -3,15 +3,8 @@ import { useForm } from "@tanstack/react-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import Highlight from "@tiptap/extension-highlight";
-import { Subscript } from "@tiptap/extension-subscript";
-import Superscript from "@tiptap/extension-superscript";
-import TextAlign from "@tiptap/extension-text-align";
-import Underline from "@tiptap/extension-underline";
-import { useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
 import { Edit } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
 	createExaminationAction,
 	updateExaminationAction,
@@ -23,19 +16,20 @@ import {
 import { checkAuth, getProfile } from "../../lib/utils";
 import { FieldInfo } from "../FieldInfo";
 import PendingComponent from "../PendingComponent";
-import { useStepper } from "../stepper";
 import { DataTable } from "../table/DataTable";
 import { patient_examination_column } from "../table/columns/consultation/patient_examination";
 import { RichEditor } from "../textEditor/RichTextEditor";
-import { StepperFormActions } from "./StepperFormAction";
 
-export function Examination() {
+export function Examination({
+	isAdmission,
+	patientId,
+}: { isAdmission: boolean; patientId: string }) {
 	const { data, isPending } = useQuery(examinationQueryOptions);
 	if (isPending) return <PendingComponent />;
 
 	return (
 		<div>
-			<ExaminationForm />
+			<ExaminationForm patientId={patientId} isAdmission={isAdmission} />
 			<div>
 				<DataTable
 					columns={patient_examination_column}
@@ -47,15 +41,12 @@ export function Examination() {
 		</div>
 	);
 }
-function ExaminationForm() {
-	const { nextStep } = useStepper();
-	const { isLastStep } = useStepper();
+function ExaminationForm({
+	isAdmission,
+	patientId,
+}: { isAdmission: boolean; patientId: string }) {
 	const [template, setTemplate] = useState("");
 	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
-
-	const { appointmentId } = useParams({
-		from: "/_layout/dashboard/appointments/$appointmentId",
-	});
 
 	const queryClient = useQueryClient();
 
@@ -70,33 +61,15 @@ function ExaminationForm() {
 			const prof = await getProfile();
 			await createExaminationAction({
 				note: `${template}`,
-				patients_id: appointmentId,
+				patients_id: patientId,
 				taken_by: `${prof?.id}`,
+				is_admission: isAdmission,
 			});
 			form.reset();
 			queryClient.invalidateQueries({ queryKey: ["examination"] });
-			nextStep();
 		},
 	});
 
-	const editor = useEditor({
-		extensions: [
-			StarterKit,
-			Underline,
-			Superscript,
-			Subscript,
-			Highlight,
-			TextAlign.configure({ types: ["heading", "paragraph"] }),
-		],
-		onUpdate: ({ editor }) => {
-			setTemplate(editor.getHTML());
-		},
-		content: template,
-	});
-
-	useEffect(() => {
-		editor?.commands.setContent(template);
-	}, [editor, template]);
 	if (isPending) return <PendingComponent />;
 
 	return (
@@ -130,7 +103,10 @@ function ExaminationForm() {
 							<Text size={"3"}>
 								Note <Text size={"1"}>(should be atleast 10 characters)</Text>*
 							</Text>
-							<RichEditor editor={editor} />
+							<RichEditor
+								initialValue={field.state.value!}
+								onChange={(e) => field.handleChange(e)}
+							/>
 							<FieldInfo field={field} />
 						</div>
 					)}
@@ -150,13 +126,6 @@ function ExaminationForm() {
 					)}
 				/>
 			</form>
-			<StepperFormActions
-				submitComp={
-					<Button onClick={nextStep} size={"4"}>
-						{isLastStep ? "Finish" : "Next"}
-					</Button>
-				}
-			/>
 		</div>
 	);
 }
@@ -171,24 +140,8 @@ export function UpdateExaminationForm({
 
 	const queryClient = useQueryClient();
 
-	const { appointmentId } = useParams({
-		from: "/_layout/dashboard/appointments/$appointmentId",
-	});
-
-	const editor = useEditor({
-		extensions: [
-			StarterKit,
-			Underline,
-			Superscript,
-			Subscript,
-			Highlight,
-			TextAlign.configure({ types: ["heading", "paragraph"] }),
-		],
-		onUpdate: ({ editor }) => {
-			setTemplate(editor.getHTML());
-		},
-
-		content: template,
+	const { patientId } = useParams({
+		from: "/_layout/dashboard/appointments/$patientId",
 	});
 
 	const form = useForm({
@@ -202,20 +155,13 @@ export function UpdateExaminationForm({
 			await updateExaminationAction({
 				id: id,
 				note: `${template}`,
-				patients_id: appointmentId,
+				patients_id: patientId,
 				taken_by: `${user?.id}`,
 			});
 			form.reset();
 			queryClient.invalidateQueries({ queryKey: ["examination"] });
 		},
 	});
-
-	useEffect(() => {
-		const updateEditor = () => {
-			editor?.commands.setContent(template!);
-		};
-		updateEditor();
-	}, [editor, template]);
 
 	if (isPending) return <PendingComponent />;
 
@@ -263,7 +209,10 @@ export function UpdateExaminationForm({
 										Note{" "}
 										<Text size={"1"}>(should be atleast 10 characters)</Text>*
 									</Text>
-									<RichEditor editor={editor} />
+									<RichEditor
+										initialValue={field.state.value!}
+										onChange={(e) => field.handleChange(e)}
+									/>
 									<FieldInfo field={field} />
 								</div>
 							)}

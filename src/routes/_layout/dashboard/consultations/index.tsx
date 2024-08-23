@@ -1,27 +1,28 @@
+import { createFileRoute } from "@tanstack/react-router";
+
 import { DateRangePicker } from "@nextui-org/date-picker";
 import { Card, Heading, Tabs } from "@radix-ui/themes";
-import { createFileRoute } from "@tanstack/react-router";
-import { CreateConsumableRequestForm } from "../../../../forms/requests/ConsumableRequestForm";
 import {
-	ConsumableRequestCompletedCard,
-	ConsumableRequestWaitingCard,
-} from "../../../../components/request/ConsumableRequest";
+	ConsultationRequestCompletedCard,
+	ConsultationRequestWaitingCard,
+} from "../../../../components/request/ConsultationRequest";
+import { CreateConsultationRequestForm } from "../../../../forms/requests/ConsultationRequestForm";
 
-export const Route = createFileRoute("/_layout/dashboard/consumables/")({
+export const Route = createFileRoute("/_layout/dashboard/consultations/")({
 	component: () => (
 		<>
-			<Heading mb={"3"}>Consumable Requests</Heading>
-			<ConsumableRequest />
+			<Heading mb={"3"}>Consultation Requests</Heading>
+			<Procedure />
 		</>
 	),
 });
 
-const ConsumableRequest = () => {
+const Procedure = () => {
 	return (
 		<div>
 			<Card variant="ghost" my={"3"} style={{ background: "var(--accent-2)" }}>
 				<div className="flex justify-between flex-col gap-2 md:flex-row">
-					<CreateConsumableRequestForm />
+					<CreateConsultationRequestForm />
 
 					<div className="flex gap-2 flex-col">
 						<DateRangePicker />
@@ -35,11 +36,11 @@ const ConsumableRequest = () => {
 				</Tabs.List>
 
 				<Tabs.Content value="waiting" mt={"2"}>
-					<ConsumableRequestWaitingCard />
+					<ConsultationRequestWaitingCard />
 				</Tabs.Content>
 
 				<Tabs.Content value="completed" mt={"2"}>
-					<ConsumableRequestCompletedCard />
+					<ConsultationRequestCompletedCard />
 				</Tabs.Content>
 			</Tabs.Root>
 		</div>
