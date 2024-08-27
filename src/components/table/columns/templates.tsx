@@ -49,9 +49,7 @@ export const consultation_templates_column: ColumnDef<
 						title="Delete Consultation Template"
 						warning="Are you sure? this template will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deleteConsultationTemplatesAction({ id: temp.id })
-						}
+						actionFn={() => deleteConsultationTemplatesAction({ id: temp.id })}
 					/>
 				</div>
 			);

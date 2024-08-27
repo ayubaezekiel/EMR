@@ -50,9 +50,7 @@ export const procedure_cat_column: ColumnDef<
 						title="Delete Procedure Category?"
 						warning="Are you sure? this category type will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deleteProcedureCategoryAction({ id: params.id })
-						}
+						actionFn={() => deleteProcedureCategoryAction({ id: params.id })}
 					/>
 				</div>
 			);

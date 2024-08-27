@@ -45,7 +45,7 @@ export function Branch() {
 								title="Delete Branch"
 								warning="Are you sure? this branch will be parmanently deleted from the
           database."
-								actionFn={async () => await deleteBranchAction({ id: b.id })}
+								actionFn={() => deleteBranchAction({ id: b.id })}
 								id={b.id}
 							/>
 						</Flex>

@@ -62,9 +62,7 @@ export const anaesthesia_column: ColumnDef<DB["anaesthesia"]["Row"]>[] = [
 						title="Delete Theatre?"
 						warning="Are you sure? this anaesthesia will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deleteAnaesthesiaAction({ id: params.id })
-						}
+						actionFn={() => deleteAnaesthesiaAction({ id: params.id })}
 					/>
 				</div>
 			);

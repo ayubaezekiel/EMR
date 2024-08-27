@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 import supabase from "../../supabase/client";
 
-export const createBranchAction = async (values: BranchType["Insert"]) => {
+export const createBranchAction = async (values: DB["branch"]["Insert"]) => {
 	const { error } = await supabase.from("branch").insert(values);
 	if (error) {
 		toast.error(error.message);
@@ -10,7 +10,7 @@ export const createBranchAction = async (values: BranchType["Insert"]) => {
 	}
 };
 
-export const updateBranchAction = async (values: BranchType["Update"]) => {
+export const updateBranchAction = async (values: DB["branch"]["Update"]) => {
 	if (values.id) {
 		const { error } = await supabase
 			.from("branch")
@@ -23,6 +23,18 @@ export const updateBranchAction = async (values: BranchType["Update"]) => {
 	}
 };
 
+export const updateCenterAction = async (values: DB["center"]["Update"]) => {
+	if (values.id) {
+		const { error } = await supabase
+			.from("center")
+			.update(values)
+			.eq("id", values.id);
+		if (error) {
+			toast.error(error.message);
+		}
+		toast.success("center updated successfully");
+	}
+};
 export const deleteBranchAction = async ({ id }: { id: string }) => {
 	if (id) {
 		const { error } = await supabase.from("branch").delete().eq("id", id);

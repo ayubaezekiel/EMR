@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import supabase from "../supabase/client";
 import { getPerms } from "../actions/actions";
 import { getProfile } from "./utils";
+import { toast } from "sonner";
 
 export const useRequestById = ({ patientId }: { patientId: string }) => {
 	const { data: request_data, isPending: isRequestPending } = useQuery({
@@ -40,4 +41,26 @@ export const useProfile = () => {
 	});
 
 	return { profile_data, isProfilePending };
+};
+
+export const useCenter = () => {
+	const { data: center_data, isPending: isCenterPending } = useQuery({
+		queryKey: ["center"],
+		queryFn: async () => {
+			const { data, error } = await supabase
+				.from("center")
+				.select("*")
+				.single();
+			if (error) {
+				if (error?.details === "The result contains 0 rows") {
+					toast.error("Please create a center");
+				} else {
+					toast.error(error.message);
+				}
+			}
+			return data;
+		},
+	});
+
+	return { center_data, isCenterPending };
 };

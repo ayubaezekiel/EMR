@@ -113,9 +113,7 @@ export const procedures_column: ColumnDef<DB["procedure"]["Row"]>[] = [
 						title="Delete Procedure?"
 						warning="Are you sure? this procedure will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deleteProcedureAction({ id: params.id })
-						}
+						actionFn={() => deleteProcedureAction({ id: params.id })}
 					/>
 				</div>
 			);

@@ -28,7 +28,7 @@ export const getWards = async () => {
 export const getBeds = async () => {
 	const { data: beds_data, error: beds_error } = await supabase
 		.from("beds")
-		.select("*");
+		.select("*,wards(*)");
 
 	if (beds_error) {
 		toast.error(beds_error.message);
@@ -594,5 +594,33 @@ export const changeRequestStatus = async ({
 		toast.error(error.message);
 	} else {
 		toast.success("status updated successfully");
+	}
+};
+
+export const changeAdmissionStatus = async ({
+	isDischarged,
+	isActive,
+	isCritical,
+	id,
+}: {
+	isDischarged?: boolean;
+	isCritical?: boolean;
+	isActive?: boolean;
+	id: string;
+}) => {
+	const { error } = await supabase
+		.from("admissions")
+		.update({
+			is_active: isActive,
+			is_critical: isCritical,
+			is_discharged: isDischarged,
+		})
+		.eq("id", id)
+		.select();
+
+	if (error) {
+		toast.error(error.message);
+	} else {
+		toast.success("done!");
 	}
 };

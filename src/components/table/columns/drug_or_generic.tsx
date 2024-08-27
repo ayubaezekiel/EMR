@@ -106,9 +106,7 @@ export const drug_or_generic_column: ColumnDef<DrugType>[] = [
 						title="Delete Drug/Generic"
 						warning="Are you sure? this drug/generic will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deleteDrugOrGenericAction({ id: drug.id })
-						}
+						actionFn={() => deleteDrugOrGenericAction({ id: drug.id })}
 					/>
 				</div>
 			);
@@ -161,9 +159,7 @@ export const drug_or_generic_brand_column: ColumnDef<
 						title="Delete Drug/Generic Brand"
 						warning="Are you sure? this drug/generic brand will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deleteDrugOrGenericAction({ id: brand.id })
-						}
+						actionFn={() => deleteDrugOrGenericAction({ id: brand.id })}
 					/>
 				</div>
 			);

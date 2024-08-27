@@ -52,9 +52,7 @@ export const anaesthesia_type_column: ColumnDef<
 						title="Delete Anaesthesia Type?"
 						warning="Are you sure? this anaesthesia type will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deleteAnaesthesiaTypeAction({ id: params.id })
-						}
+						actionFn={() => deleteAnaesthesiaTypeAction({ id: params.id })}
 					/>
 				</div>
 			);

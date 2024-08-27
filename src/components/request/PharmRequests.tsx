@@ -7,7 +7,7 @@ import {
 	IconButton,
 	Text,
 } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Printer, X } from "lucide-react";
 import { useMemo } from "react";
 import { requestQueryOptions } from "../../actions/queries";
@@ -26,6 +26,8 @@ export function PharmRequestWaitingCard() {
 		[request_data?.request_data],
 	);
 
+	const queryClient = useQueryClient();
+
 	if (isRequestPending) return <PendingComponent />;
 
 	return (
@@ -42,8 +44,8 @@ export function PharmRequestWaitingCard() {
 					<Flex direction={"column"} mt={"4"} height={"100px"}>
 						<div className="flex flex-wrap gap-2 mt-4">
 							{JSON.parse(JSON.stringify(a.services)).map(
-								(d: { note: string; service: { name: string } }) => (
-									<Badge key={d.note}>{d.service.name}</Badge>
+								(d: { note: string; generic_drug: { name: string } }) => (
+									<Badge key={d.note}>{d.generic_drug.name}</Badge>
 								),
 							)}
 						</div>
@@ -62,6 +64,7 @@ export function PharmRequestWaitingCard() {
 									isWaiting: true,
 									isCompleted: false,
 								});
+								queryClient.invalidateQueries({ queryKey: ["requests"] });
 							}}
 						/>
 						<ConfirmRequestStatusUpdate
@@ -77,6 +80,7 @@ export function PharmRequestWaitingCard() {
 									isWaiting: false,
 									isCompleted: true,
 								});
+								queryClient.invalidateQueries({ queryKey: ["requests"] });
 							}}
 						/>
 						<Dialog.Root>
@@ -95,9 +99,9 @@ export function PharmRequestWaitingCard() {
 									</Dialog.Close>
 								</div>
 								{JSON.parse(JSON.stringify(a.services)).map(
-									(d: { note: string; service: { name: string } }) => (
+									(d: { note: string; generic_drug: { name: string } }) => (
 										<Card my={"4"} key={d.note}>
-											<Badge mb={"2"}>{d.service.name}</Badge>{" "}
+											<Badge mb={"2"}>{d.generic_drug.name}</Badge>{" "}
 											<Card>{d.note}</Card>
 										</Card>
 									),
@@ -122,6 +126,8 @@ export function PharmRequestCompletedCard() {
 		[request_data?.request_data],
 	);
 
+	const queryClient = useQueryClient();
+
 	if (isRequestPending) return <PendingComponent />;
 
 	return (
@@ -138,8 +144,8 @@ export function PharmRequestCompletedCard() {
 					<Flex direction={"column"} mt={"4"} height={"100px"}>
 						<div className="flex flex-wrap gap-2 mt-4">
 							{JSON.parse(JSON.stringify(a.services)).map(
-								(d: { test: string; note: string }) => (
-									<Badge key={d.note}>{d.test}</Badge>
+								(d: { note: string; generic_drug: { name: string } }) => (
+									<Badge key={d.note}>{d.generic_drug.name}</Badge>
 								),
 							)}
 						</div>
@@ -158,6 +164,7 @@ export function PharmRequestCompletedCard() {
 									isWaiting: true,
 									isCompleted: false,
 								});
+								queryClient.invalidateQueries({ queryKey: ["requests"] });
 							}}
 						/>
 						<ConfirmRequestStatusUpdate
@@ -173,6 +180,7 @@ export function PharmRequestCompletedCard() {
 									isWaiting: false,
 									isCompleted: true,
 								});
+								queryClient.invalidateQueries({ queryKey: ["requests"] });
 							}}
 						/>
 						<Dialog.Root>
@@ -191,9 +199,10 @@ export function PharmRequestCompletedCard() {
 									</Dialog.Close>
 								</div>
 								{JSON.parse(JSON.stringify(a.services)).map(
-									(d: { test: string; note: string }) => (
+									(d: { note: string; generic_drug: { name: string } }) => (
 										<Card my={"4"} key={d.note}>
-											{d.note}
+											<Badge mb={"2"}>{d.generic_drug.name}</Badge>{" "}
+											<Card>{d.note}</Card>
 										</Card>
 									),
 								)}

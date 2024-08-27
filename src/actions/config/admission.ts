@@ -202,7 +202,7 @@ export const deleteBedAction = async ({ id }: { id: string }) => {
 		if (error) {
 			toast.error(error.message);
 		}
-		toast.success("bed  deleted successfully");
+		toast.success("bed deleted successfully");
 	}
 };
 

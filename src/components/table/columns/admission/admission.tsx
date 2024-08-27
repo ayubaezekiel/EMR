@@ -98,9 +98,7 @@ export const admission_column: ColumnDef<DB["admissions"]["Row"]>[] = [
 						title="Delete Admission?"
 						warning="Are you sure? this admission will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deleteAdmissionAction({ id: params.id })
-						}
+						actionFn={() => deleteAdmissionAction({ id: params.id })}
 					/>
 				</div>
 			);

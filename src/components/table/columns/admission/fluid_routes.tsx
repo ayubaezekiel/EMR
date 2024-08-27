@@ -53,9 +53,7 @@ export const fluid_routes_column: ColumnDef<DB["fluid_routes"]["Row"]>[] = [
 						title="Delete Fluid Route?"
 						warning="Are you sure? this fluid route type will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deleteFluidRoutesAction({ id: params.id })
-						}
+						actionFn={() => deleteFluidRoutesAction({ id: params.id })}
 					/>
 				</div>
 			);

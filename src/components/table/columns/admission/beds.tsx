@@ -5,7 +5,15 @@ import { DeleteActionForm } from "../../../../actions/DeleteAction";
 import { deleteBedAction } from "../../../../actions/config/admission";
 import { UpdateBedForm } from "../../../../forms/config/admission/BedForm";
 
-export const beds_column: ColumnDef<DB["beds"]["Row"]>[] = [
+export interface BedProps {
+	default_price: string;
+	id: string;
+	is_available: boolean | null;
+	name: string;
+	ward_id: string;
+	ward: string;
+}
+export const beds_column: ColumnDef<BedProps>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -41,9 +49,9 @@ export const beds_column: ColumnDef<DB["beds"]["Row"]>[] = [
 		),
 	},
 	{
-		accessorKey: "ward_id",
+		accessorKey: "ward",
 		header: "Ward",
-		cell: ({ row }) => <div className="capitalize">{row.getValue("")}</div>,
+		cell: ({ row }) => <div className="capitalize">{row.getValue("ward")}</div>,
 	},
 	{
 		accessorKey: "is_available",
@@ -51,11 +59,11 @@ export const beds_column: ColumnDef<DB["beds"]["Row"]>[] = [
 		cell: ({ row }) => (
 			<div className="capitalize">
 				{row.getValue("is_available") ? (
-					<Badge size={"1"}>
+					<Badge size={"1"} radius="full">
 						<CheckCircle />
 					</Badge>
 				) : (
-					<Badge>
+					<Badge size={"1"} color="red" radius="full">
 						<X />
 					</Badge>
 				)}
@@ -78,7 +86,7 @@ export const beds_column: ColumnDef<DB["beds"]["Row"]>[] = [
 						title="Delete Bed?"
 						warning="Are you sure? this bed type will be parmanently deleted from the
           database."
-						actionFn={async () => await deleteBedAction({ id: params.id })}
+						actionFn={() => deleteBedAction({ id: params.id })}
 					/>
 				</div>
 			);

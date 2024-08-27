@@ -48,9 +48,7 @@ export const payment_method_column: ColumnDef<PaymentMethodType["Row"]>[] = [
 						title="Delete Service"
 						warning="Are you sure? this payment method will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deletePaymentMethodAction({ id: method.id })
-						}
+						actionFn={() => deletePaymentMethodAction({ id: method.id })}
 					/>
 				</div>
 			);

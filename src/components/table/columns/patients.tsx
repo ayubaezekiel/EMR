@@ -111,7 +111,7 @@ export const patients: ColumnDef<DB["patients"]["Row"]>[] = [
 						title="Delete Specialty"
 						warning="Are you sure? this patient will be parmanently deleted from the
           database."
-						actionFn={async () => await deletePatientAction({ id: patient.id })}
+						actionFn={() => deletePatientAction({ id: patient.id })}
 					/>
 				</div>
 			);

@@ -86,7 +86,7 @@ export const treatment_plan_column: ColumnDef<SharedConsultationTypes>[] = [
 						title="Delete Plan"
 						warning="Are you sure? this plan will be parmanently deleted from the
           database."
-						actionFn={async () => await deletePlanAction({ id: plan.id })}
+						actionFn={() => deletePlanAction({ id: plan.id })}
 					/>
 				</div>
 			);

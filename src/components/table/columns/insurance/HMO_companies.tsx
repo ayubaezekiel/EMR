@@ -81,9 +81,7 @@ export const hmo_companies_column: ColumnDef<DB["hmo_companies"]["Row"]>[] = [
 						title="Delete HMO Company"
 						warning="Are you sure? This HMO company will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deleteHMOCompaniesAction({ id: comp.id })
-						}
+						actionFn={() => deleteHMOCompaniesAction({ id: comp.id })}
 					/>
 				</div>
 			);

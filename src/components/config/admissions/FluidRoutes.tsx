@@ -1,4 +1,4 @@
-import { Flex, Heading } from "@radix-ui/themes";
+import { Flex, Heading, Spinner } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { fluidRoutesQueryOptions } from "../../../actions/queries";
 import { CreateFluidRoutesForm } from "../../../forms/config/admission/FluidRoutes";
@@ -6,7 +6,7 @@ import { DataTable } from "../../table/DataTable";
 import { fluid_routes_column } from "../../table/columns/admission/fluid_routes";
 
 export function FluidRoutes() {
-	const { data } = useQuery(fluidRoutesQueryOptions);
+	const { data, isPending } = useQuery(fluidRoutesQueryOptions);
 
 	return (
 		<div>
@@ -14,13 +14,16 @@ export function FluidRoutes() {
 				<Heading>Fluid Routes</Heading>
 				<CreateFluidRoutesForm />
 			</Flex>
-
-			<DataTable
-				filterLabel="filter by name..."
-				filterer="name"
-				columns={fluid_routes_column}
-				data={data?.fluid_routes_data ?? []}
-			/>
+			{isPending ? (
+				<Spinner />
+			) : (
+				<DataTable
+					filterLabel="filter by name..."
+					filterer="name"
+					columns={fluid_routes_column}
+					data={data?.fluid_routes_data ?? []}
+				/>
+			)}
 		</div>
 	);
 }

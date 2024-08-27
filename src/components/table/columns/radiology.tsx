@@ -67,7 +67,7 @@ export const imaging_column: ColumnDef<DB["imaging"]["Row"]>[] = [
 						title="Delete Imaging"
 						warning="Are you sure? this imaging will be parmanently deleted from the
           database."
-						actionFn={async () => await deleteImagingAction({ id: params.id })}
+						actionFn={() => deleteImagingAction({ id: params.id })}
 					/>
 				</div>
 			);
@@ -118,9 +118,7 @@ export const imaging_cat_column: ColumnDef<DB["imaging_category"]["Row"]>[] = [
 						title="Delete Category"
 						warning="Are you sure? this category will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deleteImagingCategoryAction({ id: cat.id })
-						}
+						actionFn={() => deleteImagingCategoryAction({ id: cat.id })}
 					/>
 				</div>
 			);

@@ -87,9 +87,7 @@ export const patient_diagnosis_column: ColumnDef<SharedConsultationTypes>[] = [
 						title="Delete Diagnosis"
 						warning="Are you sure? this diagnosis will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deletePatientDiagnosisAction({ id: diag.id })
-						}
+						actionFn={() => deletePatientDiagnosisAction({ id: diag.id })}
 					/>
 				</div>
 			);

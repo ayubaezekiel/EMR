@@ -13,6 +13,7 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as ResetpasswordImport } from './routes/reset_password'
 import { Route as LayoutImport } from './routes/_layout'
 import { Route as IndexImport } from './routes/index'
 import { Route as LayoutDashboardBillingImport } from './routes/_layout/dashboard/billing'
@@ -44,6 +45,11 @@ import { Route as LayoutDashboardAdmissionsPatientIdImport } from './routes/_lay
 const LayoutDashboardIndexLazyImport = createFileRoute('/_layout/dashboard/')()
 
 // Create/Update Routes
+
+const ResetpasswordRoute = ResetpasswordImport.update({
+  path: '/reset_password',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const LayoutRoute = LayoutImport.update({
   id: '/_layout',
@@ -214,6 +220,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof LayoutImport
+      parentRoute: typeof rootRoute
+    }
+    '/reset_password': {
+      id: '/reset_password'
+      path: '/reset_password'
+      fullPath: '/reset_password'
+      preLoaderRoute: typeof ResetpasswordImport
       parentRoute: typeof rootRoute
     }
     '/_layout/dashboard/billing': {
@@ -417,6 +430,7 @@ export const routeTree = rootRoute.addChildren({
     LayoutDashboardRadiologyIndexRoute,
     LayoutDashboardUsersIndexRoute,
   }),
+  ResetpasswordRoute,
 })
 
 /* prettier-ignore-end */
@@ -428,7 +442,8 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/_layout"
+        "/_layout",
+        "/reset_password"
       ]
     },
     "/": {
@@ -462,6 +477,9 @@ export const routeTree = rootRoute.addChildren({
         "/_layout/dashboard/radiology/",
         "/_layout/dashboard/users/"
       ]
+    },
+    "/reset_password": {
+      "filePath": "reset_password.tsx"
     },
     "/_layout/dashboard/billing": {
       "filePath": "_layout/dashboard/billing.tsx",

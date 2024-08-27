@@ -1,5 +1,4 @@
 import { AlertDialog, Button, Flex } from "@radix-ui/themes";
-import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { Trash } from "lucide-react";
 
@@ -8,7 +7,7 @@ interface DeleteActionType {
 	title: string;
 	warning: string;
 	inValidate: string;
-	actionFn: ({ id }: { id: string }) => void;
+	actionFn: ({ id }: { id: string }) => Promise<void>;
 }
 
 export function DeleteActionForm({
@@ -19,15 +18,6 @@ export function DeleteActionForm({
 	actionFn,
 }: DeleteActionType) {
 	const queryClient = useQueryClient();
-	const form = useForm({
-		defaultValues: {
-			id: id,
-		},
-		onSubmit: () => {
-			actionFn({ id: id });
-			() => queryClient.invalidateQueries({ queryKey: [inValidate] });
-		},
-	});
 
 	return (
 		<AlertDialog.Root>
@@ -47,18 +37,17 @@ export function DeleteActionForm({
 						</Button>
 					</AlertDialog.Cancel>
 					<AlertDialog.Action>
-						<form
-							onSubmit={(e) => {
-								e.stopPropagation();
-								e.preventDefault();
-								form.handleSubmit();
-								form.reset();
+						<Button
+							onClick={async () => {
+								await actionFn({ id: id });
+								queryClient.invalidateQueries({ queryKey: [inValidate] });
 							}}
+							type="submit"
+							variant="solid"
+							color="red"
 						>
-							<Button type="submit" variant="solid" color="red">
-								Confirm
-							</Button>
-						</form>
+							Confirm
+						</Button>
 					</AlertDialog.Action>
 				</Flex>
 			</AlertDialog.Content>

@@ -48,7 +48,7 @@ export const hmo_groups_column: ColumnDef<DB["hmo_group"]["Row"]>[] = [
 						title="Delete HMO Group"
 						warning="Are you sure? This HMO group will be parmanently deleted from the
           database."
-						actionFn={async () => await deleteHMOGroupAction({ id: group.id })}
+						actionFn={() => deleteHMOGroupAction({ id: group.id })}
 					/>
 				</div>
 			);

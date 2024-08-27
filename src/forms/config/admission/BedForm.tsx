@@ -91,9 +91,7 @@ export function CreateBedForm() {
 						<form.Field
 							name="default_price"
 							validators={{
-								onChange: z
-									.string()
-									.min(3, { message: "field must be atleast 3 characters" }),
+								onChange: z.string().min(1, { message: "required" }),
 							}}
 						>
 							{(field) => (
@@ -123,7 +121,7 @@ export function CreateBedForm() {
 									<Text size={"3"}>Ward*</Text>
 									<Select.Root onValueChange={(e) => field.handleChange(e)}>
 										<Select.Trigger placeholder="select ward..." />
-										<Select.Content>
+										<Select.Content position="popper">
 											{wards_data?.wards_data?.map((w) => (
 												<Select.Item key={w.id} value={w.id}>
 													{w.name}
@@ -248,9 +246,7 @@ export function UpdateBedForm({ id, ...values }: DB["beds"]["Update"]) {
 						<form.Field
 							name="default_price"
 							validators={{
-								onChange: z
-									.string()
-									.min(3, { message: "field must be atleast 3 characters" }),
+								onChange: z.string().min(1, { message: "required" }),
 							}}
 						>
 							{(field) => (
@@ -280,7 +276,7 @@ export function UpdateBedForm({ id, ...values }: DB["beds"]["Update"]) {
 									<Text size={"3"}>Ward*</Text>
 									<Select.Root onValueChange={(e) => field.handleChange(e)}>
 										<Select.Trigger placeholder="select ward..." />
-										<Select.Content>
+										<Select.Content position="popper">
 											{wards_data?.wards_data?.map((w) => (
 												<Select.Item key={w.id} value={w.id}>
 													{w.name}

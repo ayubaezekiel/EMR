@@ -47,9 +47,7 @@ export const specialties_column: ColumnDef<DB["specialties"]["Row"]>[] = [
 						title="Delete Specialty"
 						warning="Are you sure? this specialty will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deleteSpecialtyAction({ id: specialties.id })
-						}
+						actionFn={() => deleteSpecialtyAction({ id: specialties.id })}
 					/>
 				</div>
 			);

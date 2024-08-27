@@ -116,7 +116,7 @@ export const hmo_plans_column: ColumnDef<NewHMOPlanType>[] = [
 						title="Delete HMO Plan"
 						warning="Are you sure? This HMO plan will be parmanently deleted from the
           database."
-						actionFn={async () => await deleteHMOPlanAction({ id: plans.id })}
+						actionFn={() => deleteHMOPlanAction({ id: plans.id })}
 					/>
 				</div>
 			);

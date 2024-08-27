@@ -86,9 +86,7 @@ export const history_taking_column: ColumnDef<SharedConsultationTypes>[] = [
 						title="Delete History"
 						warning="Are you sure? this history will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deleteHistoryTakingAction({ id: history.id })
-						}
+						actionFn={() => deleteHistoryTakingAction({ id: history.id })}
 					/>
 				</div>
 			);

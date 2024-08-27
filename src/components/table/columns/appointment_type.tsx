@@ -67,9 +67,7 @@ export const appointment_type_column: ColumnDef<
 						title="Delete Lab Parameter"
 						warning="Are you sure? this appointment type parameter will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deleteAppointmentTypeAction({ id: type.id })
-						}
+						actionFn={() => deleteAppointmentTypeAction({ id: type.id })}
 					/>
 				</div>
 			);

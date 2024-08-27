@@ -60,7 +60,7 @@ export const vitals_column: ColumnDef<DB["vitals"]["Row"]>[] = [
 						title="Delete Vitals"
 						warning="Are you sure? this vitals will be parmanently deleted from the
           database."
-						actionFn={async () => await deleteVitalsAction({ id: vitals.id })}
+						actionFn={() => deleteVitalsAction({ id: vitals.id })}
 					/>
 				</div>
 			);
@@ -144,13 +144,11 @@ export const patient_vitals_column: ColumnDef<VitalsProps>[] = [
 					<UpdatePatientVitalsForm {...vitals} />
 					<DeleteActionForm
 						id={vitals.id}
-						inValidate="patientVitals"
+						inValidate="patientVitalsById"
 						title="Delete Patient Vitals"
 						warning="Are you sure? this vitals will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deletePatientVitalsAction({ id: vitals.id })
-						}
+						actionFn={() => deletePatientVitalsAction({ id: vitals.id })}
 					/>
 				</div>
 			);

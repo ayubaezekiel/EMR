@@ -352,6 +352,42 @@ export type Database = {
           },
         ]
       }
+      center: {
+        Row: {
+          address: string
+          date_created: string | null
+          footer: string | null
+          id: string
+          lga: string
+          logo_url: string
+          name: string
+          state: string
+          vailid_till: string
+        }
+        Insert: {
+          address: string
+          date_created?: string | null
+          footer?: string | null
+          id?: string
+          lga: string
+          logo_url: string
+          name: string
+          state: string
+          vailid_till: string
+        }
+        Update: {
+          address?: string
+          date_created?: string | null
+          footer?: string | null
+          id?: string
+          lga?: string
+          logo_url?: string
+          name?: string
+          state?: string
+          vailid_till?: string
+        }
+        Relationships: []
+      }
       clinics: {
         Row: {
           created_at: string | null

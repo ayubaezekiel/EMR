@@ -48,7 +48,7 @@ export const cashpoint_column: ColumnDef<CashpointType["Row"]>[] = [
 						title="Delete Cashpoint"
 						warning="Are you sure? this cashpoint will be parmanently deleted from the
           database."
-						actionFn={async () => await deleteCashpointAction({ id: cash.id })}
+						actionFn={() => deleteCashpointAction({ id: cash.id })}
 					/>
 				</div>
 			);

@@ -74,7 +74,7 @@ export const lab_test_column: ColumnDef<DB["lab_tests"]["Row"]>[] = [
 						title="Delete Lab Tests"
 						warning="Are you sure? this lab test will be parmanently deleted from the
           database."
-						actionFn={async () => await deleteLabTestAction({ id: params.id })}
+						actionFn={() => deleteLabTestAction({ id: params.id })}
 					/>
 				</div>
 			);
@@ -134,9 +134,7 @@ export const lab_test_params_column: ColumnDef<
 						title="Delete Lab Parameter"
 						warning="Are you sure? this lab parameter will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deleteLabTestParamsAction({ id: params.id })
-						}
+						actionFn={() => deleteLabTestParamsAction({ id: params.id })}
 					/>
 				</div>
 			);

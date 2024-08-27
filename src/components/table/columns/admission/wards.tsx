@@ -46,11 +46,11 @@ export const wards_column: ColumnDef<DB["wards"]["Row"]>[] = [
 		cell: ({ row }) => (
 			<div className="capitalize">
 				{row.getValue("is_labor") ? (
-					<Badge size={"1"}>
+					<Badge size={"1"} radius="full">
 						<CheckCircle />
 					</Badge>
 				) : (
-					<Badge>
+					<Badge size={"1"} color="red" radius="full">
 						<X />
 					</Badge>
 				)}
@@ -73,7 +73,7 @@ export const wards_column: ColumnDef<DB["wards"]["Row"]>[] = [
 						title="Delete Ward?"
 						warning="Are you sure? this ward type will be parmanently deleted from the
           database."
-						actionFn={async () => await deleteWardAction({ id: params.id })}
+						actionFn={() => deleteWardAction({ id: params.id })}
 					/>
 				</div>
 			);

@@ -87,9 +87,7 @@ export const nursing_report_column: ColumnDef<NursingReportProps>[] = [
 						title="Delete Nursing Report?"
 						warning="Are you sure? this report will be parmanently deleted from the
           database."
-						actionFn={async () =>
-							await deleteAdmissionReportsAction({ id: params.id })
-						}
+						actionFn={() => deleteAdmissionReportsAction({ id: params.id })}
 					/>
 				</div>
 			);
