@@ -8,7 +8,8 @@
 		"build": "tsc -b && vite build",
 		"gen": "supabase gen types --schema=public --lang=typescript --linked > ./src/lib/supabase.types.ts",
 		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"postinstall": "node ./postinstall.js"
 	},
 	"dependencies": {
 		"@internationalized/date": "^3.5.5",
@@ -38,6 +39,7 @@
 		"@tanstack/router-devtools": "^1.44.4",
 		"@tanstack/router-plugin": "^1.44.3",
 		"@tanstack/zod-form-adapter": "^0.26.4",
+		"@tinymce/tinymce-react": "^5.1.1",
 		"@tiptap/extension-highlight": "^2.5.4",
 		"@tiptap/extension-image": "^2.5.4",
 		"@tiptap/extension-link": "^2.5.4",
@@ -56,15 +58,18 @@
 		"date-fns": "^3.6.0",
 		"dayjs": "^1.11.12",
 		"framer-motion": "^11.3.17",
+		"fs-extra": "^11.2.0",
 		"lucide-react": "^0.408.0",
 		"nigeria-states-lgas": "^0.0.2",
 		"novel": "^0.5.0",
+		"quill": "^2.0.2",
 		"react": "^18.3.1",
 		"react-day-picker": "^8.10.1",
 		"react-dom": "^18.3.1",
 		"sonner": "^1.5.0",
 		"tailwind-merge": "^2.4.0",
 		"tailwindcss-animate": "^1.0.7",
+		"tinymce": "^7.3.0",
 		"zod": "^3.23.8"
 	},
 	"devDependencies": {

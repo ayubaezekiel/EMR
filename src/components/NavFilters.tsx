@@ -15,16 +15,16 @@ import { useState } from "react";
 import { patientsQueryOptions } from "../actions/queries";
 
 export function NavPatientFilters() {
-	const [patient, setPatient] = useState("");
+	const [patient, setPatient] = useState({ match: "", startLoading: false });
 	const [open, onOpenChange] = useState(false);
 
 	const { data, isPending } = useQuery(patientsQueryOptions);
 
 	const filtered_patients = data?.patient_data?.filter(
 		(p) =>
-			p.first_name.toLowerCase().includes(patient.toLowerCase()) ||
-			p.middle_name?.toLowerCase().includes(patient.toLowerCase()) ||
-			p.last_name.toLowerCase().includes(patient.toLowerCase()),
+			p.first_name.toLowerCase().includes(patient.match.toLowerCase()) ||
+			p.middle_name?.toLowerCase().includes(patient.match.toLowerCase()) ||
+			p.last_name.toLowerCase().includes(patient.match.toLowerCase()),
 	);
 	return (
 		<div className="">
@@ -38,20 +38,36 @@ export function NavPatientFilters() {
 					<Flex gap="3">
 						<Box flexGrow="1">
 							<TextField.Root
-								onChange={(e) => setPatient(e.target.value)}
+								onInput={(e) =>
+									setPatient({
+										match: e.currentTarget.value,
+										startLoading:
+											e.currentTarget.value.length < 3 &&
+											e.currentTarget.value.length > 0
+												? true
+												: false,
+									})
+								}
 								placeholder="type aleast 3 letters..."
 							>
 								<TextField.Slot side="right">
 									<Search />
 								</TextField.Slot>
 							</TextField.Root>
-							{patient.length < 3 || isPending ? (
+							{isPending || patient.startLoading ? (
 								<div className="flex justify-center mt-4">
 									<Spinner />
 								</div>
-							) : filtered_patients!.length > 0 ? (
+							) : filtered_patients?.length === 0 ? (
+								<Callout.Root mt={"4"}>
+									<Callout.Icon>
+										<AlertCircle />
+									</Callout.Icon>
+									<Callout.Text ml={"2"}>No patient found</Callout.Text>
+								</Callout.Root>
+							) : (
 								filtered_patients?.map((f) => (
-									<Card mt={"2"}>
+									<Card mt={"2"} style={{ background: "var(--accent-3)" }}>
 										<Link
 											onClick={() => onOpenChange(false)}
 											to={`/dashboard/patients/${f.id}/`}
@@ -62,13 +78,6 @@ export function NavPatientFilters() {
 										</Link>
 									</Card>
 								))
-							) : (
-								<Callout.Root mt={"4"}>
-									<Callout.Icon>
-										<AlertCircle />
-									</Callout.Icon>
-									<Callout.Text ml={"2"}>No patient found</Callout.Text>
-								</Callout.Root>
 							)}
 						</Box>
 					</Flex>

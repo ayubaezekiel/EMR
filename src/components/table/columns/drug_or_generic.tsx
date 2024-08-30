@@ -31,15 +31,30 @@ export const drug_or_generic_column: ColumnDef<DrugType>[] = [
 		enableHiding: false,
 	},
 	{
+		accessorKey: "created_at",
+		header: "Date Created",
+		cell: ({ row }) => (
+			<div>{new Date(row.getValue("created_at")).toDateString()}</div>
+		),
+	},
+	{
+		accessorKey: "created_by",
+		header: "Created By",
+		cell: ({ row }) => (
+			<div className="capitalize">{row.getValue("created_by")}</div>
+		),
+	},
+
+	{
 		accessorKey: "name",
 		header: "Drug/generic",
 		cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
 	},
 	{
-		accessorKey: "drug_or_generic_brand_id",
+		accessorKey: "drug_or_generic_brand",
 		header: "Brand",
 		cell: ({ row }) => (
-			<div className="capitalize">{row.original.drug_or_generic_brand}</div>
+			<div className="capitalize">{row.getValue("drug_or_generic_brand")}</div>
 		),
 	},
 	{
@@ -75,11 +90,19 @@ export const drug_or_generic_column: ColumnDef<DrugType>[] = [
 			</div>
 		),
 	},
-
 	{
-		accessorKey: "name",
-		header: "Total Left",
-		cell: () => <div className="capitalize">------</div>,
+		accessorKey: "total_quantity",
+		header: "Total Sold",
+		cell: ({ row }) => (
+			<div className="capitalize">{row.getValue("total_quantity")}</div>
+		),
+	},
+	{
+		accessorKey: "total_sold",
+		header: "Total Sold",
+		cell: ({ row }) => (
+			<div className="capitalize">{row.getValue("total_sold")}</div>
+		),
 	},
 
 	{
@@ -92,13 +115,13 @@ export const drug_or_generic_column: ColumnDef<DrugType>[] = [
 				<div className="flex gap-4">
 					<UpdateDrugOrGeneric
 						created_at={drug.created_at}
-						created_by={drug.created_by}
 						default_price={drug.default_price}
 						drug_or_generic_brand_id={drug.drug_or_generic_brand_id}
 						id={drug.id}
 						is_consumable={Boolean(drug.is_consumable)}
 						name={drug.name}
 						quantity={Number(drug.quantity)}
+						total_quantity={Number(drug.total_quantity)}
 					/>
 					<DeleteActionForm
 						id={drug.id}

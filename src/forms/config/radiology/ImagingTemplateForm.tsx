@@ -10,7 +10,8 @@ import {
 	updateImagingTemplateAction,
 } from "../../../actions/config/radiology";
 import { FieldInfo } from "../../../components/FieldInfo";
-import { RichEditor } from "../../../components/textEditor/RichTextEditor";
+import { editor_plugins } from "../../../components/textEditor/RichTextEditor";
+import { Editor } from "@tinymce/tinymce-react";
 
 export function CreateImagingTemplateForm() {
 	const [open, onOpenChange] = useState(false);
@@ -85,11 +86,12 @@ export function CreateImagingTemplateForm() {
 										Note
 										<Text size={"1"}> (should be atleast 10 characters)</Text>*
 									</Text>
-									<RichEditor
-										onChange={(value) => {
-											field.handleChange(value);
-										}}
+									<Editor
+										tinymceScriptSrc="/tinymce/tinymce.min.js"
+										licenseKey="gpl"
+										onChange={(e) => field.handleChange(e.target.getContent())}
 										initialValue={field.state.value}
+										init={editor_plugins}
 									/>
 									<FieldInfo field={field} />
 								</div>
@@ -193,13 +195,14 @@ export function UpdateImagingTemplateForm({
 								<div className="flex flex-col">
 									<Text size={"3"}>
 										Note
-										<Text size={"1"}> (should be atleast 10 characters)</Text>*
+										<Text size={"1"}>(should be atleast 10 characters)</Text>*
 									</Text>
-									<RichEditor
-										onChange={(value) => {
-											field.handleChange(value);
-										}}
-										initialValue={field.state.value!}
+									<Editor
+										tinymceScriptSrc="/tinymce/tinymce.min.js"
+										licenseKey="gpl"
+										onChange={(e) => field.handleChange(e.target.getContent())}
+										initialValue={field.state.value}
+										init={editor_plugins}
 									/>
 									<FieldInfo field={field} />
 								</div>

@@ -9,7 +9,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 import { Toaster } from "sonner";
-import { NextUIProvider } from "@nextui-org/react";
+import { MantineProvider } from "@mantine/core";
+import "@mantine/core/styles.css";
 
 const queryClient = new QueryClient();
 
@@ -30,12 +31,12 @@ if (!rootElement.innerHTML) {
 	root.render(
 		<StrictMode>
 			<QueryClientProvider client={queryClient}>
-				<NextUIProvider>
+				<MantineProvider theme={{ primaryColor: "green", primaryShade: 8 }}>
 					<Theme accentColor="grass" panelBackground="solid">
 						<Toaster richColors />
 						<RouterProvider router={router} />
 					</Theme>
-				</NextUIProvider>
+				</MantineProvider>
 			</QueryClientProvider>
 		</StrictMode>,
 	);

@@ -7,6 +7,7 @@ import {
 	Flex,
 	IconButton,
 	Select,
+	Spinner,
 	Text,
 	TextField,
 } from "@radix-ui/themes";
@@ -23,9 +24,8 @@ import {
 } from "../../actions/config/vitals";
 import { vitalsQueryOptions } from "../../actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
-import PendingComponent from "../../components/PendingComponent";
 import { Label } from "../../components/ui/label";
-import { useProfile } from "../../lib/hooks";
+import { getProfile } from "../../lib/utils";
 import supabase from "../../supabase/client";
 
 export function CreateVitalsForm() {
@@ -235,10 +235,10 @@ export function UpdateVitalsForm({ id, ...values }: DB["vitals"]["Update"]) {
 }
 
 export function CreatePatientVitalsForm({ patientId }: { patientId: string }) {
+	const [isSubmitting, setIsSubmitting] = useState(false);
 	const { data, isPending } = useQuery(vitalsQueryOptions);
 
 	const queryClient = useQueryClient();
-	const { profile_data, isProfilePending } = useProfile();
 
 	const [open, onOpenChange] = useState(false);
 
@@ -287,25 +287,29 @@ export function CreatePatientVitalsForm({ patientId }: { patientId: string }) {
 					{...form.getInputProps(`vitals.${index}.value`)}
 				/>
 			</div>
-			<div className="flex flex-col gap-1 w-40">
-				<Label>Unit</Label>
-				<Select.Root
-					size={"3"}
-					key={form.key(`vitals.${index}.unit`)}
-					onValueChange={(e) =>
-						form.getInputProps(`vitals.${index}.unit`).onChange(e)
-					}
-				>
-					<Select.Trigger placeholder="kg" />
-					<Select.Content position="popper">
-						{vitals_data.map((v) => (
-							<Select.Item value={`${v!.length > 0 ? v : "---"}`}>
-								{v!.length < 1 ? "---" : v}
-							</Select.Item>
-						))}
-					</Select.Content>
-				</Select.Root>
-			</div>
+			{isPending ? (
+				<Spinner />
+			) : (
+				<div className="flex flex-col gap-1 w-40">
+					<Label>Unit</Label>
+					<Select.Root
+						size={"3"}
+						key={form.key(`vitals.${index}.unit`)}
+						onValueChange={(e) =>
+							form.getInputProps(`vitals.${index}.unit`).onChange(e)
+						}
+					>
+						<Select.Trigger placeholder="kg" />
+						<Select.Content position="popper">
+							{vitals_data.map((v) => (
+								<Select.Item value={`${v!.length > 0 ? v : "---"}`}>
+									{v!.length < 1 ? "---" : v}
+								</Select.Item>
+							))}
+						</Select.Content>
+					</Select.Root>
+				</div>
+			)}
 			<div className="flex flex-col mt-5">
 				<IconButton
 					type="button"
@@ -318,8 +322,6 @@ export function CreatePatientVitalsForm({ patientId }: { patientId: string }) {
 		</Flex>
 	));
 
-	if (isPending || isProfilePending) return <PendingComponent />;
-
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
 			<Dialog.Trigger>
@@ -331,23 +333,27 @@ export function CreatePatientVitalsForm({ patientId }: { patientId: string }) {
 				<Dialog.Title>Record Vitals</Dialog.Title>
 				<form
 					onSubmit={form.onSubmit(async (values) => {
+						setIsSubmitting(true);
 						const p_vitals = values.vitals.map((n) => ({
 							name: n.name,
 							unit: n.unit,
 							value: n.value,
 						}));
+						const prof = await getProfile();
 						const { error } = await supabase
 							.from("patient_vitals")
 							.insert({
 								patient_id: patientId,
-								taken_by: `${profile_data?.id}`,
+								taken_by: `${prof?.id}`,
 								vitals: p_vitals,
 							})
 							.select();
 
 						if (error) {
 							toast.error(error.message);
+							setIsSubmitting(false);
 						} else {
+							setIsSubmitting(false);
 							onOpenChange(false);
 							toast.success("patient vitals recorded successfully");
 							queryClient.invalidateQueries({
@@ -383,7 +389,12 @@ export function CreatePatientVitalsForm({ patientId }: { patientId: string }) {
 							Add more
 						</Button>
 					</Flex>
-					<Button disabled={!form.isValid()} size={"4"} type="submit">
+					<Button
+						disabled={!form.isValid() || isSubmitting}
+						size={"4"}
+						loading={isSubmitting}
+						type="submit"
+					>
 						Record
 					</Button>
 				</form>
@@ -398,7 +409,7 @@ export function UpdatePatientVitalsForm({
 }: DB["patient_vitals"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
-	const { profile_data, isProfilePending } = useProfile();
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const { data, isPending } = useQuery(vitalsQueryOptions);
 
@@ -411,8 +422,6 @@ export function UpdatePatientVitalsForm({
 			vitals: [...vitals],
 		},
 	});
-
-	if (isPending || isProfilePending) return <PendingComponent />;
 
 	const fitered_vitals = new Set(data?.vitals_data?.map((v) => v.unit));
 
@@ -451,25 +460,29 @@ export function UpdatePatientVitalsForm({
 					{...form.getInputProps(`vitals.${index}.value`)}
 				/>
 			</div>
-			<div className="flex flex-col gap-1 w-40">
-				<Label>Unit</Label>
-				<Select.Root
-					size={"3"}
-					key={form.key(`vitals.${index}.unit`)}
-					onValueChange={(e) =>
-						form.getInputProps(`vitals.${index}.unit`).onChange(e)
-					}
-				>
-					<Select.Trigger placeholder="kg" />
-					<Select.Content position="popper">
-						{vitals_data.map((v) => (
-							<Select.Item value={`${v!.length > 0 ? v : "---"}`}>
-								{v!.length < 1 ? "---" : v}
-							</Select.Item>
-						))}
-					</Select.Content>
-				</Select.Root>
-			</div>
+			{isPending ? (
+				<Spinner />
+			) : (
+				<div className="flex flex-col gap-1 w-40">
+					<Label>Unit</Label>
+					<Select.Root
+						size={"3"}
+						key={form.key(`vitals.${index}.unit`)}
+						onValueChange={(e) =>
+							form.getInputProps(`vitals.${index}.unit`).onChange(e)
+						}
+					>
+						<Select.Trigger placeholder="kg" />
+						<Select.Content position="popper">
+							{vitals_data.map((v) => (
+								<Select.Item value={`${v!.length > 0 ? v : "---"}`}>
+									{v!.length < 1 ? "---" : v}
+								</Select.Item>
+							))}
+						</Select.Content>
+					</Select.Root>
+				</div>
+			)}
 			<div className="flex flex-col mt-5">
 				<IconButton
 					type="button"
@@ -498,23 +511,27 @@ export function UpdatePatientVitalsForm({
 					</Dialog.Description>
 					<form
 						onSubmit={form.onSubmit(async (values) => {
+							setIsSubmitting(true);
 							const p_vitals = values.vitals.map((n) => ({
 								name: n.name,
 								unit: n.unit,
 								value: n.value,
 							}));
+							const prof = await getProfile();
 							const { error } = await supabase
 								.from("patient_vitals")
 								.update({
 									patient: values.patient,
-									taken_by: `${profile_data?.id}`,
+									taken_by: `${prof?.id}`,
 									vitals: p_vitals,
 								})
 								.eq("id", `${id}`);
 
 							if (error) {
 								toast.error(error.message);
+								setIsSubmitting(false);
 							} else {
+								setIsSubmitting(false);
 								onOpenChange(false);
 								toast.success("patient vitals updated successfully");
 								queryClient.invalidateQueries({
@@ -550,7 +567,12 @@ export function UpdatePatientVitalsForm({
 								Add more
 							</Button>
 						</Flex>
-						<Button disabled={!form.isValid()} size={"4"} type="submit">
+						<Button
+							disabled={!form.isValid() || isSubmitting}
+							loading={isSubmitting}
+							size={"4"}
+							type="submit"
+						>
 							Update
 						</Button>
 					</form>

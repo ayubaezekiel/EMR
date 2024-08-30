@@ -19,8 +19,7 @@ import {
 	drugOrGenericQueryOptions,
 	patientsQueryOptions,
 } from "../../actions/queries";
-import PendingComponent from "../../components/PendingComponent";
-import { checkAuth } from "../../lib/utils";
+import { getProfile } from "../../lib/utils";
 import supabase from "../../supabase/client";
 
 export function CreateConsumableRequestForm({
@@ -32,7 +31,7 @@ export function CreateConsumableRequestForm({
 		drugOrGenericQueryOptions,
 	);
 
-	const { data: patient_data, isPending: patientsPending } =
+	const { data: patient_data, isPending: isPatientsPending } =
 		useQuery(patientsQueryOptions);
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
@@ -58,8 +57,6 @@ export function CreateConsumableRequestForm({
 		[drug_data?.drug_or_generic_data],
 	);
 
-	if (patientsPending || isDrugPending) return <PendingComponent />;
-
 	const fields = form.getValues().services.map((item, index) => (
 		<div key={item.key} className="mt-4 flex gap-2 items-center">
 			<Card className="w-full">
@@ -80,6 +77,7 @@ export function CreateConsumableRequestForm({
 									<Select.Item
 										key={v.id}
 										value={JSON.stringify({
+											id: v.id,
 											name: v.name,
 											amount: v.default_price,
 										})}
@@ -128,107 +126,108 @@ export function CreateConsumableRequestForm({
 	));
 
 	return (
-		<div>
-			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button size={"4"}>New Request</Button>
-				</Dialog.Trigger>
+		<Dialog.Root open={open} onOpenChange={onOpenChange}>
+			<Dialog.Trigger disabled={isDrugPending || isPatientsPending}>
+				<Button
+					loading={isDrugPending || isLoading || isPatientsPending}
+					size={"4"}
+				>
+					New Request
+				</Button>
+			</Dialog.Trigger>
 
-				<Dialog.Content>
-					<Dialog.Title>Consumable Request</Dialog.Title>
-					<Dialog.Description size="2" mb="4">
-						Fill out the form information
-					</Dialog.Description>
+			<Dialog.Content>
+				<Dialog.Title>Consumable Request</Dialog.Title>
+				<Dialog.Description size="2" mb="4">
+					Fill out the form information
+				</Dialog.Description>
 
-					<form
-						onSubmit={form.onSubmit(async (values) => {
-							setIsLoading(true);
+				<form
+					onSubmit={form.onSubmit(async (values) => {
+						setIsLoading(true);
 
-							const user = await checkAuth();
-							const { error } = await supabase.from("requests").insert([
-								{
-									patients_id: patientId ?? `${values.patients_id}`,
-									taken_by: `${user?.id}`,
-									is_consumable: true,
-									services: values.services.map((v) => ({
-										consumable: JSON.parse(v.consumable),
-										quantity: v.quantity,
-										note: v.note,
-									})),
-								},
-							]);
-							if (error) {
-								toast.error(error.message);
-								setIsLoading(false);
-							} else {
-								toast.success("request issued successfully");
-								form.reset();
-								queryClient.invalidateQueries({ queryKey: ["requests"] });
-								setIsLoading(false);
-								onOpenChange(false);
-							}
-						})}
-					>
-						{!patientId && (
-							<div className="flex flex-col">
-								<Text size={"3"}>Patient*</Text>
-								<Select.Root
-									size={"3"}
-									onValueChange={(e) =>
-										form.getInputProps("patients_id").onChange(e)
-									}
-								>
-									<Select.Trigger placeholder="select patient..." />
-									<Select.Content position="popper">
-										{patient_data?.patient_data?.map((p) => (
-											<Select.Item key={p.id} value={p.id}>
-												{p.first_name} {p.middle_name} {p.last_name} - [
-												{p.id.slice(0, 8).toUpperCase()}]
-											</Select.Item>
-										))}
-									</Select.Content>
-								</Select.Root>
-							</div>
-						)}
-
-						{fields.length === 0 && (
-							<Callout.Root color="red" mt={"4"}>
-								<Callout.Icon>
-									<AlertCircle />
-									<Callout.Text ml={"2"}>Empty</Callout.Text>
-								</Callout.Icon>
-							</Callout.Root>
-						)}
-
-						{fields}
-						<Flex justify="end" mt="4">
-							<Button
-								type="button"
-								variant="soft"
-								onClick={() =>
-									form.insertListItem("services", {
-										consumable: "",
-										quantity: "",
-										note: "",
-										key: randomId(),
-									})
+						const prof = await getProfile();
+						const { error } = await supabase.from("requests").insert({
+							patients_id: patientId ?? `${values.patients_id}`,
+							taken_by: `${prof?.id}`,
+							is_consumable: true,
+							services: values.services.map((v) => ({
+								consumable: JSON.parse(v.consumable),
+								quantity: v.quantity,
+								note: v.note,
+							})),
+						});
+						if (error) {
+							toast.error(error.message);
+							setIsLoading(false);
+						} else {
+							toast.success("request issued successfully");
+							form.reset();
+							queryClient.invalidateQueries({ queryKey: ["requests"] });
+							setIsLoading(false);
+							onOpenChange(false);
+						}
+					})}
+				>
+					{!patientId && (
+						<div className="flex flex-col">
+							<Text size={"3"}>Patient*</Text>
+							<Select.Root
+								size={"3"}
+								onValueChange={(e) =>
+									form.getInputProps("patients_id").onChange(e)
 								}
 							>
-								Add more
-							</Button>
-						</Flex>
+								<Select.Trigger placeholder="select patient..." />
+								<Select.Content position="popper">
+									{patient_data?.patient_data?.map((p) => (
+										<Select.Item key={p.id} value={p.id}>
+											{p.first_name} {p.middle_name} {p.last_name} - [
+											{p.id.slice(0, 8).toUpperCase()}]
+										</Select.Item>
+									))}
+								</Select.Content>
+							</Select.Root>
+						</div>
+					)}
+
+					{fields.length === 0 && (
+						<Callout.Root color="red" mt={"4"}>
+							<Callout.Icon>
+								<AlertCircle />
+								<Callout.Text ml={"2"}>Empty</Callout.Text>
+							</Callout.Icon>
+						</Callout.Root>
+					)}
+
+					{fields}
+					<Flex justify="end" mt="4">
 						<Button
-							loading={isLoading}
-							disabled={!form.isValid() || isLoading || fields.length === 0}
-							size={"4"}
-							type="submit"
+							type="button"
+							variant="soft"
+							onClick={() =>
+								form.insertListItem("services", {
+									consumable: "",
+									quantity: "",
+									note: "",
+									key: randomId(),
+								})
+							}
 						>
-							Request
+							Add more
 						</Button>
-					</form>
-				</Dialog.Content>
-			</Dialog.Root>
-		</div>
+					</Flex>
+					<Button
+						loading={isLoading}
+						disabled={!form.isValid() || isLoading || fields.length === 0}
+						size={"4"}
+						type="submit"
+					>
+						Request
+					</Button>
+				</form>
+			</Dialog.Content>
+		</Dialog.Root>
 	);
 }
 
@@ -242,18 +241,28 @@ export function UpdateConsumableRequestForm(conData: DB["requests"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 
+	const services = JSON.parse(JSON.stringify(conData.services)).map(
+		(s: {
+			consumable: { id: string; name: string; amount: string };
+			quantity: number;
+			note: string;
+			key: string;
+		}) => ({
+			consumable: JSON.stringify({
+				id: s.consumable.id,
+				name: s.consumable.name,
+				amount: s.consumable.amount,
+			}),
+			quantity: s.quantity,
+			note: s.note,
+			key: randomId(),
+		}),
+	);
+
 	const form = useForm({
 		mode: "uncontrolled",
 		initialValues: {
-			services: [
-				{
-					consumable: "",
-					quantity: "",
-					note: "",
-					key: randomId(),
-				},
-			],
-			patients_id: "",
+			services: [...services],
 		},
 	});
 
@@ -262,8 +271,6 @@ export function UpdateConsumableRequestForm(conData: DB["requests"]["Update"]) {
 			drug_data?.drug_or_generic_data?.filter((c) => c.is_consumable === true),
 		[drug_data?.drug_or_generic_data],
 	);
-
-	if (isDrugPending) return <PendingComponent />;
 
 	const fields = form.getValues().services.map((item, index) => (
 		<div key={item.key} className="mt-4 flex gap-2 items-center">
@@ -274,6 +281,7 @@ export function UpdateConsumableRequestForm(conData: DB["requests"]["Update"]) {
 						<Select.Root
 							required
 							size={"3"}
+							defaultValue={form.values.services[index].consumable}
 							key={form.key(`services.${index}.consumable`)}
 							onValueChange={(e) =>
 								form.getInputProps(`services.${index}.consumable`).onChange(e)
@@ -285,6 +293,7 @@ export function UpdateConsumableRequestForm(conData: DB["requests"]["Update"]) {
 									<Select.Item
 										key={v.id}
 										value={JSON.stringify({
+											id: v.id,
 											name: v.name,
 											amount: v.default_price,
 										})}
@@ -298,6 +307,7 @@ export function UpdateConsumableRequestForm(conData: DB["requests"]["Update"]) {
 					<div className="flex flex-col gap-1 w-full">
 						<Text size={"3"}>Quantity*</Text>
 						<TextField.Root
+							defaultValue={form.values.services[index].quantity}
 							type="number"
 							size={"3"}
 							placeholder="quantity..."
@@ -333,87 +343,90 @@ export function UpdateConsumableRequestForm(conData: DB["requests"]["Update"]) {
 	));
 
 	return (
-		<div>
-			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button size={"1"} color="red" variant="ghost">
-						<Edit />
-					</Button>
-				</Dialog.Trigger>
+		<Dialog.Root open={open} onOpenChange={onOpenChange}>
+			<Dialog.Trigger disabled={isDrugPending}>
+				<Button
+					size={"1"}
+					color="red"
+					variant="ghost"
+					loading={isDrugPending || isLoading}
+				>
+					<Edit />
+				</Button>
+			</Dialog.Trigger>
 
-				<Dialog.Content>
-					<Dialog.Title>Consumable Request</Dialog.Title>
-					<Dialog.Description size="2" mb="4">
-						Fill out the form information
-					</Dialog.Description>
+			<Dialog.Content>
+				<Dialog.Title>Update Consumable Request</Dialog.Title>
+				<Dialog.Description size="2" mb="4">
+					Fill out the form information
+				</Dialog.Description>
 
-					<form
-						onSubmit={form.onSubmit(async (values) => {
-							setIsLoading(true);
+				<form
+					onSubmit={form.onSubmit(async (values) => {
+						setIsLoading(true);
 
-							const user = await checkAuth();
-							const { error } = await supabase
-								.from("requests")
-								.update({
-									patients_id: `${conData.patients_id}`,
-									taken_by: `${user?.id}`,
-									is_consumable: true,
-									services: values.services.map((v) => ({
-										consumable: JSON.parse(v.consumable),
-										quantity: v.quantity,
-										note: v.note,
-									})),
-								})
-								.eq("id", `${conData.id}`);
-							if (error) {
-								toast.error(error.message);
-								setIsLoading(false);
-							} else {
-								toast.success("request issued successfully");
-								form.reset();
-								queryClient.invalidateQueries({ queryKey: ["requests"] });
-								setIsLoading(false);
-								onOpenChange(false);
-							}
-						})}
-					>
-						{fields.length === 0 && (
-							<Callout.Root color="red" mt={"4"}>
-								<Callout.Icon>
-									<AlertCircle />
-									<Callout.Text ml={"2"}>Empty</Callout.Text>
-								</Callout.Icon>
-							</Callout.Root>
-						)}
+						const prof = await getProfile();
+						const { error } = await supabase
+							.from("requests")
+							.update({
+								patients_id: `${conData.patients_id}`,
+								taken_by: `${prof?.id}`,
+								is_consumable: true,
+								services: values.services.map((v) => ({
+									consumable: JSON.parse(v.consumable),
+									quantity: v.quantity,
+									note: v.note,
+								})),
+							})
+							.eq("id", `${conData.id}`);
+						if (error) {
+							toast.error(error.message);
+							setIsLoading(false);
+						} else {
+							toast.success("request issued successfully");
+							form.reset();
+							queryClient.invalidateQueries({ queryKey: ["requests"] });
+							setIsLoading(false);
+							onOpenChange(false);
+						}
+					})}
+				>
+					{fields.length === 0 && (
+						<Callout.Root color="red" mt={"4"}>
+							<Callout.Icon>
+								<AlertCircle />
+								<Callout.Text ml={"2"}>Empty</Callout.Text>
+							</Callout.Icon>
+						</Callout.Root>
+					)}
 
-						{fields}
-						<Flex justify="end" mt="4">
-							<Button
-								type="button"
-								variant="soft"
-								onClick={() =>
-									form.insertListItem("services", {
-										consumable: "",
-										quantity: "",
-										note: "",
-										key: randomId(),
-									})
-								}
-							>
-								Add more
-							</Button>
-						</Flex>
+					{fields}
+					<Flex justify="end" mt="4">
 						<Button
-							loading={isLoading}
-							disabled={!form.isValid() || isLoading || fields.length === 0}
-							size={"4"}
-							type="submit"
+							type="button"
+							variant="soft"
+							onClick={() =>
+								form.insertListItem("services", {
+									consumable: "",
+									quantity: "",
+									note: "",
+									key: randomId(),
+								})
+							}
 						>
-							Update
+							Add more
 						</Button>
-					</form>
-				</Dialog.Content>
-			</Dialog.Root>
-		</div>
+					</Flex>
+					<Button
+						loading={isLoading}
+						disabled={!form.isValid() || isLoading || fields.length === 0}
+						size={"4"}
+						type="submit"
+					>
+						Update
+					</Button>
+				</form>
+			</Dialog.Content>
+		</Dialog.Root>
 	);
 }

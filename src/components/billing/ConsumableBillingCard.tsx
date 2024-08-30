@@ -1,15 +1,14 @@
-import { Badge, Callout, Card, Flex, Text } from "@radix-ui/themes";
+import { Badge, Callout, Card, Flex, Spinner, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { FileQuestion } from "lucide-react";
 import { useMemo } from "react";
 import { requestQueryOptions } from "../../actions/queries";
+import { UpdateConsumableRequestForm } from "../../forms/requests/ConsumableRequestForm";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";
-import PendingComponent from "../PendingComponent";
-import { UpdateConsumableRequestForm } from "../../forms/requests/ConsumableRequestForm";
 
 export function ConsumableBillingCard() {
-	const { data: request_data, isPending: isLabPending } =
+	const { data: request_data, isPending: isConsPending } =
 		useQuery(requestQueryOptions);
 
 	const consumable_data_filtered = useMemo(
@@ -20,8 +19,6 @@ export function ConsumableBillingCard() {
 			),
 		[request_data?.request_data],
 	);
-
-	if (isLabPending) return <PendingComponent />;
 
 	return (
 		<div className="w-full">
@@ -34,6 +31,8 @@ export function ConsumableBillingCard() {
 						<Callout.Text ml={"1"}>No result found</Callout.Text>
 					</Callout.Root>
 				</Flex>
+			) : isConsPending ? (
+				<Spinner />
 			) : (
 				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
 					{consumable_data_filtered?.map((a) => (
@@ -46,22 +45,38 @@ export function ConsumableBillingCard() {
 									patientId={a.patients_id}
 									middleName={a.patients?.middle_name as string}
 								/>
-								<UpdateConsumableRequestForm />
+
+								<UpdateConsumableRequestForm {...a} />
 							</Flex>
 							<Flex direction={"column"} mt={"4"} height={"100px"}>
 								<div className="flex flex-wrap gap-2 mt-4">
 									{JSON.parse(JSON.stringify(a.services)).map(
 										(d: {
 											note: string;
+											quantity: number;
 											consumable: { name: string; amount: string };
 										}) => (
 											<Badge key={d.note}>
 												{d.consumable.name}
-												<Text color="red">N{d.consumable.amount}</Text>
+												<Text color="red">
+													N
+													{new Intl.NumberFormat().format(
+														Number(d.consumable.amount) * d.quantity,
+													)}
+													, qty:
+													{d.quantity}
+												</Text>
 											</Badge>
 										),
 									)}
 								</div>
+							</Flex>
+							<Flex align={"center"} gap={"2"} justify={"between"}>
+								Issued By :{" "}
+								<Badge>
+									{a.profile?.first_name} {a.profile?.middle_name}{" "}
+									{a.profile?.last_name}
+								</Badge>
 							</Flex>
 							<Flex justify={"end"} align={"center"} mt={"4"}>
 								<ApprovePayments
@@ -80,8 +95,10 @@ export function ConsumableBillingCard() {
 									)}
 									amount={JSON.parse(JSON.stringify(a.services))
 										.map(
-											(v: { consumable: { name: string; amount: string } }) =>
-												v.consumable.amount,
+											(v: {
+												quantity: number;
+												consumable: { name: string; amount: string };
+											}) => Number(Number(v.consumable.amount) * v.quantity),
 										)
 										.reduce(
 											(prev: string, curr: string) =>

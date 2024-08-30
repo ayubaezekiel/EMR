@@ -2,7 +2,7 @@ import { Button, Card, Checkbox } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { DeleteActionForm } from "../../../../actions/DeleteAction";
-import { deleteHistoryTakingAction } from "../../../../actions/consultation/actions";
+import { deleteExaminationAction } from "../../../../actions/consultation/actions";
 import { UpdateExaminationForm } from "../../../consultation/Examinitation";
 import { SharedConsultationTypes } from "../../../consultation/SharedTypes";
 
@@ -83,13 +83,11 @@ export const patient_examination_column: ColumnDef<SharedConsultationTypes>[] =
 						/>
 						<DeleteActionForm
 							id={exam.id}
-							inValidate="examination"
+							inValidate="examinations"
 							title="Delete Examination"
-							warning="Are you sure? this examintion will be parmanently deleted from the
+							warning="Are you sure? this examination will be parmanently deleted from the
           database."
-							actionFn={async () =>
-								await deleteHistoryTakingAction({ id: exam.id })
-							}
+							actionFn={() => deleteExaminationAction({ id: exam.id })}
 						/>
 					</div>
 				);

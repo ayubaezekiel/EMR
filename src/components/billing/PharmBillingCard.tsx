@@ -1,15 +1,14 @@
-import { Badge, Callout, Card, Flex, Text } from "@radix-ui/themes";
+import { Badge, Callout, Card, Flex, Spinner, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { FileQuestion } from "lucide-react";
 import { useMemo } from "react";
 import { requestQueryOptions } from "../../actions/queries";
+import { UpdatePharmRequestForm } from "../../forms/requests/PharmRequestForm";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";
-import PendingComponent from "../PendingComponent";
-import { UpdatePharmRequestForm } from "../../forms/requests/PharmRequestForm";
 
 export function PharmBillingCard() {
-	const { data: request_data, isPending: isLabPending } =
+	const { data: request_data, isPending: isPharmPending } =
 		useQuery(requestQueryOptions);
 
 	const pharm_data_filtered = useMemo(
@@ -19,8 +18,6 @@ export function PharmBillingCard() {
 			),
 		[request_data?.request_data],
 	);
-
-	if (isLabPending) return <PendingComponent />;
 
 	return (
 		<div className="w-full">
@@ -33,6 +30,8 @@ export function PharmBillingCard() {
 						<Callout.Text ml={"1"}>No result found</Callout.Text>
 					</Callout.Root>
 				</Flex>
+			) : isPharmPending ? (
+				<Spinner />
 			) : (
 				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
 					{pharm_data_filtered?.map((a) => (
@@ -63,6 +62,13 @@ export function PharmBillingCard() {
 										),
 									)}
 								</div>
+							</Flex>
+							<Flex align={"center"} gap={"2"} justify={"between"}>
+								Issued By :{" "}
+								<Badge>
+									{a.profile?.first_name} {a.profile?.middle_name}{" "}
+									{a.profile?.last_name}
+								</Badge>
 							</Flex>
 							<Flex justify={"end"} align={"center"} mt={"4"}>
 								<ApprovePayments

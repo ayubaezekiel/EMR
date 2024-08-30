@@ -56,7 +56,7 @@ export const ApprovePayments = ({
 
 	const form = useForm({
 		defaultValues: {
-			amount: amount,
+			amount: `N${new Intl.NumberFormat().format(Number(amount))}`,
 			patient_id: patientId,
 			cash_points_id: "",
 			is_appointment: is_appointment,
@@ -74,8 +74,9 @@ export const ApprovePayments = ({
 			const { error } = await supabase
 				.from("payments")
 				.insert({
-					approved_by: `${user?.id}`,
 					...value,
+					approved_by: `${user?.id}`,
+					amount: amount,
 				})
 				.select();
 			if (error) {

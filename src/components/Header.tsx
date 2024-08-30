@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { services_routes } from "../lib/constants";
 import { NavPatientFilters } from "./NavFilters";
+import logo from "../assets/logo.png";
 
 const nav_items = [
 	{ icon: Home, route: "/dashboard", tip: "Home" },
@@ -118,14 +119,14 @@ export function Header({
 					</SheetContent>
 				</Sheet>
 				<div className="hidden lg:block">
-					<Avatar size={"4"} fallback="L" radius="full" />
+					<Avatar size={"4"} src={logo} fallback="L" radius="full" />
 				</div>
 				<NavPatientFilters />
 			</Flex>
 			<Flex gap={"4"} align={"center"} justify={"center"}>
 				{nav_items.map((i) => (
 					<Flex key={i.tip} direction={"column"} align={"center"} gap={"3"}>
-						<Tooltip content="Billing">
+						<Tooltip content={i.tip}>
 							<Link to={i.route}>
 								<Button size={"4"} variant="ghost">
 									<i.icon className="w-8 h-8 md:w-24" />

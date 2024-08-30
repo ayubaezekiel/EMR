@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { getPatientVitalsById } from "../../actions/actions";
-import PendingComponent from "../PendingComponent";
 import { DataTable } from "../table/DataTable";
 import { patient_vitals_column } from "../table/columns/vitals";
 import { Json } from "../../lib/supabase.types";
+import { Spinner } from "@radix-ui/themes";
 
 export interface VitalsProps {
 	id: string;
@@ -32,16 +32,18 @@ export function PatientVitals({ patientId }: { patientId: string }) {
 			[data?.patient_vitals_data],
 		) ?? [];
 
-	if (isPending) return <PendingComponent />;
-
 	return (
 		<div>
-			<DataTable
-				columns={patient_vitals_column}
-				data={patient_vitals_data}
-				filterLabel="search by name..."
-				filterer="name"
-			/>
+			{isPending ? (
+				<Spinner />
+			) : (
+				<DataTable
+					columns={patient_vitals_column}
+					data={patient_vitals_data}
+					filterLabel="search by name..."
+					filterer="name"
+				/>
+			)}
 		</div>
 	);
 }

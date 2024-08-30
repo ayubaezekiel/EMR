@@ -6,7 +6,7 @@ import { checkAuth } from "../lib/utils";
 export const getAdmissions = async () => {
 	const { data: admissions_data, error: admissions_error } = await supabase
 		.from("admissions")
-		.select("*,patients(*),beds(*),wards(*)");
+		.select("*,patients(*),profile(*),beds(*),wards(*)");
 
 	if (admissions_error) {
 		toast.error(admissions_error.message);
@@ -144,7 +144,7 @@ export const getDrugOrGeneric = async () => {
 	const { data: drug_or_generic_data, error: drug_or_generic_err } =
 		await supabase
 			.from("drug_or_generic")
-			.select("*,drug_or_generic_brand(name)");
+			.select("*,drug_or_generic_brand(name),profile(*)");
 	if (drug_or_generic_err) {
 		toast.error(drug_or_generic_err.message);
 	}
@@ -378,7 +378,7 @@ export const getLabTest = async () => {
 export const getRequest = async () => {
 	const { data: request_data, error: lab_test_err } = await supabase
 		.from("requests")
-		.select("*,patients(*)");
+		.select("*,patients(*),profile(*)");
 
 	if (lab_test_err) {
 		toast.error(lab_test_err.message);

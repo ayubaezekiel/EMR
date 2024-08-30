@@ -1,12 +1,11 @@
-import { Badge, Callout, Card, Flex, Text } from "@radix-ui/themes";
+import { Badge, Callout, Card, Flex, Spinner, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { FileQuestion } from "lucide-react";
 import { useMemo } from "react";
 import { requestQueryOptions } from "../../actions/queries";
+import { UpdateRadiologyRequestForm } from "../../forms/requests/RadioloyRequestForm";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";
-import PendingComponent from "../PendingComponent";
-import { UpdateRadiologyRequestForm } from "../../forms/requests/RadioloyRequestForm";
 
 export function RadiologyBillingCard() {
 	const { data: request_data, isPending: isRadiologyPending } =
@@ -21,8 +20,6 @@ export function RadiologyBillingCard() {
 		[request_data?.request_data],
 	);
 
-	if (isRadiologyPending) return <PendingComponent />;
-
 	return (
 		<div className="w-full">
 			{radiology_data_filtered?.length === 0 ? (
@@ -34,6 +31,8 @@ export function RadiologyBillingCard() {
 						<Callout.Text ml={"1"}>No result found</Callout.Text>
 					</Callout.Root>
 				</Flex>
+			) : isRadiologyPending ? (
+				<Spinner />
 			) : (
 				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
 					{radiology_data_filtered?.map((a) => (
@@ -68,6 +67,13 @@ export function RadiologyBillingCard() {
 										),
 									)}
 								</div>
+							</Flex>
+							<Flex align={"center"} gap={"2"} justify={"between"}>
+								Issued By :{" "}
+								<Badge>
+									{a.profile?.first_name} {a.profile?.middle_name}{" "}
+									{a.profile?.last_name}
+								</Badge>
 							</Flex>
 							<Flex justify={"end"} align={"center"} mt={"4"}>
 								<ApprovePayments

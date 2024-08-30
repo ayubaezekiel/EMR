@@ -1,4 +1,5 @@
 import { Avatar, Flex, Strong, Text } from "@radix-ui/themes";
+import { Link } from "@tanstack/react-router";
 import { UserCheck } from "lucide-react";
 
 interface PatientProps {
@@ -16,24 +17,26 @@ export function PatientCardHeader({
 	patientId,
 }: PatientProps) {
 	return (
-		<Flex justify={"between"}>
-			<Flex gap={"2"} align={"center"}>
-				<Avatar fallback={<UserCheck />} radius="full" size={"3"} />
-				<Flex direction={"column"}>
-					<Flex gap={"1"} align={"center"}>
-						<Strong>
-							{firstName} {middleName} {lastName} [
-							{patientId.slice(0, 8).toUpperCase()}]
-						</Strong>
-					</Flex>
-					<Flex gap={"1"} align={"center"}>
-						<Text size={"1"}>
-							<Strong>created</Strong>
-						</Text>
-						.<Text size={"1"}>{new Date(createdAt).toLocaleString()}</Text>
+		<Link to={`/dashboard/patients/${patientId}`} className="hover:underline">
+			<Flex justify={"between"}>
+				<Flex gap={"2"} align={"center"}>
+					<Avatar fallback={<UserCheck />} radius="full" size={"3"} />
+					<Flex direction={"column"}>
+						<Flex gap={"1"} align={"center"}>
+							<Strong>
+								{firstName} {middleName} {lastName} [
+								{patientId.slice(0, 8).toUpperCase()}]
+							</Strong>
+						</Flex>
+						<Flex gap={"1"} align={"center"}>
+							<Text size={"1"}>
+								<Strong>created</Strong>
+							</Text>
+							.<Text size={"1"}>{new Date(createdAt).toLocaleString()}</Text>
+						</Flex>
 					</Flex>
 				</Flex>
 			</Flex>
-		</Flex>
+		</Link>
 	);
 }

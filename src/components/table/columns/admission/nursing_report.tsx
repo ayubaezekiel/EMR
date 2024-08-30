@@ -83,7 +83,7 @@ export const nursing_report_column: ColumnDef<NursingReportProps>[] = [
 					/>
 					<DeleteActionForm
 						id={params.id}
-						inValidate="beds"
+						inValidate="nursingReportsById"
 						title="Delete Nursing Report?"
 						warning="Are you sure? this report will be parmanently deleted from the
           database."

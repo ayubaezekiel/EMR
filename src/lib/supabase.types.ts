@@ -83,10 +83,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "admissions_admitted_by_fkey"
+            foreignKeyName: "admissions_admitted_by_fkey1"
             columns: ["admitted_by"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "profile"
             referencedColumns: ["id"]
           },
           {
@@ -470,6 +470,7 @@ export type Database = {
           is_consumable: boolean | null
           name: string
           quantity: number
+          total_quantity: number | null
         }
         Insert: {
           created_at?: string | null
@@ -480,6 +481,7 @@ export type Database = {
           is_consumable?: boolean | null
           name: string
           quantity: number
+          total_quantity?: number | null
         }
         Update: {
           created_at?: string | null
@@ -490,13 +492,14 @@ export type Database = {
           is_consumable?: boolean | null
           name?: string
           quantity?: number
+          total_quantity?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "drug_or_generic_created_by_fkey"
+            foreignKeyName: "drug_or_generic_created_by_fkey1"
             columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "profile"
             referencedColumns: ["id"]
           },
           {
@@ -1535,10 +1538,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "lab_request_taken_by_fkey"
+            foreignKeyName: "requests_taken_by_fkey"
             columns: ["taken_by"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "profile"
             referencedColumns: ["id"]
           },
         ]

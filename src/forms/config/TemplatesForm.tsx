@@ -1,14 +1,8 @@
-import {
-	Button,
-	Dialog,
-	Flex,
-	Spinner,
-	Text,
-	TextField,
-} from "@radix-ui/themes";
+import { Button, Dialog, Flex, Text, TextField } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
+import { Editor } from "@tinymce/tinymce-react";
 import { Edit } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
@@ -17,24 +11,16 @@ import {
 	updateConsultationTemplatesAction,
 } from "../../actions/config/templates";
 import { FieldInfo } from "../../components/FieldInfo";
-import { RichEditor } from "../../components/textEditor/RichTextEditor";
-import { useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
-import Superscript from "@tiptap/extension-superscript";
-import Subscript from "@tiptap/extension-subscript";
-import Highlight from "@tiptap/extension-highlight";
-import TextAlign from "@tiptap/extension-text-align";
+import { editor_plugins } from "../../components/textEditor/RichTextEditor";
 
 export function CreateConsultationTemplateForm() {
 	const [open, onOpenChange] = useState(false);
-	const [tempalte, setTemplate] = useState("");
 	const queryClient = useQueryClient();
 
 	const form = useForm({
 		defaultValues: {
 			name: "",
-			content: tempalte,
+			content: "",
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
@@ -43,22 +29,6 @@ export function CreateConsultationTemplateForm() {
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["consultationTemplates"] });
 		},
-	});
-
-	const editor = useEditor({
-		extensions: [
-			StarterKit,
-			Underline,
-			Superscript,
-			Subscript,
-			Highlight,
-			TextAlign.configure({ types: ["heading", "paragraph"] }),
-		],
-		onUpdate: ({ editor }) => {
-			setTemplate(editor.getHTML());
-		},
-
-		content: tempalte,
 	});
 
 	return (
@@ -113,7 +83,13 @@ export function CreateConsultationTemplateForm() {
 							children={(field) => (
 								<label htmlFor={field.name} className="flex flex-col">
 									<Text size={"3"}>Content*</Text>
-									<RichEditor editor={editor} />
+									<Editor
+										tinymceScriptSrc="/tinymce/tinymce.min.js"
+										licenseKey="gpl"
+										onChange={(e) => field.handleChange(e.target.getContent())}
+										initialValue={field.state.value}
+										init={editor_plugins}
+									/>
 									<FieldInfo field={field} />
 								</label>
 							)}
@@ -145,14 +121,13 @@ export function UpdateConsultationTemplateForm({
 	...values
 }: DB["consultation_templates"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
-	const [tempalte, setTemplate] = useState(values.content);
 	const queryClient = useQueryClient();
 
 	const form = useForm({
 		defaultValues: {
 			id: id,
 			name: values.name,
-			content: tempalte,
+			content: values.content,
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
@@ -161,22 +136,6 @@ export function UpdateConsultationTemplateForm({
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["consultationTemplates"] });
 		},
-	});
-
-	const editor = useEditor({
-		extensions: [
-			StarterKit,
-			Underline,
-			Superscript,
-			Subscript,
-			Highlight,
-			TextAlign.configure({ types: ["heading", "paragraph"] }),
-		],
-		onUpdate: ({ editor }) => {
-			setTemplate(editor.getHTML());
-		},
-
-		content: tempalte,
 	});
 
 	return (
@@ -231,7 +190,13 @@ export function UpdateConsultationTemplateForm({
 							children={(field) => (
 								<label htmlFor={field.name} className="flex flex-col">
 									<Text size={"3"}>Content*</Text>
-									<RichEditor editor={editor} />
+									<Editor
+										tinymceScriptSrc="/tinymce/tinymce.min.js"
+										licenseKey="gpl"
+										onChange={(e) => field.handleChange(e.target.getContent())}
+										initialValue={field.state.value}
+										init={editor_plugins}
+									/>
 									<FieldInfo field={field} />
 								</label>
 							)}

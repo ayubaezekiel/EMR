@@ -1,21 +1,24 @@
-import { Button, Dialog, Select, Spinner, Text } from "@radix-ui/themes";
+import { Button, Modal, Select } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { Flex, Spinner, Text } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
+import { Editor } from "@tinymce/tinymce-react";
 import { Edit } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { z } from "zod";
 import { getExaminationById } from "../../actions/actions";
 import {
 	createExaminationAction,
 	updateExaminationAction,
 } from "../../actions/consultation/actions";
 import { consultationTemplatesQueryOptions } from "../../actions/queries";
-import { checkAuth, getProfile } from "../../lib/utils";
+import { getProfile } from "../../lib/utils";
 import { FieldInfo } from "../FieldInfo";
-import PendingComponent from "../PendingComponent";
 import { DataTable } from "../table/DataTable";
 import { patient_examination_column } from "../table/columns/consultation/patient_examination";
-import { RichEditor } from "../textEditor/RichTextEditor";
+import { editor_plugins } from "../textEditor/RichTextEditor";
 import { SharedConsultationTypes } from "./SharedTypes";
 
 export function Examination({
@@ -42,11 +45,16 @@ export function Examination({
 			[data?.examination_data],
 		) ?? [];
 
-	if (isPending) return <PendingComponent />;
-
 	return (
 		<div>
-			<CreateExaminationForm patientId={patientId} isAdmission={isAdmission} />
+			{isPending ? (
+				<Spinner />
+			) : (
+				<CreateExaminationForm
+					patientId={patientId}
+					isAdmission={isAdmission}
+				/>
+			)}
 			<div>
 				<DataTable
 					columns={patient_examination_column}
@@ -62,88 +70,104 @@ export function CreateExaminationForm({
 	isAdmission,
 	patientId,
 }: { isAdmission: boolean; patientId: string }) {
-	const [template, setTemplate] = useState("");
-	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
+	const [opened, { open, close }] = useDisclosure(false);
 
+	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
 	const queryClient = useQueryClient();
 
 	const form = useForm({
 		defaultValues: {
-			patients_id: "",
-			taken_by: "",
-			note: template,
+			note: "",
 		},
-
-		onSubmit: async () => {
+		validatorAdapter: zodValidator(),
+		onSubmit: async ({ value }) => {
 			const prof = await getProfile();
 			await createExaminationAction({
-				note: `${template}`,
+				note: value.note,
 				patients_id: patientId,
 				taken_by: `${prof?.id}`,
 				is_admission: isAdmission,
 			});
 			form.reset();
-			queryClient.invalidateQueries({ queryKey: ["examination"] });
+			close();
+			queryClient.invalidateQueries({ queryKey: ["examinations"] });
 		},
 	});
 
-	if (isPending) return <PendingComponent />;
-
 	return (
-		<div>
-			<form
-				onSubmit={(e) => {
-					e.stopPropagation();
-					e.preventDefault();
-					form.handleSubmit();
-				}}
-				className="space-y-6"
-			>
-				<div className="flex flex-col gap-1 w-96">
-					<Text size={"3"}>Use a template?</Text>
-					<Select.Root onValueChange={(e) => setTemplate(e)}>
-						<Select.Trigger placeholder="select a template..." />
-						<Select.Content position="popper">
-							{data?.consultation_templates_data?.map((t) => (
-								<Select.Item key={t.id} value={t.content}>
-									{t.name}
-								</Select.Item>
-							))}
-						</Select.Content>
-					</Select.Root>
-				</div>
-				<form.Field
-					defaultValue={template}
-					name="note"
-					children={(field) => (
-						<div className="flex flex-col">
-							<Text size={"3"}>
-								Note <Text size={"1"}>(should be atleast 10 characters)</Text>*
-							</Text>
-							<RichEditor
-								initialValue={field.state.value!}
-								onChange={(e) => field.handleChange(e)}
-							/>
-							<FieldInfo field={field} />
-						</div>
-					)}
-				/>
+		<>
+			<Button size="md" onClick={open}>
+				Add New
+			</Button>
 
-				<form.Subscribe
-					selector={(state) => [state.canSubmit, state.isSubmitting]}
-					children={([canSubmit, isSubmitting]) => (
-						<Button
-							type="submit"
-							disabled={!canSubmit || template.length < 10}
-							size={"4"}
+			<Modal opened={opened} onClose={close} title={"Examination"} size={"xl"}>
+				<form
+					onSubmit={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+						form.handleSubmit();
+					}}
+				>
+					<div className="flex flex-col gap-1 w-96">
+						{isPending ? (
+							<Spinner />
+						) : (
+							<Select
+								label="Use a template?"
+								onChange={(e) => {
+									form.setFieldValue("note", e!);
+								}}
+								data={
+									data?.consultation_templates_data?.map((t) => ({
+										value: t.content,
+										label: t.name,
+									})) ?? []
+								}
+							/>
+						)}
+					</div>
+					<form.Field
+						name="note"
+						validators={{
+							onChange: z
+								.string()
+								.min(10, { message: "must be atleast 3 characters" }),
+						}}
+					>
+						{(field) => (
+							<label htmlFor={field.name} className="flex flex-col">
+								<Text size={"3"}>Task</Text>
+								<Editor
+									tinymceScriptSrc="/tinymce/tinymce.min.js"
+									licenseKey="gpl"
+									onChange={(e) => field.handleChange(e.target.getContent())}
+									initialValue={field.state.value}
+									init={editor_plugins}
+								/>
+								<FieldInfo field={field} />
+							</label>
+						)}
+					</form.Field>
+					<Flex gap="3" mt="4" justify="end">
+						<form.Subscribe
+							selector={(state) => [state.canSubmit, state.isSubmitting]}
 						>
-							{isSubmitting && <Spinner />}
-							Save
-						</Button>
-					)}
-				/>
-			</form>
-		</div>
+							{([canSubmit, isSubmitting]) => (
+								<Button
+									mt="4"
+									loading={isSubmitting}
+									type="submit"
+									disabled={!canSubmit || isSubmitting}
+									size={"lg"}
+								>
+									Save
+								</Button>
+							)}
+						</form.Subscribe>
+					</Flex>
+				</form>
+			</Modal>
+		</>
 	);
 }
 
@@ -151,102 +175,108 @@ export function UpdateExaminationForm({
 	id,
 	...values
 }: DB["patient_examination"]["Update"]) {
-	const [open, onOpenChange] = useState(false);
-	const [template, setTemplate] = useState(values.note);
 	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
+	const [opened, { open, close }] = useDisclosure(false);
 
 	const queryClient = useQueryClient();
 
 	const form = useForm({
 		defaultValues: {
 			...values,
-			note: template,
 		},
 		validatorAdapter: zodValidator(),
-		onSubmit: async () => {
-			const user = await checkAuth();
+		onSubmit: async ({ value }) => {
+			const prof = await getProfile();
 			await updateExaminationAction({
 				id: id,
-				note: `${template}`,
+				note: value.note,
 				patients_id: values.patients_id,
-				taken_by: `${user?.id}`,
+				taken_by: `${prof?.id}`,
 			});
 			form.reset();
-			queryClient.invalidateQueries({ queryKey: ["examination"] });
+			close();
+			queryClient.invalidateQueries({ queryKey: ["examinations"] });
 		},
 	});
 
-	if (isPending) return <PendingComponent />;
-
 	return (
-		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button variant="ghost">
-					<Edit size={16} />
-				</Button>
-			</Dialog.Trigger>
+		<>
+			<Button variant="subtle" size="compact-xs" onClick={open}>
+				<Edit size={16} />
+			</Button>
 
-			<Dialog.Content>
-				<Dialog.Title>Update Examination</Dialog.Title>
-				<Dialog.Description size="2" mb="4">
-					Fill out the form information
-				</Dialog.Description>
-				<div>
-					<form
-						onSubmit={(e) => {
-							e.stopPropagation();
-							e.preventDefault();
-							form.handleSubmit();
+			<Modal
+				opened={opened}
+				onClose={close}
+				title={"Update Examination"}
+				size={"xl"}
+			>
+				<form
+					onSubmit={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+						form.handleSubmit();
+					}}
+				>
+					<div className="flex flex-col gap-1 w-96">
+						{isPending ? (
+							<Spinner />
+						) : (
+							<Select
+								label="Use a template?"
+								onChange={(e) => {
+									form.setFieldValue("note", e!);
+								}}
+								data={
+									data?.consultation_templates_data?.map((t) => ({
+										value: t.content,
+										label: t.name,
+									})) ?? []
+								}
+							/>
+						)}
+					</div>
+					<form.Field
+						name="note"
+						validators={{
+							onChange: z
+								.string()
+								.min(10, { message: "must be atleast 3 characters" }),
 						}}
-						className="space-y-6"
 					>
-						<div className="flex flex-col gap-1 w-96">
-							<Text size={"3"}>Use a template?</Text>
-							<Select.Root onValueChange={(e) => setTemplate(e)}>
-								<Select.Trigger placeholder="select a template..." />
-								<Select.Content position="popper">
-									{data?.consultation_templates_data?.map((t) => (
-										<Select.Item key={t.id} value={t.content}>
-											{t.name}
-										</Select.Item>
-									))}
-								</Select.Content>
-							</Select.Root>
-						</div>
-						<form.Field
-							defaultValue={template}
-							name="note"
-							children={(field) => (
-								<div className="flex flex-col">
-									<Text size={"3"}>
-										Note{" "}
-										<Text size={"1"}>(should be atleast 10 characters)</Text>*
-									</Text>
-									<RichEditor
-										initialValue={field.state.value!}
-										onChange={(e) => field.handleChange(e)}
-									/>
-									<FieldInfo field={field} />
-								</div>
-							)}
-						/>
-
+						{(field) => (
+							<label htmlFor={field.name} className="flex flex-col">
+								<Text size={"3"}>Task</Text>
+								<Editor
+									tinymceScriptSrc="/tinymce/tinymce.min.js"
+									licenseKey="gpl"
+									onChange={(e) => field.handleChange(e.target.getContent())}
+									initialValue={field.state.value}
+									init={editor_plugins}
+								/>
+								<FieldInfo field={field} />
+							</label>
+						)}
+					</form.Field>
+					<Flex gap="3" mt="4" justify="end">
 						<form.Subscribe
 							selector={(state) => [state.canSubmit, state.isSubmitting]}
-							children={([canSubmit, isSubmitting]) => (
+						>
+							{([canSubmit, isSubmitting]) => (
 								<Button
+									mt="4"
+									loading={isSubmitting}
 									type="submit"
-									disabled={!canSubmit || template!.length < 10}
-									size={"4"}
+									disabled={!canSubmit || isSubmitting}
+									size={"lg"}
 								>
-									{isSubmitting && <Spinner />}
 									Save
 								</Button>
 							)}
-						/>
-					</form>
-				</div>
-			</Dialog.Content>
-		</Dialog.Root>
+						</form.Subscribe>
+					</Flex>
+				</form>
+			</Modal>
+		</>
 	);
 }

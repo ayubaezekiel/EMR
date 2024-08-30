@@ -1,8 +1,11 @@
-import { Button, Dialog, Flex, Select, Text } from "@radix-ui/themes";
+import { Button, Modal, Select } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { Flex, Spinner, Text } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { useState } from "react";
+import { Editor } from "@tinymce/tinymce-react";
+import { Edit } from "lucide-react";
 import { z } from "zod";
 import {
 	createAdmissionReportsAction,
@@ -10,10 +13,8 @@ import {
 } from "../../actions/config/admission";
 import { consultationTemplatesQueryOptions } from "../../actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
-import PendingComponent from "../../components/PendingComponent";
-import { RichEditor } from "../../components/textEditor/RichTextEditor";
+import { editor_plugins } from "../../components/textEditor/RichTextEditor";
 import { useProfile } from "../../lib/hooks";
-import { Edit } from "lucide-react";
 
 export function RecordsAndTaskForm({
 	patientId,
@@ -26,15 +27,14 @@ export function RecordsAndTaskForm({
 	dialogTitle: string;
 	isProgressNote: boolean;
 }) {
-	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
-	const [template, setTemplate] = useState("");
 	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
 	const { isProfilePending, profile_data } = useProfile();
+	const [opened, { open, close }] = useDisclosure(false);
 
 	const form = useForm({
 		defaultValues: {
-			note: template,
+			note: "",
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
@@ -45,25 +45,17 @@ export function RecordsAndTaskForm({
 				is_progress_note: isProgressNote,
 			});
 			form.reset();
-			onOpenChange(false);
-			queryClient.invalidateQueries({ queryKey: ["nursingReports"] });
+			close();
+			queryClient.invalidateQueries({ queryKey: ["nursingReportsById"] });
 		},
 	});
 
-	if (isPending || isProfilePending) return <PendingComponent />;
-
 	return (
-		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button size={"4"}>{btnLable}</Button>
-			</Dialog.Trigger>
-
-			<Dialog.Content>
-				<Dialog.Title>{dialogTitle}</Dialog.Title>
-				<Dialog.Description size="2" mb="4">
-					Fill out the form information
-				</Dialog.Description>
-
+		<>
+			<Button size={"md"} onClick={open} loading={isProfilePending}>
+				{btnLable}
+			</Button>
+			<Modal opened={opened} onClose={close} title={dialogTitle} size={"xl"}>
 				<form
 					onSubmit={(e) => {
 						e.stopPropagation();
@@ -72,17 +64,22 @@ export function RecordsAndTaskForm({
 					}}
 				>
 					<div className="flex flex-col gap-1 w-96">
-						<Text size={"3"}>Use a template?</Text>
-						<Select.Root onValueChange={(e) => setTemplate(e)}>
-							<Select.Trigger placeholder="select a template..." />
-							<Select.Content position="popper">
-								{data?.consultation_templates_data?.map((t) => (
-									<Select.Item key={t.id} value={t.content}>
-										{t.name}
-									</Select.Item>
-								))}
-							</Select.Content>
-						</Select.Root>
+						{isPending ? (
+							<Spinner />
+						) : (
+							<Select
+								label="Use a template?"
+								onChange={(e) => {
+									form.setFieldValue("note", e!);
+								}}
+								data={
+									data?.consultation_templates_data?.map((t) => ({
+										value: t.content,
+										label: t.name,
+									})) ?? []
+								}
+							/>
+						)}
 					</div>
 					<form.Field
 						name="note"
@@ -95,24 +92,28 @@ export function RecordsAndTaskForm({
 						{(field) => (
 							<label htmlFor={field.name} className="flex flex-col">
 								<Text size={"3"}>Task</Text>
-								<RichEditor
+								<Editor
+									tinymceScriptSrc="/tinymce/tinymce.min.js"
+									licenseKey="gpl"
+									onChange={(e) => field.handleChange(e.target.getContent())}
 									initialValue={field.state.value}
-									onChange={(e) => field.handleChange(e)}
+									init={editor_plugins}
 								/>
 								<FieldInfo field={field} />
 							</label>
 						)}
 					</form.Field>
-					<Flex gap="3" mt="4" justify="end">
+					<Flex gap="3" justify="end">
 						<form.Subscribe
 							selector={(state) => [state.canSubmit, state.isSubmitting]}
 						>
 							{([canSubmit, isSubmitting]) => (
 								<Button
+									mt="8"
 									loading={isSubmitting}
 									type="submit"
 									disabled={!canSubmit || isSubmitting}
-									size={"4"}
+									size={"lg"}
 								>
 									Save
 								</Button>
@@ -120,23 +121,22 @@ export function RecordsAndTaskForm({
 						</form.Subscribe>
 					</Flex>
 				</form>
-			</Dialog.Content>
-		</Dialog.Root>
+			</Modal>
+		</>
 	);
 }
 
 export function UpdateRecordsAndTaskForm(
 	values: DB["nursing_report"]["Update"],
 ) {
-	const [open, onOpenChange] = useState(false);
+	const [opened, { open, close }] = useDisclosure(false);
+
 	const queryClient = useQueryClient();
-	const [template, setTemplate] = useState(values.note);
 	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
 	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
-			note: template,
 			...values,
 		},
 		validatorAdapter: zodValidator(),
@@ -146,27 +146,28 @@ export function UpdateRecordsAndTaskForm(
 				created_by: `${profile_data?.id}`,
 			});
 			form.reset();
-			onOpenChange(false);
-			queryClient.invalidateQueries({ queryKey: ["nursingReports"] });
+			close();
+			queryClient.invalidateQueries({ queryKey: ["nursingReportsById"] });
 		},
 	});
 
-	if (isPending || isProfilePending) return <PendingComponent />;
-
 	return (
-		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button variant="ghost">
-					<Edit size={16} />
-				</Button>
-			</Dialog.Trigger>
+		<>
+			<Button
+				variant="subtle"
+				size="compact-xs"
+				onClick={open}
+				loading={isProfilePending}
+			>
+				<Edit size={16} />
+			</Button>
 
-			<Dialog.Content>
-				<Dialog.Title>Update Nursing Report</Dialog.Title>
-				<Dialog.Description size="2" mb="4">
-					Fill out the form information
-				</Dialog.Description>
-
+			<Modal
+				opened={opened}
+				onClose={close}
+				title={"Update Nursing Report"}
+				size={"xl"}
+			>
 				<form
 					onSubmit={(e) => {
 						e.stopPropagation();
@@ -175,17 +176,22 @@ export function UpdateRecordsAndTaskForm(
 					}}
 				>
 					<div className="flex flex-col gap-1 w-96">
-						<Text size={"3"}>Use a template?</Text>
-						<Select.Root onValueChange={(e) => setTemplate(e)}>
-							<Select.Trigger placeholder="select a template..." />
-							<Select.Content position="popper">
-								{data?.consultation_templates_data?.map((t) => (
-									<Select.Item key={t.id} value={t.content}>
-										{t.name}
-									</Select.Item>
-								))}
-							</Select.Content>
-						</Select.Root>
+						{isPending ? (
+							<Spinner />
+						) : (
+							<Select
+								label="Use a template?"
+								onChange={(e) => {
+									form.setFieldValue("note", e!);
+								}}
+								data={
+									data?.consultation_templates_data?.map((t) => ({
+										value: t.content,
+										label: t.name,
+									})) ?? []
+								}
+							/>
+						)}
 					</div>
 					<form.Field
 						name="note"
@@ -198,9 +204,12 @@ export function UpdateRecordsAndTaskForm(
 						{(field) => (
 							<label htmlFor={field.name} className="flex flex-col">
 								<Text size={"3"}>Task</Text>
-								<RichEditor
-									initialValue={field.state.value!}
-									onChange={(e) => field.handleChange(e)}
+								<Editor
+									tinymceScriptSrc="/tinymce/tinymce.min.js"
+									licenseKey="gpl"
+									onChange={(e) => field.handleChange(e.target.getContent())}
+									initialValue={field.state.value}
+									init={editor_plugins}
 								/>
 								<FieldInfo field={field} />
 							</label>
@@ -212,10 +221,11 @@ export function UpdateRecordsAndTaskForm(
 						>
 							{([canSubmit, isSubmitting]) => (
 								<Button
+									mt="4"
 									loading={isSubmitting}
 									type="submit"
 									disabled={!canSubmit || isSubmitting}
-									size={"4"}
+									size={"lg"}
 								>
 									Save
 								</Button>
@@ -223,7 +233,7 @@ export function UpdateRecordsAndTaskForm(
 						</form.Subscribe>
 					</Flex>
 				</form>
-			</Dialog.Content>
-		</Dialog.Root>
+			</Modal>
+		</>
 	);
 }

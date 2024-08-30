@@ -1,4 +1,12 @@
-import { Button, Card, Dialog, Flex, Heading, Tabs } from "@radix-ui/themes";
+import {
+	Button,
+	Card,
+	Dialog,
+	Flex,
+	Heading,
+	Spinner,
+	Tabs,
+} from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
@@ -9,12 +17,12 @@ import {
 	getNursingReportsById,
 	getTreatmentPlanById,
 } from "../../../../actions/actions";
-import PendingComponent from "../../../../components/PendingComponent";
 import { CreateDiagnosisForm } from "../../../../components/consultation/Diagnosis";
 import { CreateExaminationForm } from "../../../../components/consultation/Examinitation";
 import { CreateHistoryTakingForm } from "../../../../components/consultation/HistoryTaking";
 import { IssueRequests } from "../../../../components/consultation/IssueRequests";
 import { PatientVitals } from "../../../../components/consultation/PatientVitals";
+import { SharedConsultationTypes } from "../../../../components/consultation/SharedTypes";
 import { CreateTreatmentPlanForm } from "../../../../components/consultation/TreatmentPlan";
 import { DataTable } from "../../../../components/table/DataTable";
 import {
@@ -24,10 +32,9 @@ import {
 import { patient_diagnosis_column } from "../../../../components/table/columns/consultation/diagnosis";
 import { history_taking_column } from "../../../../components/table/columns/consultation/history_taking";
 import { patient_examination_column } from "../../../../components/table/columns/consultation/patient_examination";
+import { treatment_plan_column } from "../../../../components/table/columns/consultation/plan";
 import { RecordsAndTaskForm } from "../../../../forms/admission/RecordsAndTaskForm";
 import { CreatePatientVitalsForm } from "../../../../forms/config/Vitals";
-import { treatment_plan_column } from "../../../../components/table/columns/consultation/plan";
-import { SharedConsultationTypes } from "../../../../components/consultation/SharedTypes";
 
 export const Route = createFileRoute(
 	"/_layout/dashboard/admissions/$patientId",
@@ -50,7 +57,7 @@ const AdmissionsPatientView = () => {
 
 	const { data, isPending } = useQuery({
 		queryFn: () => getNursingReportsById(patientId),
-		queryKey: ["nursingReports", patientId],
+		queryKey: ["nursingReportsById", patientId],
 	});
 	const { data: diag, isPending: isDiagPending } = useQuery({
 		queryFn: () => getDiagnosisById(patientId),
@@ -161,15 +168,6 @@ const AdmissionsPatientView = () => {
 				})),
 			[plan?.plan_data],
 		) ?? [];
-	if (
-		isPending ||
-		isHistoryPending ||
-		isDiagPending ||
-		isHistoryPending ||
-		isPlanPending ||
-		isExamPending
-	)
-		return <PendingComponent />;
 
 	return (
 		<div>
@@ -185,17 +183,21 @@ const AdmissionsPatientView = () => {
 				</Tabs.List>
 				<Tabs.Content value="progress" mt={"2"}>
 					<Flex justify={"end"}>
-						<RecordsAndTaskForm
-							dialogTitle="Record Progress Note"
-							btnLable="Record Note"
-							patientId={patientId}
-							isProgressNote
-						/>
+						{isPending ? (
+							<Spinner />
+						) : (
+							<RecordsAndTaskForm
+								dialogTitle="Record Progress Note"
+								btnLable="Record Note"
+								patientId={patientId}
+								isProgressNote
+							/>
+						)}
 					</Flex>
 					<DataTable
 						columns={nursing_report_column}
 						data={progress_notes_data}
-						filterLabel="filte by created_by..."
+						filterLabel="filter by created_by..."
 						filterer="created_by"
 					/>
 				</Tabs.Content>
@@ -223,14 +225,11 @@ const AdmissionsPatientView = () => {
 				</Tabs.Content>
 				<Tabs.Content value="history" mt={"2"}>
 					<Flex justify={"end"}>
-						<Dialog.Root>
-							<Dialog.Trigger>
-								<Button>Add History</Button>
-							</Dialog.Trigger>
-							<Dialog.Content maxWidth={"50rem"}>
-								<CreateHistoryTakingForm isAdmission patientId={patientId} />
-							</Dialog.Content>
-						</Dialog.Root>
+						{isHistoryPending ? (
+							<Spinner />
+						) : (
+							<CreateHistoryTakingForm isAdmission patientId={patientId} />
+						)}
 					</Flex>
 					<DataTable
 						columns={history_taking_column}
@@ -241,14 +240,11 @@ const AdmissionsPatientView = () => {
 				</Tabs.Content>
 				<Tabs.Content value="examination" mt={"2"}>
 					<Flex justify={"end"}>
-						<Dialog.Root>
-							<Dialog.Trigger>
-								<Button>Add Examination</Button>
-							</Dialog.Trigger>
-							<Dialog.Content maxWidth={"50rem"}>
-								<CreateExaminationForm isAdmission patientId={patientId} />
-							</Dialog.Content>
-						</Dialog.Root>
+						{isExamPending ? (
+							<Spinner />
+						) : (
+							<CreateExaminationForm isAdmission patientId={patientId} />
+						)}
 					</Flex>
 					<DataTable
 						columns={patient_examination_column}
@@ -259,14 +255,11 @@ const AdmissionsPatientView = () => {
 				</Tabs.Content>
 				<Tabs.Content value="diagnosis" mt={"2"}>
 					<Flex justify={"end"}>
-						<Dialog.Root>
-							<Dialog.Trigger>
-								<Button>Add Diagnosis</Button>
-							</Dialog.Trigger>
-							<Dialog.Content maxWidth={"50rem"}>
-								<CreateDiagnosisForm isAdmission patientId={patientId} />
-							</Dialog.Content>
-						</Dialog.Root>
+						{isDiagPending ? (
+							<Spinner />
+						) : (
+							<CreateDiagnosisForm isAdmission patientId={patientId} />
+						)}
 					</Flex>
 					<DataTable
 						columns={patient_diagnosis_column}
@@ -277,14 +270,11 @@ const AdmissionsPatientView = () => {
 				</Tabs.Content>
 				<Tabs.Content value="plans" mt={"2"}>
 					<Flex justify={"end"}>
-						<Dialog.Root>
-							<Dialog.Trigger>
-								<Button>Create Plan</Button>
-							</Dialog.Trigger>
-							<Dialog.Content maxWidth={"50rem"}>
-								<CreateTreatmentPlanForm isAdmission patientId={patientId} />
-							</Dialog.Content>
-						</Dialog.Root>
+						{isPlanPending ? (
+							<Spinner />
+						) : (
+							<CreateTreatmentPlanForm isAdmission patientId={patientId} />
+						)}
 					</Flex>
 					<DataTable
 						columns={treatment_plan_column}

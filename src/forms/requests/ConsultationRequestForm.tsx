@@ -7,7 +7,6 @@ import { z } from "zod";
 import { createConsultationAction } from "../../actions/config/admission";
 import { admissionsQueryOptions } from "../../actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
-import PendingComponent from "../../components/PendingComponent";
 
 export function CreateConsultationRequestForm() {
 	const [open, onOpenChange] = useState(false);
@@ -33,13 +32,13 @@ export function CreateConsultationRequestForm() {
 		},
 	});
 
-	if (isAdmissionPending) return <PendingComponent />;
-
 	return (
 		<div>
 			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button size={"4"}>New Request</Button>
+				<Dialog.Trigger disabled={isAdmissionPending}>
+					<Button size={"4"} loading={isAdmissionPending}>
+						New Request
+					</Button>
 				</Dialog.Trigger>
 
 				<Dialog.Content>

@@ -16,7 +16,6 @@ import { ArrowRightCircle, FileQuestion } from "lucide-react";
 import { useMemo } from "react";
 import { changeAdmissionStatus } from "../../actions/actions";
 import { admissionsQueryOptions } from "../../actions/queries";
-import { UpdateAdmissionForm } from "../../forms/admission/AdmissionForm";
 import { ConfirmAdmissionUpdate } from "../../forms/requests/ConfirmAdmissionUpdate";
 import { PatientCardHeader } from "../PatientCardHeader";
 
@@ -63,19 +62,6 @@ export function AdmissionActiveCard() {
 										middleName={a.patients?.middle_name as string}
 									/>
 								</Link>
-								<UpdateAdmissionForm
-									admitted_by={a.admitted_by}
-									dischard_date={a.dischard_date}
-									id={a.id}
-									created_at={a.created_at}
-									is_active={a.is_active}
-									is_approved={a.is_approved}
-									is_critical={a.is_critical}
-									is_discharged={a.is_discharged}
-									beds_id={a.beds_id}
-									wards_id={a.wards_id}
-									patient_id={a.patient_id}
-								/>
 							</Flex>
 
 							<Flex my={"4"} justify={"between"}>
@@ -88,6 +74,13 @@ export function AdmissionActiveCard() {
 										critical
 									</Badge>
 								)}
+							</Flex>
+							<Flex align={"center"} gap={"2"} justify={"between"}>
+								Addmitted By :{" "}
+								<Badge>
+									{a.profile?.first_name} {a.profile?.middle_name}{" "}
+									{a.profile?.last_name}
+								</Badge>
 							</Flex>
 							<Flex justify={"between"}>
 								<Text>Discharge Date:</Text>
@@ -199,19 +192,6 @@ export function AdmissionDischargedCard() {
 										middleName={a.patients?.middle_name as string}
 									/>
 								</Link>
-								<UpdateAdmissionForm
-									admitted_by={a.admitted_by}
-									dischard_date={a.dischard_date}
-									id={a.id}
-									created_at={a.created_at}
-									is_active={a.is_active}
-									is_approved={a.is_approved}
-									is_critical={a.is_critical}
-									is_discharged={a.is_discharged}
-									beds_id={a.beds_id}
-									wards_id={a.wards_id}
-									patient_id={a.patient_id}
-								/>
 							</Flex>
 
 							<Flex my={"4"} justify={"between"}>
@@ -224,6 +204,13 @@ export function AdmissionDischargedCard() {
 										critical
 									</Badge>
 								)}
+							</Flex>
+							<Flex align={"center"} gap={"2"} justify={"between"}>
+								Addmitted By :{" "}
+								<Badge>
+									{a.profile?.first_name} {a.profile?.middle_name}{" "}
+									{a.profile?.last_name}
+								</Badge>
 							</Flex>
 							<Flex justify={"between"}>
 								<Text>Discharge Date:</Text>

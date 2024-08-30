@@ -1,12 +1,11 @@
-import { Badge, Callout, Card, Flex, Text } from "@radix-ui/themes";
+import { Badge, Callout, Card, Flex, Spinner, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { FileQuestion } from "lucide-react";
 import { useMemo } from "react";
 import { admissionsQueryOptions } from "../../actions/queries";
+import { UpdateAdmissionForm } from "../../forms/admission/AdmissionForm";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";
-import PendingComponent from "../PendingComponent";
-import { UpdateAdmissionForm } from "../../forms/admission/AdmissionForm";
 
 export function AdmissionBillingCard() {
 	const { data: admission_data, isPending: isAdmissionPending } = useQuery(
@@ -21,8 +20,6 @@ export function AdmissionBillingCard() {
 		[admission_data?.admissions_data],
 	);
 
-	if (isAdmissionPending) return <PendingComponent />;
-
 	return (
 		<div className="w-full">
 			{admission_data_filtered?.length === 0 ? (
@@ -34,6 +31,8 @@ export function AdmissionBillingCard() {
 						<Callout.Text ml={"1"}>No result found</Callout.Text>
 					</Callout.Root>
 				</Flex>
+			) : isAdmissionPending ? (
+				<Spinner />
 			) : (
 				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
 					{admission_data_filtered?.map((a) => (
@@ -46,10 +45,23 @@ export function AdmissionBillingCard() {
 									patientId={a.patient_id}
 									middleName={a.patients?.middle_name as string}
 								/>
-								<UpdateAdmissionForm {...a} />
+
+								<UpdateAdmissionForm
+									admitted_by={a.admitted_by}
+									beds_id={a.beds_id}
+									created_at={a.created_at}
+									dischard_date={a.dischard_date}
+									id={a.id}
+									is_active={a.is_active}
+									is_approved={a.is_approved}
+									is_critical={a.is_critical}
+									is_discharged={a.is_discharged}
+									patient_id={a.patient_id}
+									wards_id={a.wards_id}
+								/>
 							</Flex>
 
-							<Flex direction={"column"} mt={"4"} height={"100px"}>
+							<Flex direction={"column"} mt={"6"}>
 								<div className="flex flex-wrap gap-2 mt-4">
 									<Badge>
 										{a.beds?.name}
@@ -71,6 +83,13 @@ export function AdmissionBillingCard() {
 										</Text>
 									</Badge>
 								</div>
+							</Flex>
+							<Flex align={"center"} gap={"2"} justify={"between"}>
+								Addmitted By :{" "}
+								<Badge>
+									{a.profile?.first_name} {a.profile?.middle_name}{" "}
+									{a.profile?.last_name}
+								</Badge>
 							</Flex>
 							<Flex justify={"end"} align={"center"} mt={"4"}>
 								<ApprovePayments

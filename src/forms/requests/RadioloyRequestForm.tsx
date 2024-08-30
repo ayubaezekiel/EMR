@@ -18,8 +18,7 @@ import {
 	imagingQueryOptions,
 	patientsQueryOptions,
 } from "../../actions/queries";
-import PendingComponent from "../../components/PendingComponent";
-import { checkAuth } from "../../lib/utils";
+import { getProfile } from "../../lib/utils";
 import supabase from "../../supabase/client";
 
 export function CreateRadiologyRequestForm({
@@ -29,7 +28,7 @@ export function CreateRadiologyRequestForm({
 	const { data: imaging_data, isPending: isRadiologyPending } =
 		useQuery(imagingQueryOptions);
 
-	const { data: patient_data, isPending: patientsPending } =
+	const { data: patient_data, isPending: isPatientsPending } =
 		useQuery(patientsQueryOptions);
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
@@ -41,8 +40,6 @@ export function CreateRadiologyRequestForm({
 			patients_id: "",
 		},
 	});
-
-	if (patientsPending || isRadiologyPending) return <PendingComponent />;
 
 	const fields = form.getValues().services.map((item, index) => (
 		<Flex key={item.key} gap={"2"} mt={"4"}>
@@ -98,105 +95,103 @@ export function CreateRadiologyRequestForm({
 	));
 
 	return (
-		<div>
-			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button size={"4"}>New Request</Button>
-				</Dialog.Trigger>
+		<Dialog.Root open={open} onOpenChange={onOpenChange}>
+			<Dialog.Trigger disabled={isRadiologyPending || isPatientsPending}>
+				<Button loading={isLoading || isRadiologyPending} size={"4"}>
+					New Request
+				</Button>
+			</Dialog.Trigger>
 
-				<Dialog.Content>
-					<Dialog.Title>Radiology Request</Dialog.Title>
-					<Dialog.Description size="2" mb="4">
-						Fill out the form information
-					</Dialog.Description>
+			<Dialog.Content>
+				<Dialog.Title>Radiology Request</Dialog.Title>
+				<Dialog.Description size="2" mb="4">
+					Fill out the form information
+				</Dialog.Description>
 
-					<form
-						onSubmit={form.onSubmit(async (values) => {
-							setIsLoading(true);
+				<form
+					onSubmit={form.onSubmit(async (values) => {
+						setIsLoading(true);
 
-							const user = await checkAuth();
-							const { error } = await supabase.from("requests").insert([
-								{
-									patients_id: patientId ?? `${values.patients_id}`,
-									taken_by: `${user?.id}`,
-									is_radiology: true,
-									services: values.services.map((v) => ({
-										service: JSON.parse(v.service),
-										note: v.note,
-									})),
-								},
-							]);
-							if (error) {
-								toast.error(error.message);
-								setIsLoading(false);
-							} else {
-								toast.success("request issued successfully");
-								form.reset();
-								queryClient.invalidateQueries({ queryKey: ["requests"] });
-								setIsLoading(false);
-								onOpenChange(false);
-							}
-						})}
-					>
-						{!patientId && (
-							<div className="flex flex-col">
-								<Text size={"3"}>Patient*</Text>
-								<Select.Root
-									size={"3"}
-									onValueChange={(e) =>
-										form.getInputProps("patients_id").onChange(e)
-									}
-								>
-									<Select.Trigger placeholder="select patient..." />
-									<Select.Content position="popper">
-										{patient_data?.patient_data?.map((p) => (
-											<Select.Item key={p.id} value={p.id}>
-												{p.first_name} {p.middle_name} {p.last_name} - [
-												{p.id.slice(0, 8).toUpperCase()}]
-											</Select.Item>
-										))}
-									</Select.Content>
-								</Select.Root>
-							</div>
-						)}
-
-						{fields.length < 0 && (
-							<Callout.Root color="red">
-								<Callout.Icon>
-									<AlertCircle />
-									<Callout.Text ml={"2"}>Empty</Callout.Text>
-								</Callout.Icon>
-							</Callout.Root>
-						)}
-
-						{fields}
-						<Flex justify="end" mt="4">
-							<Button
-								type="button"
-								variant="soft"
-								onClick={() =>
-									form.insertListItem("services", {
-										service: "",
-										note: "",
-										key: randomId(),
-									})
+						const prof = await getProfile();
+						const { error } = await supabase.from("requests").insert({
+							patients_id: patientId ?? `${values.patients_id}`,
+							taken_by: `${prof?.id}`,
+							is_radiology: true,
+							services: values.services.map((v) => ({
+								service: JSON.parse(v.service),
+								note: v.note,
+							})),
+						});
+						if (error) {
+							toast.error(error.message);
+							setIsLoading(false);
+						} else {
+							toast.success("request issued successfully");
+							form.reset();
+							queryClient.invalidateQueries({ queryKey: ["requests"] });
+							setIsLoading(false);
+							onOpenChange(false);
+						}
+					})}
+				>
+					{!patientId && (
+						<div className="flex flex-col">
+							<Text size={"3"}>Patient*</Text>
+							<Select.Root
+								size={"3"}
+								onValueChange={(e) =>
+									form.getInputProps("patients_id").onChange(e)
 								}
 							>
-								Add more
-							</Button>
-						</Flex>
+								<Select.Trigger placeholder="select patient..." />
+								<Select.Content position="popper">
+									{patient_data?.patient_data?.map((p) => (
+										<Select.Item key={p.id} value={p.id}>
+											{p.first_name} {p.middle_name} {p.last_name} - [
+											{p.id.slice(0, 8).toUpperCase()}]
+										</Select.Item>
+									))}
+								</Select.Content>
+							</Select.Root>
+						</div>
+					)}
+
+					{fields.length < 0 && (
+						<Callout.Root color="red">
+							<Callout.Icon>
+								<AlertCircle />
+								<Callout.Text ml={"2"}>Empty</Callout.Text>
+							</Callout.Icon>
+						</Callout.Root>
+					)}
+
+					{fields}
+					<Flex justify="end" mt="4">
 						<Button
-							loading={isLoading}
-							disabled={!form.isValid() || isLoading}
-							size={"4"}
-							type="submit"
+							type="button"
+							variant="soft"
+							onClick={() =>
+								form.insertListItem("services", {
+									service: "",
+									note: "",
+									key: randomId(),
+								})
+							}
 						>
-							Request
+							Add more
 						</Button>
-					</form>
-				</Dialog.Content>
-			</Dialog.Root>
-		</div>
+					</Flex>
+					<Button
+						loading={isLoading}
+						disabled={!form.isValid() || isLoading}
+						size={"4"}
+						type="submit"
+					>
+						Request
+					</Button>
+				</form>
+			</Dialog.Content>
+		</Dialog.Root>
 	);
 }
 
@@ -215,8 +210,6 @@ export function UpdateRadiologyRequestForm(radData: DB["requests"]["Update"]) {
 		},
 	});
 
-	if (isRadiologyPending) return <PendingComponent />;
-
 	const fields = form.getValues().services.map((item, index) => (
 		<Flex key={item.key} gap={"2"} mt={"4"}>
 			<div className="flex flex-col gap-1 w-full">
@@ -273,8 +266,13 @@ export function UpdateRadiologyRequestForm(radData: DB["requests"]["Update"]) {
 	return (
 		<div>
 			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button size={"1"} color="red" variant="ghost">
+				<Dialog.Trigger disabled={isRadiologyPending}>
+					<Button
+						loading={isLoading || isRadiologyPending}
+						size={"1"}
+						color="red"
+						variant="ghost"
+					>
 						<Edit />
 					</Button>
 				</Dialog.Trigger>
@@ -289,12 +287,12 @@ export function UpdateRadiologyRequestForm(radData: DB["requests"]["Update"]) {
 						onSubmit={form.onSubmit(async (values) => {
 							setIsLoading(true);
 
-							const user = await checkAuth();
+							const prof = await getProfile();
 							const { error } = await supabase
 								.from("requests")
 								.update({
 									patients_id: `${radData.patients_id}`,
-									taken_by: `${user?.id}`,
+									taken_by: `${prof?.id}`,
 									is_radiology: true,
 									services: values.services.map((v) => ({
 										service: JSON.parse(v.service),

@@ -4,6 +4,7 @@ import {
 	Dialog,
 	Flex,
 	Select,
+	Spinner,
 	Text,
 	TextField,
 } from "@radix-ui/themes";
@@ -11,7 +12,7 @@ import { useForm } from "@tanstack/react-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { z } from "zod";
 import {
 	createAdmissionAction,
@@ -23,18 +24,17 @@ import {
 	wardsQueryOptions,
 } from "../../actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
-import PendingComponent from "../../components/PendingComponent";
-import { checkAuth } from "../../lib/utils";
+import { useProfile } from "../../lib/hooks";
 
 export function CreateAdmissionForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+
 	const { data: wards_data, isPending: isWardPending } =
 		useQuery(wardsQueryOptions);
-
+	const { isProfilePending, profile_data } = useProfile();
 	const { data: bed_data, isPending: isBedPending } =
 		useQuery(bedsQueryOptions);
-
 	const { data: patient_data, isPending: isPatientPending } =
 		useQuery(patientsQueryOptions);
 
@@ -48,21 +48,27 @@ export function CreateAdmissionForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			const user = await checkAuth();
-			await createAdmissionAction({ ...value, admitted_by: `${user?.id}` });
+			await createAdmissionAction({
+				admitted_by: `${profile_data?.id}`,
+				...value,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["admissions"] });
 		},
 	});
 
-	if (isWardPending || isBedPending || isPatientPending)
-		return <PendingComponent />;
+	const filtered_beds = useMemo(
+		() => bed_data?.beds_data?.filter((b) => b.is_available),
+		[bed_data?.beds_data],
+	);
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button size={"4"}>Admit Patient</Button>
+			<Dialog.Trigger disabled={isProfilePending}>
+				<Button size={"4"} loading={isProfilePending}>
+					Admit Patient
+				</Button>
 			</Dialog.Trigger>
 
 			<Dialog.Content>
@@ -96,91 +102,104 @@ export function CreateAdmissionForm() {
 							</label>
 						)}
 					</form.Field>
-					<form.Field
-						name="patient_id"
-						validators={{
-							onChange: z
-								.string()
-								.min(3, { message: "field must be atleast 3 characters" }),
-						}}
-					>
-						{(field) => (
-							<div className="flex flex-col">
-								<Text size={"3"}>Patient*</Text>
-								<Select.Root
-									size={"3"}
-									onValueChange={(e) => field.handleChange(e)}
-								>
-									<Select.Trigger placeholder="select ward..." />
-									<Select.Content position="popper">
-										{patient_data?.patient_data?.map((w) => (
-											<Select.Item key={w.id} value={w.id}>
-												{w.first_name} {w.middle_name} {w.last_name} - [
-												{w.id.slice(0, 8).toUpperCase()}]
-											</Select.Item>
-										))}
-									</Select.Content>
-								</Select.Root>
-								<FieldInfo field={field} />
-							</div>
-						)}
-					</form.Field>
-					<form.Field
-						name="wards_id"
-						validators={{
-							onChange: z
-								.string()
-								.min(3, { message: "field must be atleast 3 characters" }),
-						}}
-					>
-						{(field) => (
-							<div className="flex flex-col">
-								<Text size={"3"}>Ward*</Text>
-								<Select.Root
-									size={"3"}
-									onValueChange={(e) => field.handleChange(e)}
-								>
-									<Select.Trigger placeholder="select ward..." />
-									<Select.Content position="popper">
-										{wards_data?.wards_data?.map((w) => (
-											<Select.Item key={w.id} value={w.id}>
-												{w.name}
-											</Select.Item>
-										))}
-									</Select.Content>
-								</Select.Root>
-								<FieldInfo field={field} />
-							</div>
-						)}
-					</form.Field>
-					<form.Field
-						name="beds_id"
-						validators={{
-							onChange: z
-								.string()
-								.min(3, { message: "field must be atleast 3 characters" }),
-						}}
-					>
-						{(field) => (
-							<div className="flex flex-col">
-								<Text size={"3"}>Bed*</Text>
-								<Select.Root
-									size={"3"}
-									onValueChange={(e) => field.handleChange(e)}
-								>
-									<Select.Trigger placeholder="select bed..." />
-									<Select.Content position="popper">
-										{bed_data?.beds_data?.map((w) => (
-											<Select.Item key={w.id} value={w.id}>
-												{w.name}
-											</Select.Item>
-										))}
-									</Select.Content>
-								</Select.Root>
-								<FieldInfo field={field} />
-							</div>
-						)}
-					</form.Field>
+					{isPatientPending ? (
+						<Spinner />
+					) : (
+						<form.Field
+							name="patient_id"
+							validators={{
+								onChange: z
+									.string()
+									.min(3, { message: "field must be atleast 3 characters" }),
+							}}
+						>
+							{(field) => (
+								<div className="flex flex-col">
+									<Text size={"3"}>Patient*</Text>
+									<Select.Root
+										size={"3"}
+										onValueChange={(e) => field.handleChange(e)}
+									>
+										<Select.Trigger placeholder="select ward..." />
+										<Select.Content position="popper">
+											{patient_data?.patient_data?.map((w) => (
+												<Select.Item key={w.id} value={w.id}>
+													{w.first_name} {w.middle_name} {w.last_name} - [
+													{w.id.slice(0, 8).toUpperCase()}]
+												</Select.Item>
+											))}
+										</Select.Content>
+									</Select.Root>
+									<FieldInfo field={field} />
+								</div>
+							)}
+						</form.Field>
+					)}
+					{isWardPending ? (
+						<Spinner />
+					) : (
+						<form.Field
+							name="wards_id"
+							validators={{
+								onChange: z
+									.string()
+									.min(3, { message: "field must be atleast 3 characters" }),
+							}}
+						>
+							{(field) => (
+								<div className="flex flex-col">
+									<Text size={"3"}>Ward*</Text>
+									<Select.Root
+										size={"3"}
+										onValueChange={(e) => field.handleChange(e)}
+									>
+										<Select.Trigger placeholder="select ward..." />
+										<Select.Content position="popper">
+											{wards_data?.wards_data?.map((w) => (
+												<Select.Item key={w.id} value={w.id}>
+													{w.name}
+												</Select.Item>
+											))}
+										</Select.Content>
+									</Select.Root>
+									<FieldInfo field={field} />
+								</div>
+							)}
+						</form.Field>
+					)}
+					{isBedPending ? (
+						<Spinner />
+					) : (
+						<form.Field
+							name="beds_id"
+							validators={{
+								onChange: z
+									.string()
+									.min(3, { message: "field must be atleast 3 characters" }),
+							}}
+						>
+							{(field) => (
+								<div className="flex flex-col">
+									<Text size={"3"}>Bed*</Text>
+									<Select.Root
+										size={"3"}
+										onValueChange={(e) => field.handleChange(e)}
+									>
+										<Select.Trigger placeholder="select bed..." />
+										<Select.Content position="popper">
+											{filtered_beds?.map((w) => (
+												<Select.Item key={w.id} value={w.id}>
+													{w.name}
+												</Select.Item>
+											))}
+										</Select.Content>
+									</Select.Root>
+									<FieldInfo field={field} />
+								</div>
+							)}
+						</form.Field>
+					)}
+
 					<form.Field
 						name="is_critical"
 						validators={{
@@ -231,7 +250,7 @@ export function UpdateAdmissionForm({
 
 	const { data: wards_data, isPending: isWardPending } =
 		useQuery(wardsQueryOptions);
-
+	const { isProfilePending, profile_data } = useProfile();
 	const { data: bed_data, isPending: isBedPending } =
 		useQuery(bedsQueryOptions);
 
@@ -244,24 +263,21 @@ export function UpdateAdmissionForm({
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			const user = await checkAuth();
+			const { ...values } = value;
 			await updateAdmissionAction({
-				admitted_by: `${user?.id}`,
-				beds_id: value.beds_id,
-				...value,
+				admitted_by: `${profile_data?.id}`,
+				...values,
 			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["admissions"] });
 		},
 	});
-
-	if (isWardPending || isBedPending) return <PendingComponent />;
 	return (
 		<div>
 			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button variant="ghost">
+				<Dialog.Trigger disabled={isProfilePending}>
+					<Button variant="ghost" loading={isProfilePending}>
 						<Edit size={16} />
 					</Button>
 				</Dialog.Trigger>
@@ -288,7 +304,7 @@ export function UpdateAdmissionForm({
 										name={field.name}
 										type="date"
 										id={field.name}
-										value={field.state.value as string}
+										value={field.state.value!}
 										onChange={(e) => field.handleChange(e.target.value)}
 										onBlur={field.handleBlur}
 									/>
@@ -296,62 +312,72 @@ export function UpdateAdmissionForm({
 								</label>
 							)}
 						</form.Field>
-						<form.Field
-							name="wards_id"
-							validators={{
-								onChange: z
-									.string()
-									.min(3, { message: "field must be atleast 3 characters" }),
-							}}
-						>
-							{(field) => (
-								<div className="flex flex-col">
-									<Text size={"3"}>Ward*</Text>
-									<Select.Root
-										size={"3"}
-										onValueChange={(e) => field.handleChange(e)}
-									>
-										<Select.Trigger placeholder="select ward..." />
-										<Select.Content position="popper">
-											{wards_data?.wards_data?.map((w) => (
-												<Select.Item key={w.id} value={w.id}>
-													{w.name}
-												</Select.Item>
-											))}
-										</Select.Content>
-									</Select.Root>
-									<FieldInfo field={field} />
-								</div>
-							)}
-						</form.Field>
-						<form.Field
-							name="beds_id"
-							validators={{
-								onChange: z
-									.string()
-									.min(3, { message: "field must be atleast 3 characters" }),
-							}}
-						>
-							{(field) => (
-								<div className="flex flex-col">
-									<Text size={"3"}>Bed*</Text>
-									<Select.Root
-										size={"3"}
-										onValueChange={(e) => field.handleChange(e)}
-									>
-										<Select.Trigger placeholder="select bed..." />
-										<Select.Content position="popper">
-											{bed_data?.beds_data?.map((w) => (
-												<Select.Item key={w.id} value={w.id}>
-													{w.name}
-												</Select.Item>
-											))}
-										</Select.Content>
-									</Select.Root>
-									<FieldInfo field={field} />
-								</div>
-							)}
-						</form.Field>
+
+						{isWardPending ? (
+							<Spinner />
+						) : (
+							<form.Field
+								name="wards_id"
+								validators={{
+									onChange: z
+										.string()
+										.min(3, { message: "field must be atleast 3 characters" }),
+								}}
+							>
+								{(field) => (
+									<div className="flex flex-col">
+										<Text size={"3"}>Ward*</Text>
+										<Select.Root
+											size={"3"}
+											onValueChange={(e) => field.handleChange(e)}
+										>
+											<Select.Trigger placeholder="select ward..." />
+											<Select.Content position="popper">
+												{wards_data?.wards_data?.map((w) => (
+													<Select.Item key={w.id} value={w.id}>
+														{w.name}
+													</Select.Item>
+												))}
+											</Select.Content>
+										</Select.Root>
+										<FieldInfo field={field} />
+									</div>
+								)}
+							</form.Field>
+						)}
+						{isBedPending ? (
+							<Spinner />
+						) : (
+							<form.Field
+								name="beds_id"
+								validators={{
+									onChange: z
+										.string()
+										.min(3, { message: "field must be atleast 3 characters" }),
+								}}
+							>
+								{(field) => (
+									<div className="flex flex-col">
+										<Text size={"3"}>Bed*</Text>
+										<Select.Root
+											size={"3"}
+											onValueChange={(e) => field.handleChange(e)}
+										>
+											<Select.Trigger placeholder="select bed..." />
+											<Select.Content position="popper">
+												{bed_data?.beds_data?.map((w) => (
+													<Select.Item key={w.id} value={w.id}>
+														{w.name}
+													</Select.Item>
+												))}
+											</Select.Content>
+										</Select.Root>
+										<FieldInfo field={field} />
+									</div>
+								)}
+							</form.Field>
+						)}
+
 						<form.Field
 							name="is_critical"
 							validators={{
@@ -364,7 +390,7 @@ export function UpdateAdmissionForm({
 									<Checkbox
 										name={field.name}
 										id={field.name}
-										checked={Boolean(field.state.value)}
+										checked={field.state.value!}
 										onCheckedChange={(e) => field.handleChange(Boolean(e))}
 										onBlur={field.handleBlur}
 									/>
