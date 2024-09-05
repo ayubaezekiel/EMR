@@ -2,8 +2,9 @@ import { Badge, Callout, Card, Flex, Spinner, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { FileQuestion } from "lucide-react";
 import { useMemo } from "react";
-import { requestQueryOptions } from "../../actions/queries";
-import { UpdateConsumableRequestForm } from "../../forms/requests/ConsumableRequestForm";
+import { DeleteActionForm } from "../../actions/DeleteAction";
+import { deleteRequestAction } from "../../actions/actions";
+import { requestQueryOptions } from "@/actions/queries";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";
 
@@ -46,7 +47,14 @@ export function ConsumableBillingCard() {
 									middleName={a.patients?.middle_name as string}
 								/>
 
-								<UpdateConsumableRequestForm {...a} />
+								<DeleteActionForm
+									id={a.id}
+									inValidate="requests"
+									title="Delete Request"
+									warning="Are you sure? this request will be parmanently deleted from the
+          database."
+									actionFn={async () => await deleteRequestAction(a.id)}
+								/>
 							</Flex>
 							<Flex direction={"column"} mt={"4"} height={"100px"}>
 								<div className="flex flex-wrap gap-2 mt-4">
@@ -54,6 +62,7 @@ export function ConsumableBillingCard() {
 										(d: {
 											note: string;
 											quantity: number;
+											quantity_type: string;
 											consumable: { name: string; amount: string };
 										}) => (
 											<Badge key={d.note}>
@@ -62,9 +71,10 @@ export function ConsumableBillingCard() {
 													N
 													{new Intl.NumberFormat().format(
 														Number(d.consumable.amount) * d.quantity,
-													)}
-													, qty:
-													{d.quantity}
+													)}{" "}
+													<Badge>
+														{d.quantity} {d.quantity_type}
+													</Badge>
 												</Text>
 											</Badge>
 										),

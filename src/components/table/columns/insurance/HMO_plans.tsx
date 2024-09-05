@@ -5,13 +5,7 @@ import { DeleteActionForm } from "../../../../actions/DeleteAction";
 import { deleteHMOPlanAction } from "../../../../actions/config/insurance";
 import { UpdateHMOPlanForm } from "../../../../forms/config/insurance/HMOPlanForm";
 
-export type NewHMOPlanType = DB["hmo_plans"]["Row"] & {
-	hmo_companies: {
-		name: string | undefined | null;
-	};
-};
-
-export const hmo_plans_column: ColumnDef<NewHMOPlanType>[] = [
+export const hmo_plans_column: ColumnDef<DB["hmo_plans"]["Row"]>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -43,16 +37,10 @@ export const hmo_plans_column: ColumnDef<NewHMOPlanType>[] = [
 		accessorKey: "hmo_companies",
 		header: "HMO",
 		cell: ({ row }) => (
-			<div className="capitalize">{row.original.hmo_companies.name}</div>
+			<div className="capitalize">{row.getValue("hmo_companies")}</div>
 		),
 	},
-	{
-		accessorKey: "email",
-		header: "Email",
-		cell: ({ row }) => (
-			<div className="capitalize">{row.getValue("email")}</div>
-		),
-	},
+
 	{
 		accessorKey: "enrolment_amount",
 		header: ({ column }) => {
@@ -70,7 +58,7 @@ export const hmo_plans_column: ColumnDef<NewHMOPlanType>[] = [
 			const price = new Intl.NumberFormat("en-IN", {
 				maximumSignificantDigits: 3,
 			}).format(row.getValue("enrolment_amount"));
-			return <div className="lowercase">{price}</div>;
+			return <div>N{price}</div>;
 		},
 	},
 
@@ -91,15 +79,8 @@ export const hmo_plans_column: ColumnDef<NewHMOPlanType>[] = [
 			const price = new Intl.NumberFormat("en-IN", {
 				maximumSignificantDigits: 3,
 			}).format(row.getValue("sign_up_amount"));
-			return <div className="lowercase">{price}</div>;
+			return <div>N{price}</div>;
 		},
-	},
-	{
-		accessorKey: "phone",
-		header: "Phone",
-		cell: ({ row }) => (
-			<div className="capitalize">{row.getValue("phone")}</div>
-		),
 	},
 	{
 		id: "actions",
@@ -109,10 +90,19 @@ export const hmo_plans_column: ColumnDef<NewHMOPlanType>[] = [
 
 			return (
 				<div className="flex gap-4">
-					<UpdateHMOPlanForm {...plans} />
+					<UpdateHMOPlanForm
+						branch_id={plans.branch_id}
+						enrolment_amount={plans.enrolment_amount}
+						hmo_companies_id={plans.hmo_companies_id}
+						hmo_group_id={plans.hmo_group_id}
+						id={plans.id}
+						max_number_of_beneficiaries={plans.max_number_of_beneficiaries}
+						name={plans.name}
+						sign_up_amount={plans.sign_up_amount}
+					/>
 					<DeleteActionForm
 						id={plans.id}
-						redirectTo="/dashboard/config"
+						inValidate="hmoPlans"
 						title="Delete HMO Plan"
 						warning="Are you sure? This HMO plan will be parmanently deleted from the
           database."

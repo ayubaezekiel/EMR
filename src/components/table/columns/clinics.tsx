@@ -1,11 +1,10 @@
 import { Checkbox } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
-import {
-	DeleteClinicsForm,
-	UpdateClinicsForm,
-} from "../../../forms/config/ClinicsForm";
+import { DeleteActionForm } from "../../../actions/DeleteAction";
+import { deleteClinicsAction } from "../../../actions/config/clinics";
+import { UpdateClinicsForm } from "../../../forms/config/ClinicsForm";
 
-export const clinic_column: ColumnDef<ClinicsType["Row"]>[] = [
+export const clinic_column: ColumnDef<DB["clinics"]["Row"]>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -43,7 +42,14 @@ export const clinic_column: ColumnDef<ClinicsType["Row"]>[] = [
 			return (
 				<div className="flex gap-4">
 					<UpdateClinicsForm {...clinics} />
-					<DeleteClinicsForm id={clinics.id} />
+					<DeleteActionForm
+						id={clinics.id}
+						inValidate="clinics"
+						title="Delete Clinic"
+						warning="Are you sure? this clinic will be parmanently deleted from the
+          database."
+						actionFn={() => deleteClinicsAction({ id: clinics.id })}
+					/>
 				</div>
 			);
 		},

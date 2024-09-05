@@ -5,6 +5,7 @@ import {
 	Callout,
 	Card,
 	Flex,
+	Spinner,
 	Strong,
 	Text,
 } from "@radix-ui/themes";
@@ -13,9 +14,8 @@ import { Link } from "@tanstack/react-router";
 import { FileQuestion, UserCheck } from "lucide-react";
 import { useMemo } from "react";
 import { changeAppointmentStatus } from "../../actions/actions";
-import { appointmentsQueryOptions } from "../../actions/queries";
+import { appointmentsQueryOptions } from "@/actions/queries";
 import { CreatePatientVitalsForm } from "../../forms/config/Vitals";
-import PendingComponent from "../PendingComponent";
 import { ConfirmAppointmentUpdate } from "./ConfirmAppointmentUpdate";
 
 export function AppointmentWaiting({
@@ -73,9 +73,10 @@ export function AppointmentWaiting({
 			}),
 		[appointments?.appointment_data, searchName, from, to, type],
 	);
-	if (isAppointmentPending) return <PendingComponent />;
 
-	return appointment_data_waiting?.length === 0 ? (
+	return isAppointmentPending ? (
+		<Spinner />
+	) : appointment_data_waiting?.length === 0 ? (
 		<Flex justify={"center"}>
 			<Callout.Root mt={"9"}>
 				<Callout.Icon>

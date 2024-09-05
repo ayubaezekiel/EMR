@@ -5,6 +5,7 @@ import {
 	Callout,
 	Card,
 	Flex,
+	Spinner,
 	Strong,
 	Text,
 } from "@radix-ui/themes";
@@ -13,8 +14,7 @@ import { Link } from "@tanstack/react-router";
 import { FileQuestion, UserCheck } from "lucide-react";
 import { useMemo } from "react";
 import { changeAppointmentStatus } from "../../actions/actions";
-import { appointmentsQueryOptions } from "../../actions/queries";
-import PendingComponent from "../PendingComponent";
+import { appointmentsQueryOptions } from "@/actions/queries";
 import { ConfirmAppointmentUpdate } from "./ConfirmAppointmentUpdate";
 
 export function AppointmentCheckedIn({
@@ -74,9 +74,10 @@ export function AppointmentCheckedIn({
 			}),
 		[appointments?.appointment_data, searchName, from, to, type],
 	);
-	if (isAppointmentPending) return <PendingComponent />;
 
-	return appointment_data_checkedIn?.length === 0 ? (
+	return isAppointmentPending ? (
+		<Spinner />
+	) : appointment_data_checkedIn?.length === 0 ? (
 		<Flex justify={"center"}>
 			<Callout.Root mt={"9"}>
 				<Callout.Icon>
@@ -226,7 +227,7 @@ export function AppointmentCheckedIn({
 						<Button asChild size={"2"} radius="full">
 							<Link
 								to={`/dashboard/appointments/${a.patients_id}`}
-								search={{ admission: false }}
+								search={{ admission: false, appointmentId: a.id }}
 							>
 								Attend
 							</Link>

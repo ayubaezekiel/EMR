@@ -8,13 +8,12 @@ import {
 	Text,
 } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
+import { FileQuestion } from "lucide-react";
 import { useMemo } from "react";
-import { appointmentsQueryOptions } from "../../actions/queries";
+import { appointmentsQueryOptions } from "@/actions/queries";
 import { UpdateAppointmentForm } from "../../forms/AppointmentForm";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";
-import PendingComponent from "../PendingComponent";
-import { FileQuestion } from "lucide-react";
 
 export function AppointmentBillingCards({
 	type,
@@ -33,8 +32,6 @@ export function AppointmentBillingCards({
 			),
 		[appointments?.appointment_data, type],
 	);
-
-	if (isAppointmentPending) return <PendingComponent />;
 
 	return (
 		<div className="w-full">

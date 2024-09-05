@@ -2,7 +2,6 @@ import {
 	Button,
 	Dialog,
 	Flex,
-	Spinner,
 	Text,
 	TextArea,
 	TextField,
@@ -35,7 +34,7 @@ export function CreateHMOCompaniesForm() {
 			await createHMOCompaniesAction(value);
 			form.reset();
 			onOpenChange(false);
-			queryClient.invalidateQueries({ queryKey: ["hmoCompanies"] });
+			queryClient.invalidateQueries({ queryKey: ["hmoCompaniesP"] });
 		},
 	});
 
@@ -184,7 +183,7 @@ export function UpdateHMOCompaniesForm({
 			await updateHMOCompaniesAction(value);
 			form.reset();
 			onOpenChange(false);
-			queryClient.invalidateQueries({ queryKey: ["hmoCompanies"] });
+			queryClient.invalidateQueries({ queryKey: ["hmoCompaniesP"] });
 		},
 	});
 

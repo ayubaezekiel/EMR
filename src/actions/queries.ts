@@ -144,7 +144,7 @@ export const imagingQueryOptions = queryOptions({
 });
 
 export const labTestTempQueryOptions = queryOptions({
-	queryKey: ["labTestTemp"],
+	queryKey: ["labTestTemps"],
 	queryFn: () => getLabTestTemplate(),
 });
 
@@ -184,7 +184,7 @@ export const jobPositionsQueryOptions = queryOptions({
 });
 
 export const hmoPlansQueryOptions = queryOptions({
-	queryKey: ["hmoPlan"],
+	queryKey: ["hmoPlans"],
 	queryFn: () => getHMOPlans(),
 });
 

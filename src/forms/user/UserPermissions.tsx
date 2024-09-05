@@ -1,4 +1,4 @@
-import { Button, Flex, Spinner, Switch, Text } from "@radix-ui/themes";
+import { Button, Flex, Switch, Text } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
@@ -6,8 +6,7 @@ import { zodValidator } from "@tanstack/zod-form-adapter";
 import { z } from "zod";
 import { updateUserPermsAction } from "../../actions/config/user-profile";
 import { FieldInfo } from "../../components/FieldInfo";
-import PendingComponent from "../../components/PendingComponent";
-import { usePerms } from "../../lib/hooks";
+import { usePerms } from "@/lib/hooks";
 
 export function UserPermission() {
 	const queryClient = useQueryClient();
@@ -27,8 +26,6 @@ export function UserPermission() {
 			queryClient.invalidateQueries({ queryKey: ["profile"] });
 		},
 	});
-
-	if (isPermPending) return <PendingComponent />;
 
 	const allowed = perm_data?.is_super_user || perm_data?.user_id === userId;
 
@@ -406,8 +403,13 @@ export function UserPermission() {
 				<form.Subscribe
 					selector={(state) => [state.canSubmit, state.isSubmitting]}
 					children={([canSubmit, isSubmitting]) => (
-						<Button type="submit" disabled={!canSubmit || !allowed} size={"4"}>
-							{isSubmitting && <Spinner />} Update
+						<Button
+							type="submit"
+							disabled={!canSubmit || !allowed}
+							loading={isSubmitting || isPermPending}
+							size={"4"}
+						>
+							Update
 						</Button>
 					)}
 				/>

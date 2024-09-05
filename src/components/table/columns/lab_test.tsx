@@ -50,14 +50,18 @@ export const lab_test_column: ColumnDef<DB["lab_tests"]["Row"]>[] = [
 		),
 	},
 	{
-		accessorKey: "lab_test_category_id",
+		accessorKey: "lab_test_category",
 		header: "Category",
-		cell: ({ row }) => <div className="capitalize">{row.getValue("unit")}</div>,
+		cell: ({ row }) => (
+			<div className="capitalize">{row.getValue("lab_test_category")}</div>
+		),
 	},
 	{
-		accessorKey: "template_id",
+		accessorKey: "lab_test_templates",
 		header: "Template",
-		cell: ({ row }) => <div className="capitalize">{row.getValue("unit")}</div>,
+		cell: ({ row }) => (
+			<div className="capitalize">{row.getValue("lab_test_templates")}</div>
+		),
 	},
 	{
 		id: "actions",
@@ -67,7 +71,13 @@ export const lab_test_column: ColumnDef<DB["lab_tests"]["Row"]>[] = [
 
 			return (
 				<div className="flex gap-4">
-					<UpdateLabTestForm {...params} />
+					<UpdateLabTestForm
+						default_price={params.default_price}
+						id={params.id}
+						lab_test_category_id={params.lab_test_category_id}
+						name={params.name}
+						template_id={params.template_id}
+					/>
 					<DeleteActionForm
 						id={params.id}
 						inValidate="labTest"
@@ -240,7 +250,7 @@ export const lab_test_temp_column: ColumnDef<DB["lab_test_template"]["Row"]>[] =
 						<UpdateLabTemplateForm {...params} />
 						<DeleteActionForm
 							id={params.id}
-							inValidate="labTestTemp"
+							inValidate="labTestTemps"
 							title="Delete Template"
 							warning="Are you sure? this template will be parmanently deleted from the
           database."

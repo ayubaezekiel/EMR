@@ -1,11 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { InviteUser } from "../../../../components/InviteUser";
-import { Card, Flex, Heading } from "@radix-ui/themes";
-import { DataTable } from "../../../../components/table/DataTable";
-import { getUsers } from "../../../../actions/actions";
-import { useQuery } from "@tanstack/react-query";
-import PendingComponent from "../../../../components/PendingComponent";
+import { Card, Flex, Heading, Spinner } from "@radix-ui/themes";
 import { User } from "@supabase/supabase-js";
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { getUsers } from "../../../../actions/actions";
+import { InviteUser } from "../../../../components/InviteUser";
+import { DataTable } from "../../../../components/table/DataTable";
 import { users_column } from "../../../../components/table/columns/users";
 
 export const Route = createFileRoute("/_layout/dashboard/users/")({
@@ -34,18 +33,20 @@ const AllUsers = () => {
 		queryFn: () => getUsers(),
 	});
 
-	if (isUsersPending) return <PendingComponent />;
-
 	const all_users: User[] = users_data?.user_data.users ?? [];
 
 	return (
 		<div>
-			<DataTable
-				columns={users_column}
-				data={all_users}
-				filterLabel="filter by email..."
-				filterer="email"
-			/>
+			{isUsersPending ? (
+				<Spinner />
+			) : (
+				<DataTable
+					columns={users_column}
+					data={all_users}
+					filterLabel="filter by email..."
+					filterer="email"
+				/>
+			)}
 		</div>
 	);
 };

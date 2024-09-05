@@ -1,5 +1,6 @@
 import { Badge, Button, Card, Checkbox, Flex } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown } from "lucide-react";
 import { DeleteActionForm } from "../../../actions/DeleteAction";
 import {
 	deletePatientVitalsAction,
@@ -9,8 +10,6 @@ import {
 	UpdatePatientVitalsForm,
 	UpdateVitalsForm,
 } from "../../../forms/config/Vitals";
-import { ArrowUpDown } from "lucide-react";
-import { VitalsProps } from "../../consultation/PatientVitals";
 
 export const vitals_column: ColumnDef<DB["vitals"]["Row"]>[] = [
 	{
@@ -68,7 +67,7 @@ export const vitals_column: ColumnDef<DB["vitals"]["Row"]>[] = [
 	},
 ];
 
-export const patient_vitals_column: ColumnDef<VitalsProps>[] = [
+export const patient_vitals_column: ColumnDef<DB["patient_vitals"]["Row"]>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -141,7 +140,14 @@ export const patient_vitals_column: ColumnDef<VitalsProps>[] = [
 
 			return (
 				<div className="flex gap-4">
-					<UpdatePatientVitalsForm {...vitals} />
+					<UpdatePatientVitalsForm
+						date_created={vitals.date_created}
+						id={vitals.id}
+						is_admission={vitals.is_admission}
+						patient_id={vitals.patient_id}
+						taken_by={vitals.taken_by}
+						vitals={vitals.vitals}
+					/>
 					<DeleteActionForm
 						id={vitals.id}
 						inValidate="patientVitalsById"

@@ -17,10 +17,9 @@ import {
 	cashpointsQueryOptions,
 	paymentMethodsQueryOptions,
 } from "../actions/queries";
+import { getProfile } from "../lib/utils";
 import supabase from "../supabase/client";
 import { FieldInfo } from "./FieldInfo";
-import PendingComponent from "./PendingComponent";
-import { checkAuth } from "../lib/utils";
 
 interface PaymentActionType {
 	patientId: string;
@@ -70,12 +69,12 @@ export const ApprovePayments = ({
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			const user = await checkAuth();
+			const prof = await getProfile();
 			const { error } = await supabase
 				.from("payments")
 				.insert({
 					...value,
-					approved_by: `${user?.id}`,
+					approved_by: `${prof?.id}`,
 					amount: amount,
 				})
 				.select();
@@ -88,6 +87,11 @@ export const ApprovePayments = ({
 					queryClient.invalidateQueries({
 						queryKey: ["appointments"],
 					});
+					if (is_request) {
+						queryClient.invalidateQueries({
+							queryKey: ["requests"],
+						});
+					}
 				}
 				if (isAdmission) {
 					queryClient.invalidateQueries({ queryKey: ["admissions"] });
@@ -96,12 +100,15 @@ export const ApprovePayments = ({
 		},
 	});
 
-	if (isCashpointPending || isPaymentMethodPending) return <PendingComponent />;
-
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button disabled={isApproved} size={"2"} radius="full">
+			<Dialog.Trigger disabled={isCashpointPending || isPaymentMethodPending}>
+				<Button
+					disabled={isApproved}
+					loading={isCashpointPending || isPaymentMethodPending}
+					size={"2"}
+					radius="full"
+				>
 					Approve Payment
 				</Button>
 			</Dialog.Trigger>

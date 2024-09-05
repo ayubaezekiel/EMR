@@ -22,11 +22,11 @@ import {
 	createVitalsAction,
 	updateVitalsAction,
 } from "../../actions/config/vitals";
-import { vitalsQueryOptions } from "../../actions/queries";
+import { vitalsQueryOptions } from "@/actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
 import { Label } from "../../components/ui/label";
-import { getProfile } from "../../lib/utils";
-import supabase from "../../supabase/client";
+import { getProfile } from "@/lib/utils";
+import supabase from "@/supabase/client";
 
 export function CreateVitalsForm() {
 	const [open, onOpenChange] = useState(false);
@@ -424,7 +424,6 @@ export function UpdatePatientVitalsForm({
 	});
 
 	const fitered_vitals = new Set(data?.vitals_data?.map((v) => v.unit));
-
 	const vitals_data = Array.from(fitered_vitals);
 
 	const fields = form.getValues().vitals.map((item, index) => (
@@ -432,6 +431,7 @@ export function UpdatePatientVitalsForm({
 			<div className="flex flex-col gap-1 w-full">
 				<Label>Name*</Label>
 				<Select.Root
+					defaultValue={form.values.vitals[index].name}
 					required
 					size={"3"}
 					key={form.key(`vitals.${index}.name`)}
@@ -466,6 +466,7 @@ export function UpdatePatientVitalsForm({
 				<div className="flex flex-col gap-1 w-40">
 					<Label>Unit</Label>
 					<Select.Root
+						defaultValue={form.values.vitals[index].unit}
 						size={"3"}
 						key={form.key(`vitals.${index}.unit`)}
 						onValueChange={(e) =>

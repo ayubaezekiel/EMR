@@ -470,6 +470,7 @@ export type Database = {
           is_consumable: boolean | null
           name: string
           quantity: number
+          quantity_type_id: string | null
           total_quantity: number | null
         }
         Insert: {
@@ -481,6 +482,7 @@ export type Database = {
           is_consumable?: boolean | null
           name: string
           quantity: number
+          quantity_type_id?: string | null
           total_quantity?: number | null
         }
         Update: {
@@ -492,6 +494,7 @@ export type Database = {
           is_consumable?: boolean | null
           name?: string
           quantity?: number
+          quantity_type_id?: string | null
           total_quantity?: number | null
         }
         Relationships: [
@@ -507,6 +510,13 @@ export type Database = {
             columns: ["drug_or_generic_brand_id"]
             isOneToOne: false
             referencedRelation: "drug_or_generic_brand"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drug_or_generic_quantity_type_id_fkey"
+            columns: ["quantity_type_id"]
+            isOneToOne: false
+            referencedRelation: "quantity_type"
             referencedColumns: ["id"]
           },
         ]
@@ -631,63 +641,51 @@ export type Database = {
       hmo_plans: {
         Row: {
           branch_id: string | null
-          email: string | null
           enrolment_amount: string
           hmo_companies_id: string
           hmo_group_id: string
           id: string
-          is_insurance: boolean | null
-          logo_url: string | null
           max_number_of_beneficiaries: string
           name: string
-          phone: string | null
           sign_up_amount: string
         }
         Insert: {
           branch_id?: string | null
-          email?: string | null
           enrolment_amount: string
           hmo_companies_id: string
           hmo_group_id: string
           id?: string
-          is_insurance?: boolean | null
-          logo_url?: string | null
           max_number_of_beneficiaries: string
           name: string
-          phone?: string | null
           sign_up_amount: string
         }
         Update: {
           branch_id?: string | null
-          email?: string | null
           enrolment_amount?: string
           hmo_companies_id?: string
           hmo_group_id?: string
           id?: string
-          is_insurance?: boolean | null
-          logo_url?: string | null
           max_number_of_beneficiaries?: string
           name?: string
-          phone?: string | null
           sign_up_amount?: string
         }
         Relationships: [
           {
-            foreignKeyName: "insurance_billers_branch_id_fkey"
+            foreignKeyName: "hmo_plans_branch_id_fkey"
             columns: ["branch_id"]
             isOneToOne: false
             referencedRelation: "branch"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "insurance_billers_hmo_companies_id_fkey"
+            foreignKeyName: "hmo_plans_hmo_companies_id_fkey"
             columns: ["hmo_companies_id"]
             isOneToOne: false
             referencedRelation: "hmo_companies"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "insurance_billers_hmo_group_id_fkey"
+            foreignKeyName: "hmo_plans_hmo_group_id_fkey"
             columns: ["hmo_group_id"]
             isOneToOne: false
             referencedRelation: "hmo_group"
@@ -1229,7 +1227,7 @@ export type Database = {
             foreignKeyName: "payments_approved_by_fkey"
             columns: ["approved_by"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "profile"
             referencedColumns: ["id"]
           },
           {
@@ -1480,6 +1478,21 @@ export type Database = {
           },
         ]
       }
+      quantity_type: {
+        Row: {
+          id: string
+          name: string | null
+        }
+        Insert: {
+          id?: string
+          name?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string | null
+        }
+        Relationships: []
+      }
       requests: {
         Row: {
           created_at: string
@@ -1665,7 +1678,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      mark_appointments_as_completed: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

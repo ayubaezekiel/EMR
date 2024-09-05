@@ -16,12 +16,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, Edit, Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import {
-	labTestQueryOptions,
-	patientsQueryOptions,
-} from "../../actions/queries";
-import { getProfile } from "../../lib/utils";
-import supabase from "../../supabase/client";
+import { labTestQueryOptions, patientsQueryOptions } from "@/actions/queries";
+import { getProfile } from "@/lib/utils";
+import supabase from "@/supabase/client";
 
 export function CreateLabRequestForm({ patientId }: { patientId?: string }) {
 	const [isLoading, setIsLoading] = useState(false);

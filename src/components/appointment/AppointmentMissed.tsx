@@ -5,6 +5,7 @@ import {
 	Callout,
 	Card,
 	Flex,
+	Spinner,
 	Strong,
 	Text,
 } from "@radix-ui/themes";
@@ -13,8 +14,7 @@ import { Link } from "@tanstack/react-router";
 import { FileQuestion, UserCheck } from "lucide-react";
 import { useMemo } from "react";
 import { changeAppointmentStatus } from "../../actions/actions";
-import { appointmentsQueryOptions } from "../../actions/queries";
-import PendingComponent from "../PendingComponent";
+import { appointmentsQueryOptions } from "@/actions/queries";
 import { ConfirmAppointmentUpdate } from "./ConfirmAppointmentUpdate";
 
 export function AppointmentMissed({
@@ -73,9 +73,9 @@ export function AppointmentMissed({
 		[appointments?.appointment_data, searchName, type, from, to],
 	);
 
-	if (isAppointmentPending) return <PendingComponent />;
-
-	return appointment_data_missed?.length === 0 ? (
+	return isAppointmentPending ? (
+		<Spinner />
+	) : appointment_data_missed?.length === 0 ? (
 		<Flex justify={"center"}>
 			<Callout.Root mt={"9"}>
 				<Callout.Icon>

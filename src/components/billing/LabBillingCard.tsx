@@ -2,7 +2,7 @@ import { Badge, Callout, Card, Flex, Spinner, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { FileQuestion } from "lucide-react";
 import { useMemo } from "react";
-import { requestQueryOptions } from "../../actions/queries";
+import { requestQueryOptions } from "@/actions/queries";
 import { UpdateLabRequestForm } from "../../forms/requests/LabRequestForm";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";

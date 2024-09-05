@@ -15,7 +15,7 @@ import { endOfDay } from "date-fns";
 import { ArrowRightCircle, FileQuestion } from "lucide-react";
 import { useMemo } from "react";
 import { changeAdmissionStatus } from "../../actions/actions";
-import { admissionsQueryOptions } from "../../actions/queries";
+import { admissionsQueryOptions } from "@/actions/queries";
 import { ConfirmAdmissionUpdate } from "../../forms/requests/ConfirmAdmissionUpdate";
 import { PatientCardHeader } from "../PatientCardHeader";
 

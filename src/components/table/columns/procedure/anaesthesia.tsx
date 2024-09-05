@@ -33,9 +33,11 @@ export const anaesthesia_column: ColumnDef<DB["anaesthesia"]["Row"]>[] = [
 		cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
 	},
 	{
-		accessorKey: "anaesthesia_type_id",
+		accessorKey: "anaesthesia_type",
 		header: "Anaesthesia Type",
-		cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+		cell: ({ row }) => (
+			<div className="capitalize">{row.getValue("anaesthesia_type")}</div>
+		),
 	},
 	{
 		accessorKey: "default_price",
@@ -55,7 +57,12 @@ export const anaesthesia_column: ColumnDef<DB["anaesthesia"]["Row"]>[] = [
 
 			return (
 				<div className="flex gap-4">
-					<UpdateAnaesthesiaForm {...params} />
+					<UpdateAnaesthesiaForm
+						anaesthesia_type_id={params.anaesthesia_type_id}
+						default_price={params.default_price}
+						id={params.id}
+						name={params.name}
+					/>
 					<DeleteActionForm
 						id={params.id}
 						inValidate="anaesthesia"

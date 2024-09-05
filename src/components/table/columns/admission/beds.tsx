@@ -5,15 +5,7 @@ import { DeleteActionForm } from "../../../../actions/DeleteAction";
 import { deleteBedAction } from "../../../../actions/config/admission";
 import { UpdateBedForm } from "../../../../forms/config/admission/BedForm";
 
-export interface BedProps {
-	default_price: string;
-	id: string;
-	is_available: boolean | null;
-	name: string;
-	ward_id: string;
-	ward: string;
-}
-export const beds_column: ColumnDef<BedProps>[] = [
+export const beds_column: ColumnDef<DB["beds"]["Row"]>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -79,7 +71,13 @@ export const beds_column: ColumnDef<BedProps>[] = [
 
 			return (
 				<div className="flex gap-4">
-					<UpdateBedForm {...params} />
+					<UpdateBedForm
+						default_price={params.default_price}
+						id={params.id}
+						is_available={params.is_available}
+						name={params.name}
+						ward_id={params.ward_id}
+					/>
 					<DeleteActionForm
 						id={params.id}
 						inValidate="beds"

@@ -44,7 +44,7 @@ export const hmo_groups_column: ColumnDef<DB["hmo_group"]["Row"]>[] = [
 					<UpdateHMOGroupForm {...group} />
 					<DeleteActionForm
 						id={group.id}
-						redirectTo="/dashboard/config"
+						inValidate="hmoGroups"
 						title="Delete HMO Group"
 						warning="Are you sure? This HMO group will be parmanently deleted from the
           database."

@@ -1,8 +1,8 @@
 import { toast } from "sonner";
-import supabase from "../../supabase/client";
+import supabase from "@/supabase/client";
 
 export const createDepartmentAction = async (
-	values: DepartmentType["Insert"],
+	values: DB["departments"]["Insert"],
 ) => {
 	const { error } = await supabase.from("departments").insert(values);
 	if (error) {
@@ -13,7 +13,7 @@ export const createDepartmentAction = async (
 };
 
 export const updateDepartmentAction = async (
-	values: DepartmentType["Update"],
+	values: DB["departments"]["Update"],
 ) => {
 	if (values.id) {
 		const { error } = await supabase
@@ -24,5 +24,15 @@ export const updateDepartmentAction = async (
 			toast.error(error.message);
 		}
 		toast.success("department updated successfully");
+	}
+};
+
+export const deleteDepartmentAction = async ({ id }: { id: string }) => {
+	if (id) {
+		const { error } = await supabase.from("departments").delete().eq("id", id);
+		if (error) {
+			toast.error(error.message);
+		}
+		toast.success("department deleted successfully");
 	}
 };

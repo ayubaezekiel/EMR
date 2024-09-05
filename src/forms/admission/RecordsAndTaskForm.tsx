@@ -11,10 +11,10 @@ import {
 	createAdmissionReportsAction,
 	updateAdmissionReportsAction,
 } from "../../actions/config/admission";
-import { consultationTemplatesQueryOptions } from "../../actions/queries";
+import { consultationTemplatesQueryOptions } from "@/actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
 import { editor_plugins } from "../../components/textEditor/RichTextEditor";
-import { useProfile } from "../../lib/hooks";
+import { useProfile } from "@/lib/hooks";
 
 export function RecordsAndTaskForm({
 	patientId,

@@ -1,7 +1,7 @@
-import { type ClassValue, clsx } from "clsx";
+import supabase from "@/supabase/client";
+import { clsx, type ClassValue } from "clsx";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
-import supabase from "../supabase/client";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));

@@ -1,4 +1,4 @@
-import { Flex, Heading } from "@radix-ui/themes";
+import { Flex, Heading, Spinner } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { procedureCatQueryOptions } from "../../../actions/queries";
 import { CreateProcedureCategoriesForm } from "../../../forms/config/procedures/ProceduresCategoriesForm";
@@ -6,7 +6,7 @@ import { DataTable } from "../../table/DataTable";
 import { procedure_cat_column } from "../../table/columns/procedure/procedures-category";
 
 export function ProceduresCategories() {
-	const { data } = useQuery(procedureCatQueryOptions);
+	const { data, isPending } = useQuery(procedureCatQueryOptions);
 
 	return (
 		<div>
@@ -14,13 +14,16 @@ export function ProceduresCategories() {
 				<Heading>Procedure Categories</Heading>
 				<CreateProcedureCategoriesForm />
 			</Flex>
-
-			<DataTable
-				filterLabel="filter by name..."
-				filterer="name"
-				columns={procedure_cat_column}
-				data={data?.procedure_categories_data ?? []}
-			/>
+			{isPending ? (
+				<Spinner />
+			) : (
+				<DataTable
+					filterLabel="filter by name..."
+					filterer="name"
+					columns={procedure_cat_column}
+					data={data?.procedure_categories_data ?? []}
+				/>
+			)}
 		</div>
 	);
 }

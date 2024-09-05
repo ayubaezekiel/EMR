@@ -18,7 +18,6 @@ import {
 } from "../../../actions/config/procedure";
 import { anaesthesiaTypeQueryOptions } from "../../../actions/queries";
 import { FieldInfo } from "../../../components/FieldInfo";
-import PendingComponent from "../../../components/PendingComponent";
 
 export function CreateAnaesthesiaForm() {
 	const [open, onOpenChange] = useState(false);
@@ -42,13 +41,13 @@ export function CreateAnaesthesiaForm() {
 		},
 	});
 
-	if (isAnaesthesiaTypePending) return <PendingComponent />;
-
 	return (
 		<div>
 			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button variant="soft">New</Button>
+				<Dialog.Trigger disabled={isAnaesthesiaTypePending}>
+					<Button loading={isAnaesthesiaTypePending} variant="soft">
+						New
+					</Button>
 				</Dialog.Trigger>
 
 				<Dialog.Content>
@@ -173,13 +172,11 @@ export function UpdateAnaesthesiaForm({
 		},
 	});
 
-	if (isAnaesthesiaTypePending) return <PendingComponent />;
-
 	return (
 		<div>
 			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button variant="ghost">
+				<Dialog.Trigger disabled={isAnaesthesiaTypePending}>
+					<Button variant="ghost" loading={isAnaesthesiaTypePending}>
 						<Edit size={16} />
 					</Button>
 				</Dialog.Trigger>

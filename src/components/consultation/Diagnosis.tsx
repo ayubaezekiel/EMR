@@ -13,10 +13,9 @@ import {
 	createPatientDiagnosisAction,
 	updatePatientDiagnosisAction,
 } from "../../actions/consultation/actions";
-import { consultationTemplatesQueryOptions } from "../../actions/queries";
-import { getProfile } from "../../lib/utils";
+import { consultationTemplatesQueryOptions } from "@/actions/queries";
+import { getProfile } from "@/lib/utils";
 import { FieldInfo } from "../FieldInfo";
-import PendingComponent from "../PendingComponent";
 import { DataTable } from "../table/DataTable";
 import { patient_diagnosis_column } from "../table/columns/consultation/diagnosis";
 import { editor_plugins } from "../textEditor/RichTextEditor";
@@ -45,18 +44,21 @@ export function Diagnosis({
 				})),
 			[data?.diagnosis_data],
 		) ?? [];
-	if (isPending) return <PendingComponent />;
 
 	return (
 		<div>
 			<CreateDiagnosisForm patientId={patientId} isAdmission={isAdmission} />
 			<div>
-				<DataTable
-					columns={patient_diagnosis_column}
-					data={diagnosis_data}
-					filterLabel="search by name..."
-					filterer="name"
-				/>
+				{isPending ? (
+					<Spinner />
+				) : (
+					<DataTable
+						columns={patient_diagnosis_column}
+						data={diagnosis_data}
+						filterLabel="search by name..."
+						filterer="name"
+					/>
+				)}
 			</div>
 		</div>
 	);

@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import supabase from "../../supabase/client";
+import supabase from "@/supabase/client";
 
 export const createImagingAction = async (values: DB["imaging"]["Insert"]) => {
 	const { error } = await supabase.from("imaging").insert(values);

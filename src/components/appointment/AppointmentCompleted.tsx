@@ -5,16 +5,15 @@ import {
 	Callout,
 	Card,
 	Flex,
+	Spinner,
 	Strong,
 	Text,
 } from "@radix-ui/themes";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
 import { FileQuestion, UserCheck } from "lucide-react";
 import { useMemo } from "react";
 import { changeAppointmentStatus } from "../../actions/actions";
-import { appointmentsQueryOptions } from "../../actions/queries";
-import PendingComponent from "../PendingComponent";
+import { appointmentsQueryOptions } from "@/actions/queries";
 import { ConfirmAppointmentUpdate } from "./ConfirmAppointmentUpdate";
 
 export function AppointmentCompleted({
@@ -73,9 +72,9 @@ export function AppointmentCompleted({
 		[appointments?.appointment_data, searchName, type, from, to],
 	);
 
-	if (isAppointmentPending) return <PendingComponent />;
-
-	return appointment_data_completed?.length === 0 ? (
+	return isAppointmentPending ? (
+		<Spinner />
+	) : appointment_data_completed?.length === 0 ? (
 		<Flex justify={"center"}>
 			<Callout.Root mt={"9"}>
 				<Callout.Icon>
@@ -168,7 +167,7 @@ export function AppointmentCompleted({
 							id={a.id}
 							title="Move To Waiting?"
 							triggleLabel="Waiting"
-							disabled={a.is_waiting!}
+							disabled={true}
 							warning="Are you sure you want to move this appointment to waiting?"
 							actionFn={async () => {
 								await changeAppointmentStatus({
@@ -188,7 +187,7 @@ export function AppointmentCompleted({
 							id={a.id}
 							title="Mark As Missed?"
 							triggleLabel="Missed"
-							disabled={a.is_missed!}
+							disabled={true}
 							warning="Are you sure you want to mark this appointment as missed?"
 							actionFn={async () => {
 								await changeAppointmentStatus({
@@ -207,7 +206,7 @@ export function AppointmentCompleted({
 							id={a.id}
 							title="Has Checked In?"
 							triggleLabel="Checked In"
-							disabled={a.is_checkedin!}
+							disabled={true}
 							warning="Are you sure this patient has checked in?"
 							actionFn={async () => {
 								await changeAppointmentStatus({
@@ -222,11 +221,10 @@ export function AppointmentCompleted({
 								});
 							}}
 						/>
-						<Link to={`/dashboard/appointments/${a.patients_id}`}>
-							<Button size={"2"} radius="full">
-								Attend
-							</Button>
-						</Link>
+
+						<Button disabled size={"2"} radius="full">
+							Attend
+						</Button>
 					</Flex>
 				</Card>
 			))}

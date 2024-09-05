@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import supabase from "../../supabase/client";
+import supabase from "@/supabase/client";
 
 export const createWardAction = async (values: DB["wards"]["Insert"]) => {
 	const { error } = await supabase.from("wards").insert(values);
@@ -40,7 +40,14 @@ export const updateBedAction = async (values: DB["beds"]["Update"]) => {
 			.update(values)
 			.eq("id", values.id);
 		if (error) {
-			toast.error(error.message);
+			if (
+				error.message ===
+				'duplicate key value violates unique constraint "beds_name_key"'
+			) {
+				toast.error("bed already exist");
+			} else {
+				toast.error(error.message);
+			}
 		} else {
 			toast.success("bed updated successfully");
 		}

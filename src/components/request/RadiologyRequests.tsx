@@ -6,16 +6,16 @@ import {
 	Dialog,
 	Flex,
 	IconButton,
+	Spinner,
 } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { Eye, FileQuestion, Printer, X } from "lucide-react";
 import { useMemo } from "react";
 import { changeRequestStatus } from "../../actions/actions";
-import { requestQueryOptions } from "../../actions/queries";
+import { requestQueryOptions } from "@/actions/queries";
 import { ConfirmRequestStatusUpdate } from "../../forms/requests/ConfirmRequestStatusUpdate";
-import { useRequestById } from "../../lib/hooks";
+import { useRequestById } from "@/lib/hooks";
 import { PatientCardHeader } from "../PatientCardHeader";
-import PendingComponent from "../PendingComponent";
 
 export function RadiologyCardWaiting() {
 	const { data: request_data, isPending: isRequestPending } =
@@ -27,9 +27,9 @@ export function RadiologyCardWaiting() {
 		[request_data?.request_data],
 	);
 
-	if (isRequestPending) return <PendingComponent />;
-
-	return (
+	return isRequestPending ? (
+		<Spinner />
+	) : (
 		<div className="w-full">
 			{radiology_request_waiting?.length === 0 ? (
 				<Flex justify={"center"}>
@@ -138,9 +138,10 @@ export const RadiologyCardCompleted = () => {
 			),
 		[request_data?.request_data],
 	);
-	if (isRequestPending) return <PendingComponent />;
 
-	return radiology_request_completed?.length === 0 ? (
+	return isRequestPending ? (
+		<Spinner />
+	) : radiology_request_completed?.length === 0 ? (
 		<Flex justify={"center"}>
 			<Callout.Root mt={"9"}>
 				<Callout.Icon>
@@ -265,9 +266,18 @@ export function PatientRadiologyCard({ patientId }: { patientId: string }) {
 		[request_data],
 	);
 
-	if (isRequestPending) return <PendingComponent />;
-
-	return (
+	return isRequestPending ? (
+		<Spinner />
+	) : radiology_data_filtered?.length === 0 ? (
+		<Flex justify={"center"}>
+			<Callout.Root mt={"9"}>
+				<Callout.Icon>
+					<FileQuestion />
+				</Callout.Icon>
+				<Callout.Text ml={"1"}>No result found</Callout.Text>
+			</Callout.Root>
+		</Flex>
+	) : (
 		<div className="w-full">
 			{radiology_data_filtered?.length === 0 ? (
 				<Flex justify={"center"}>

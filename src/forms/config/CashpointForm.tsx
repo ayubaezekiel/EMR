@@ -16,9 +16,8 @@ import {
 	createCashpointAction,
 	updateCashpointAction,
 } from "../../actions/config/cashpoint";
-import { branchQueryOptions, clinicsQueryOptions } from "../../actions/queries";
+import { branchQueryOptions, clinicsQueryOptions } from "@/actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
-import PendingComponent from "../../components/PendingComponent";
 
 export function CreateCashpointForm() {
 	const [open, onOpenChange] = useState(false);
@@ -40,17 +39,17 @@ export function CreateCashpointForm() {
 			await createCashpointAction(value);
 			form.reset();
 			onOpenChange(false);
-			queryClient.invalidateQueries({ queryKey: ["hmoPlan"] });
+			queryClient.invalidateQueries({ queryKey: ["cashpoints"] });
 		},
 	});
-
-	if (isClinicsPending || isBranchPending) return <PendingComponent />;
 
 	return (
 		<div>
 			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button variant="soft">New</Button>
+				<Dialog.Trigger disabled={isBranchPending || isClinicsPending}>
+					<Button loading={isBranchPending || isClinicsPending} variant="soft">
+						New
+					</Button>
 				</Dialog.Trigger>
 
 				<Dialog.Content>
@@ -190,13 +189,11 @@ export function UpdateCashpointForm({
 		},
 	});
 
-	if (isClinicsPending || isBranchPending) return <PendingComponent />;
-
 	return (
 		<div>
 			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button variant="ghost">
+				<Dialog.Trigger disabled={isBranchPending || isClinicsPending}>
+					<Button loading={isBranchPending || isClinicsPending} variant="ghost">
 						<Edit size={16} />
 					</Button>
 				</Dialog.Trigger>

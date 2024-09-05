@@ -15,13 +15,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import {
-	labTestQueryOptions,
-	patientsQueryOptions,
-} from "../../actions/queries";
-import PendingComponent from "../../components/PendingComponent";
-import { checkAuth } from "../../lib/utils";
-import supabase from "../../supabase/client";
+import { labTestQueryOptions, patientsQueryOptions } from "@/actions/queries";
+import { checkAuth } from "@/lib/utils";
+import supabase from "@/supabase/client";
 
 export function CreateAntenatalRequestForm() {
 	const [isLoading, setIsLoading] = useState(false);
@@ -40,8 +36,6 @@ export function CreateAntenatalRequestForm() {
 			patients_id: "",
 		},
 	});
-
-	if (patientsPending || isLabPending) return <PendingComponent />;
 
 	const fields = form.getValues().services.map((item, index) => (
 		<Flex key={item.key} gap={"2"} mt={"4"}>
@@ -106,104 +100,104 @@ export function CreateAntenatalRequestForm() {
 	));
 
 	return (
-		<div>
-			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button size={"4"}>New Request</Button>
-				</Dialog.Trigger>
+		<Dialog.Root open={open} onOpenChange={onOpenChange}>
+			<Dialog.Trigger disabled={patientsPending || isLabPending}>
+				<Button size={"4"} loading={patientsPending || isLabPending}>
+					New Request
+				</Button>
+			</Dialog.Trigger>
 
-				<Dialog.Content>
-					<Dialog.Title>Laboratory Request</Dialog.Title>
-					<Dialog.Description size="2" mb="4">
-						Fill out the form information
-					</Dialog.Description>
+			<Dialog.Content>
+				<Dialog.Title>Laboratory Request</Dialog.Title>
+				<Dialog.Description size="2" mb="4">
+					Fill out the form information
+				</Dialog.Description>
 
-					<form
-						onSubmit={form.onSubmit(async (values) => {
-							setIsLoading(true);
+				<form
+					onSubmit={form.onSubmit(async (values) => {
+						setIsLoading(true);
 
-							const user = await checkAuth();
-							const { error } = await supabase.from("requests").insert([
-								{
-									patients_id: `${values.patients_id}`,
-									taken_by: `${user?.id}`,
-									is_lab: true,
-									services: values.services.map((v) => ({
-										service: JSON.parse(v.service),
-										note: v.note,
-										is_urgent: v.is_urgent,
-									})),
-								},
-							]);
-							if (error) {
-								toast.error(error.message);
-								setIsLoading(false);
-							} else {
-								toast.success("request issued successfully");
-								form.reset();
-								queryClient.invalidateQueries({ queryKey: ["requests"] });
-								setIsLoading(false);
-								onOpenChange(false);
+						const user = await checkAuth();
+						const { error } = await supabase.from("requests").insert([
+							{
+								patients_id: `${values.patients_id}`,
+								taken_by: `${user?.id}`,
+								is_lab: true,
+								services: values.services.map((v) => ({
+									service: JSON.parse(v.service),
+									note: v.note,
+									is_urgent: v.is_urgent,
+								})),
+							},
+						]);
+						if (error) {
+							toast.error(error.message);
+							setIsLoading(false);
+						} else {
+							toast.success("request issued successfully");
+							form.reset();
+							queryClient.invalidateQueries({ queryKey: ["requests"] });
+							setIsLoading(false);
+							onOpenChange(false);
+						}
+					})}
+				>
+					<div className="flex flex-col">
+						<Text size={"3"}>Patient*</Text>
+						<Select.Root
+							size={"3"}
+							onValueChange={(e) =>
+								form.getInputProps("patients_id").onChange(e)
 							}
-						})}
-					>
-						<div className="flex flex-col">
-							<Text size={"3"}>Patient*</Text>
-							<Select.Root
-								size={"3"}
-								onValueChange={(e) =>
-									form.getInputProps("patients_id").onChange(e)
-								}
-							>
-								<Select.Trigger placeholder="select patient..." />
-								<Select.Content position="popper">
-									{patient_data?.patient_data?.map((p) => (
-										<Select.Item key={p.id} value={p.id}>
-											{p.first_name} {p.middle_name} {p.last_name} - [
-											{p.id.slice(0, 8).toUpperCase()}]
-										</Select.Item>
-									))}
-								</Select.Content>
-							</Select.Root>
-						</div>
-
-						{fields.length < 0 && (
-							<Callout.Root color="red">
-								<Callout.Icon>
-									<AlertCircle />
-									<Callout.Text ml={"2"}>Empty</Callout.Text>
-								</Callout.Icon>
-							</Callout.Root>
-						)}
-
-						{fields}
-						<Flex justify="end" mt="4">
-							<Button
-								type="button"
-								variant="soft"
-								onClick={() =>
-									form.insertListItem("services", {
-										service: "",
-										note: "",
-										is_urgent: false,
-										key: randomId(),
-									})
-								}
-							>
-								Add more
-							</Button>
-						</Flex>
-						<Button
-							loading={isLoading}
-							disabled={!form.isValid() || isLoading}
-							size={"4"}
-							type="submit"
 						>
-							Request
+							<Select.Trigger placeholder="select patient..." />
+							<Select.Content position="popper">
+								{patient_data?.patient_data?.map((p) => (
+									<Select.Item key={p.id} value={p.id}>
+										{p.first_name} {p.middle_name} {p.last_name} - [
+										{p.id.slice(0, 8).toUpperCase()}]
+									</Select.Item>
+								))}
+							</Select.Content>
+						</Select.Root>
+					</div>
+
+					{fields.length < 0 && (
+						<Callout.Root color="red">
+							<Callout.Icon>
+								<AlertCircle />
+								<Callout.Text ml={"2"}>Empty</Callout.Text>
+							</Callout.Icon>
+						</Callout.Root>
+					)}
+
+					{fields}
+					<Flex justify="end" mt="4">
+						<Button
+							type="button"
+							variant="soft"
+							onClick={() =>
+								form.insertListItem("services", {
+									service: "",
+									note: "",
+									is_urgent: false,
+									key: randomId(),
+								})
+							}
+						>
+							Add more
 						</Button>
-					</form>
-				</Dialog.Content>
-			</Dialog.Root>
-		</div>
+					</Flex>
+					<Button
+						loading={isLoading}
+						disabled={!form.isValid() || isLoading}
+						size={"4"}
+						type="submit"
+					>
+						Request
+					</Button>
+				</form>
+			</Dialog.Content>
+		</Dialog.Root>
 	);
 }

@@ -1,3 +1,4 @@
+import { FinancialAnalytics } from "@/components/config/FinancialAnalytics";
 import {
 	Badge,
 	Box,
@@ -6,23 +7,23 @@ import {
 	DataList,
 	Flex,
 	Heading,
+	Separator,
 	Spinner,
 	Tabs,
+	Text,
 } from "@radix-ui/themes";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { AppointmentType } from "../../../../components/config/AppointmentType";
 import { Branch } from "../../../../components/config/Branch";
-import { Cashpoint } from "../../../../components/config/Cashpoint";
 import { Clinics } from "../../../../components/config/Clinics";
 import { Departments } from "../../../../components/config/Departments";
+import { JobPostion } from "../../../../components/config/JobPosition";
+import { Specialties } from "../../../../components/config/Specialties";
 import { HMOCompanies } from "../../../../components/config/insurance/HMOCompanies";
 import { HMOGroups } from "../../../../components/config/insurance/HMOGroups";
 import { HMOPlans } from "../../../../components/config/insurance/HMOPlans";
-import { JobPostion } from "../../../../components/config/JobPosition";
-import { PaymentMethod } from "../../../../components/config/PaymentMethod";
-import { Specialties } from "../../../../components/config/Specialties";
-import { config_services_routes } from "../../../../lib/constants";
 import { UpdateCenterForm } from "../../../../forms/config/CenterForm";
+import { config_services_routes } from "../../../../lib/constants";
 import { useCenter } from "../../../../lib/hooks";
 
 export const Route = createFileRoute("/_layout/dashboard/config/")({
@@ -30,26 +31,37 @@ export const Route = createFileRoute("/_layout/dashboard/config/")({
 		return (
 			<>
 				<Heading mb={"3"}>Configuration</Heading>
-				<Tabs.Root defaultValue="settings" mt={"4"}>
-					<Tabs.List>
-						<Tabs.Trigger value="settings">Host Settings</Tabs.Trigger>
-						<Tabs.Trigger value="services">Services</Tabs.Trigger>
-						<Tabs.Trigger value="insurance">Insurance</Tabs.Trigger>
-						<Tabs.Trigger value="data">Form Config</Tabs.Trigger>
-					</Tabs.List>
-
-					<Center />
-				</Tabs.Root>
+				<Center />
 			</>
 		);
 	},
 });
 
 const Center = () => {
+	const activeTab = Route.useSearch<{ active: string }>();
+
 	const { center_data, isCenterPending } = useCenter();
+
+	const url = new URL(location.href);
+	const params = new URLSearchParams(url.search);
+
 	return (
-		<Box mt="6">
-			<Tabs.Content value="settings">
+		<Tabs.Root
+			defaultValue={activeTab.active}
+			mt={"4"}
+			onValueChange={(e) => {
+				params.set("active", e);
+			}}
+		>
+			<Tabs.List>
+				<Tabs.Trigger value="settings">Host Settings</Tabs.Trigger>
+				<Tabs.Trigger value="services">Services</Tabs.Trigger>
+				<Tabs.Trigger value="insurance">Insurance</Tabs.Trigger>
+				<Tabs.Trigger value="data">Form Config</Tabs.Trigger>
+				<Tabs.Trigger value="finance">Finance</Tabs.Trigger>
+			</Tabs.List>
+
+			<Tabs.Content mt={"4"} value="settings">
 				<div className="grid gap-4 md:grid-cols-2">
 					<Card>
 						<Flex justify={"between"} mb={"4"}>
@@ -95,17 +107,15 @@ const Center = () => {
 							</DataList.Root>
 						)}
 					</Card>
-					<div>
-						<Branch />
-					</div>
+					<Branch />
 				</div>
 			</Tabs.Content>
 
-			<Tabs.Content value="services">
+			<Tabs.Content mt={"4"} value="services">
 				<div className="grid gap-4 md:grid-cols-3 mt-4">
 					{config_services_routes.map((p) => (
 						<Card key={p.link_title}>
-							<Box height={"50px"} key={p.route + p.name}>
+							<Box height={"50px"}>
 								<Link to={p.route} className="w-full h-full ">
 									<Button
 										variant="ghost"
@@ -115,12 +125,16 @@ const Center = () => {
 									</Button>
 								</Link>
 							</Box>
+							<Separator size={"4"} mt={"3"} />
+							<div className="p-4">
+								<Text size={"1"}>{p.desc}</Text>
+							</div>
 						</Card>
 					))}
 				</div>
 			</Tabs.Content>
 
-			<Tabs.Content value="insurance">
+			<Tabs.Content mt={"4"} value="insurance">
 				<HMOPlans />
 				<div className="flex md:flex-row flex-col gap-4">
 					<div className="w-full">
@@ -132,18 +146,19 @@ const Center = () => {
 				</div>
 			</Tabs.Content>
 
-			<Tabs.Content value="data">
+			<Tabs.Content mt={"4"} value="data">
 				<AppointmentType />
 
 				<div className="grid gap-4 md:grid-cols-2 mt-4">
-					<PaymentMethod />
-					<Cashpoint />
 					<JobPostion />
 					<Clinics />
 					<Specialties />
 					<Departments />
 				</div>
 			</Tabs.Content>
-		</Box>
+			<Tabs.Content mt={"4"} value="finance">
+				<FinancialAnalytics />
+			</Tabs.Content>
+		</Tabs.Root>
 	);
 };

@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { services_routes } from "../lib/constants";
-import { Home } from "lucide-react";
-import { ScrollArea } from "@radix-ui/themes";
+import { Cog, Home } from "lucide-react";
+import { ScrollArea, Separator } from "@radix-ui/themes";
 
 export function Sidebar() {
 	return (
@@ -30,6 +30,17 @@ export function Sidebar() {
 						</Link>
 					</div>
 				))}
+				<Separator size={"4"} />
+				<div className="hover:bg-[var(--accent-3)] p-2 w-full rounded-md">
+					<Link
+						search={{ active: "settings" }}
+						to={"/dashboard/config"}
+						className="justify-start w-full flex items-center gap-1"
+					>
+						<Cog className="h-5 w-5 " />
+						Admin
+					</Link>
+				</div>
 			</div>
 		</ScrollArea>
 	);

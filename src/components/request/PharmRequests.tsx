@@ -1,21 +1,22 @@
 import {
 	Badge,
 	Button,
+	Callout,
 	Card,
 	Dialog,
 	Flex,
 	IconButton,
+	Spinner,
 	Text,
 } from "@radix-ui/themes";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Printer, X } from "lucide-react";
+import { FileQuestion, Printer, X } from "lucide-react";
 import { useMemo } from "react";
-import { requestQueryOptions } from "../../actions/queries";
-import { ConfirmRequestStatusUpdate } from "../../forms/requests/ConfirmRequestStatusUpdate";
-import { PatientCardHeader } from "../PatientCardHeader";
-import PendingComponent from "../PendingComponent";
 import { changeRequestStatus } from "../../actions/actions";
-import { useRequestById } from "../../lib/hooks";
+import { requestQueryOptions } from "@/actions/queries";
+import { ConfirmRequestStatusUpdate } from "../../forms/requests/ConfirmRequestStatusUpdate";
+import { useRequestById } from "@/lib/hooks";
+import { PatientCardHeader } from "../PatientCardHeader";
 
 export function PharmRequestWaitingCard() {
 	const { data: request_data, isPending: isRequestPending } =
@@ -28,9 +29,18 @@ export function PharmRequestWaitingCard() {
 
 	const queryClient = useQueryClient();
 
-	if (isRequestPending) return <PendingComponent />;
-
-	return (
+	return isRequestPending ? (
+		<Spinner />
+	) : pharm_request_waiting?.length === 0 ? (
+		<Flex justify={"center"}>
+			<Callout.Root mt={"9"}>
+				<Callout.Icon>
+					<FileQuestion />
+				</Callout.Icon>
+				<Callout.Text ml={"1"}>No result found</Callout.Text>
+			</Callout.Root>
+		</Flex>
+	) : (
 		<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
 			{pharm_request_waiting?.map((a) => (
 				<Card key={a.id}>
@@ -128,9 +138,18 @@ export function PharmRequestCompletedCard() {
 
 	const queryClient = useQueryClient();
 
-	if (isRequestPending) return <PendingComponent />;
-
-	return (
+	return isRequestPending ? (
+		<Spinner />
+	) : pharm_request_completed?.length === 0 ? (
+		<Flex justify={"center"}>
+			<Callout.Root mt={"9"}>
+				<Callout.Icon>
+					<FileQuestion />
+				</Callout.Icon>
+				<Callout.Text ml={"1"}>No result found</Callout.Text>
+			</Callout.Root>
+		</Flex>
+	) : (
 		<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
 			{pharm_request_completed?.map((a) => (
 				<Card key={a.id}>
@@ -224,9 +243,18 @@ export function PatientPharmRequestCard({ patientId }: { patientId: string }) {
 		[request_data],
 	);
 
-	if (isRequestPending) return <PendingComponent />;
-
-	return (
+	return isRequestPending ? (
+		<Spinner />
+	) : pharm_request?.length === 0 ? (
+		<Flex justify={"center"}>
+			<Callout.Root mt={"9"}>
+				<Callout.Icon>
+					<FileQuestion />
+				</Callout.Icon>
+				<Callout.Text ml={"1"}>No result found</Callout.Text>
+			</Callout.Root>
+		</Flex>
+	) : (
 		<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
 			{pharm_request?.map((a) => (
 				<Card key={a.id}>

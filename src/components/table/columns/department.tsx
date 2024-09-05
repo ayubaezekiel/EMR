@@ -1,11 +1,10 @@
 import { Checkbox } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
-import {
-	DeleteDepartmentForm,
-	UpdateDepartmentForm,
-} from "../../../forms/config/DepartmentForm";
+import { DeleteActionForm } from "../../../actions/DeleteAction";
+import { deleteDepartmentAction } from "../../../actions/config/department";
+import { UpdateDepartmentForm } from "../../../forms/config/DepartmentForm";
 
-export const departemnt_column: ColumnDef<DepartmentType["Row"]>[] = [
+export const departemnt_column: ColumnDef<DB["departments"]["Row"]>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -43,7 +42,14 @@ export const departemnt_column: ColumnDef<DepartmentType["Row"]>[] = [
 			return (
 				<div className="flex gap-4">
 					<UpdateDepartmentForm {...dept} />
-					<DeleteDepartmentForm id={dept.id} />
+					<DeleteActionForm
+						id={dept.id}
+						inValidate="departments"
+						title="Delete Department"
+						warning="Are you sure? this cashpoint will be parmanently deleted from the
+          database."
+						actionFn={() => deleteDepartmentAction({ id: dept.id })}
+					/>
 				</div>
 			);
 		},

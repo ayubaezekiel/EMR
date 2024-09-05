@@ -50,7 +50,7 @@ export const hmo_companies_column: ColumnDef<DB["hmo_companies"]["Row"]>[] = [
 	},
 	{
 		accessorKey: "phone",
-		header: () => <div className="text-right">HMO</div>,
+		header: () => <div className="text-right">Phone</div>,
 		cell: ({ row }) => {
 			return (
 				<div className="text-right font-medium">{row.getValue("phone")}</div>
@@ -77,7 +77,7 @@ export const hmo_companies_column: ColumnDef<DB["hmo_companies"]["Row"]>[] = [
 					<UpdateHMOCompaniesForm {...comp} />
 					<DeleteActionForm
 						id={comp.id}
-						redirectTo="/dashboard/config"
+						inValidate="hmoCompanies"
 						title="Delete HMO Company"
 						warning="Are you sure? This HMO company will be parmanently deleted from the
           database."

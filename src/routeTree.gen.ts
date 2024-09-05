@@ -31,11 +31,12 @@ import { Route as LayoutDashboardAntenatalIndexImport } from './routes/_layout/d
 import { Route as LayoutDashboardAdmissionsIndexImport } from './routes/_layout/dashboard/admissions/index'
 import { Route as LayoutDashboardUsersUserIdImport } from './routes/_layout/dashboard/users/$userId'
 import { Route as LayoutDashboardPatientsPatientIdImport } from './routes/_layout/dashboard/patients/$patientId'
+import { Route as LayoutDashboardConfigStoreImport } from './routes/_layout/dashboard/config/store'
 import { Route as LayoutDashboardConfigRadiologyImport } from './routes/_layout/dashboard/config/radiology'
 import { Route as LayoutDashboardConfigProceduresImport } from './routes/_layout/dashboard/config/procedures'
-import { Route as LayoutDashboardConfigPharmacyImport } from './routes/_layout/dashboard/config/pharmacy'
 import { Route as LayoutDashboardConfigLabImport } from './routes/_layout/dashboard/config/lab'
 import { Route as LayoutDashboardConfigConsultationImport } from './routes/_layout/dashboard/config/consultation'
+import { Route as LayoutDashboardConfigBillingImport } from './routes/_layout/dashboard/config/billing'
 import { Route as LayoutDashboardConfigAdmissionsImport } from './routes/_layout/dashboard/config/admissions'
 import { Route as LayoutDashboardAppointmentsPatientIdImport } from './routes/_layout/dashboard/appointments/$patientId'
 import { Route as LayoutDashboardAdmissionsPatientIdImport } from './routes/_layout/dashboard/admissions/$patientId'
@@ -157,6 +158,13 @@ const LayoutDashboardPatientsPatientIdRoute =
     getParentRoute: () => LayoutRoute,
   } as any)
 
+const LayoutDashboardConfigStoreRoute = LayoutDashboardConfigStoreImport.update(
+  {
+    path: '/dashboard/config/store',
+    getParentRoute: () => LayoutRoute,
+  } as any,
+)
+
 const LayoutDashboardConfigRadiologyRoute =
   LayoutDashboardConfigRadiologyImport.update({
     path: '/dashboard/config/radiology',
@@ -169,12 +177,6 @@ const LayoutDashboardConfigProceduresRoute =
     getParentRoute: () => LayoutRoute,
   } as any)
 
-const LayoutDashboardConfigPharmacyRoute =
-  LayoutDashboardConfigPharmacyImport.update({
-    path: '/dashboard/config/pharmacy',
-    getParentRoute: () => LayoutRoute,
-  } as any)
-
 const LayoutDashboardConfigLabRoute = LayoutDashboardConfigLabImport.update({
   path: '/dashboard/config/lab',
   getParentRoute: () => LayoutRoute,
@@ -183,6 +185,12 @@ const LayoutDashboardConfigLabRoute = LayoutDashboardConfigLabImport.update({
 const LayoutDashboardConfigConsultationRoute =
   LayoutDashboardConfigConsultationImport.update({
     path: '/dashboard/config/consultation',
+    getParentRoute: () => LayoutRoute,
+  } as any)
+
+const LayoutDashboardConfigBillingRoute =
+  LayoutDashboardConfigBillingImport.update({
+    path: '/dashboard/config/billing',
     getParentRoute: () => LayoutRoute,
   } as any)
 
@@ -264,6 +272,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutDashboardConfigAdmissionsImport
       parentRoute: typeof LayoutImport
     }
+    '/_layout/dashboard/config/billing': {
+      id: '/_layout/dashboard/config/billing'
+      path: '/dashboard/config/billing'
+      fullPath: '/dashboard/config/billing'
+      preLoaderRoute: typeof LayoutDashboardConfigBillingImport
+      parentRoute: typeof LayoutImport
+    }
     '/_layout/dashboard/config/consultation': {
       id: '/_layout/dashboard/config/consultation'
       path: '/dashboard/config/consultation'
@@ -278,13 +293,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutDashboardConfigLabImport
       parentRoute: typeof LayoutImport
     }
-    '/_layout/dashboard/config/pharmacy': {
-      id: '/_layout/dashboard/config/pharmacy'
-      path: '/dashboard/config/pharmacy'
-      fullPath: '/dashboard/config/pharmacy'
-      preLoaderRoute: typeof LayoutDashboardConfigPharmacyImport
-      parentRoute: typeof LayoutImport
-    }
     '/_layout/dashboard/config/procedures': {
       id: '/_layout/dashboard/config/procedures'
       path: '/dashboard/config/procedures'
@@ -297,6 +305,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/config/radiology'
       fullPath: '/dashboard/config/radiology'
       preLoaderRoute: typeof LayoutDashboardConfigRadiologyImport
+      parentRoute: typeof LayoutImport
+    }
+    '/_layout/dashboard/config/store': {
+      id: '/_layout/dashboard/config/store'
+      path: '/dashboard/config/store'
+      fullPath: '/dashboard/config/store'
+      preLoaderRoute: typeof LayoutDashboardConfigStoreImport
       parentRoute: typeof LayoutImport
     }
     '/_layout/dashboard/patients/$patientId': {
@@ -410,11 +425,12 @@ export const routeTree = rootRoute.addChildren({
     LayoutDashboardAdmissionsPatientIdRoute,
     LayoutDashboardAppointmentsPatientIdRoute,
     LayoutDashboardConfigAdmissionsRoute,
+    LayoutDashboardConfigBillingRoute,
     LayoutDashboardConfigConsultationRoute,
     LayoutDashboardConfigLabRoute,
-    LayoutDashboardConfigPharmacyRoute,
     LayoutDashboardConfigProceduresRoute,
     LayoutDashboardConfigRadiologyRoute,
+    LayoutDashboardConfigStoreRoute,
     LayoutDashboardPatientsPatientIdRoute,
     LayoutDashboardUsersUserIdRoute,
     LayoutDashboardAdmissionsIndexRoute,
@@ -457,11 +473,12 @@ export const routeTree = rootRoute.addChildren({
         "/_layout/dashboard/admissions/$patientId",
         "/_layout/dashboard/appointments/$patientId",
         "/_layout/dashboard/config/admissions",
+        "/_layout/dashboard/config/billing",
         "/_layout/dashboard/config/consultation",
         "/_layout/dashboard/config/lab",
-        "/_layout/dashboard/config/pharmacy",
         "/_layout/dashboard/config/procedures",
         "/_layout/dashboard/config/radiology",
+        "/_layout/dashboard/config/store",
         "/_layout/dashboard/patients/$patientId",
         "/_layout/dashboard/users/$userId",
         "/_layout/dashboard/admissions/",
@@ -501,6 +518,10 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_layout/dashboard/config/admissions.tsx",
       "parent": "/_layout"
     },
+    "/_layout/dashboard/config/billing": {
+      "filePath": "_layout/dashboard/config/billing.tsx",
+      "parent": "/_layout"
+    },
     "/_layout/dashboard/config/consultation": {
       "filePath": "_layout/dashboard/config/consultation.tsx",
       "parent": "/_layout"
@@ -509,16 +530,16 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_layout/dashboard/config/lab.tsx",
       "parent": "/_layout"
     },
-    "/_layout/dashboard/config/pharmacy": {
-      "filePath": "_layout/dashboard/config/pharmacy.tsx",
-      "parent": "/_layout"
-    },
     "/_layout/dashboard/config/procedures": {
       "filePath": "_layout/dashboard/config/procedures.tsx",
       "parent": "/_layout"
     },
     "/_layout/dashboard/config/radiology": {
       "filePath": "_layout/dashboard/config/radiology.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/dashboard/config/store": {
+      "filePath": "_layout/dashboard/config/store.tsx",
       "parent": "/_layout"
     },
     "/_layout/dashboard/patients/$patientId": {

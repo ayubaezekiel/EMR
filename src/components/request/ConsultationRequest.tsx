@@ -1,19 +1,20 @@
 import {
 	Badge,
 	Button,
+	Callout,
 	Card,
 	Dialog,
 	Flex,
 	IconButton,
+	Spinner,
 } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { Printer, X } from "lucide-react";
+import { FileQuestion, Printer, X } from "lucide-react";
 import { useMemo } from "react";
-import { consultationQueryOptions } from "../../actions/queries";
-import { useRequestById } from "../../lib/hooks";
+import { consultationQueryOptions } from "@/actions/queries";
+import { useRequestById } from "@/lib/hooks";
 import { PatientCardHeader } from "../PatientCardHeader";
-import PendingComponent from "../PendingComponent";
 
 export function ConsultationRequestWaitingCard() {
 	const { data: request_data, isPending: isRequestPending } = useQuery(
@@ -25,9 +26,18 @@ export function ConsultationRequestWaitingCard() {
 		[request_data?.consultation_data],
 	);
 
-	if (isRequestPending) return <PendingComponent />;
-
-	return (
+	return isRequestPending ? (
+		<Spinner />
+	) : consultation_request_waiting?.length === 0 ? (
+		<Flex justify={"center"}>
+			<Callout.Root mt={"9"}>
+				<Callout.Icon>
+					<FileQuestion />
+				</Callout.Icon>
+				<Callout.Text ml={"1"}>No result found</Callout.Text>
+			</Callout.Root>
+		</Flex>
+	) : (
 		<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
 			{consultation_request_waiting?.map((a) => (
 				<Card key={a.id}>
@@ -88,9 +98,18 @@ export function ConsultationRequestCompletedCard() {
 		[request_data?.consultation_data],
 	);
 
-	if (isRequestPending) return <PendingComponent />;
-
-	return (
+	return isRequestPending ? (
+		<Spinner />
+	) : consultation_request_completed?.length === 0 ? (
+		<Flex justify={"center"}>
+			<Callout.Root mt={"9"}>
+				<Callout.Icon>
+					<FileQuestion />
+				</Callout.Icon>
+				<Callout.Text ml={"1"}>No result found</Callout.Text>
+			</Callout.Root>
+		</Flex>
+	) : (
 		<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
 			{consultation_request_completed?.map((a) => (
 				<Card key={a.id}>
@@ -148,9 +167,18 @@ export function PatientConsultationRequestCard({
 		[request_data],
 	);
 
-	if (isRequestPending) return <PendingComponent />;
-
-	return (
+	return isRequestPending ? (
+		<Spinner />
+	) : consultation_request_completed?.length === 0 ? (
+		<Flex justify={"center"}>
+			<Callout.Root mt={"9"}>
+				<Callout.Icon>
+					<FileQuestion />
+				</Callout.Icon>
+				<Callout.Text ml={"1"}>No result found</Callout.Text>
+			</Callout.Root>
+		</Flex>
+	) : (
 		<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
 			{consultation_request_completed?.map((a) => (
 				<Card key={a.id}>

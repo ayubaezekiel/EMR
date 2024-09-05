@@ -19,14 +19,11 @@ export function PatientVitals({ patientId }: { patientId: string }) {
 		queryKey: ["patientVitalsById"],
 	});
 
-	const patient_vitals_data: VitalsProps[] =
+	const patient_vitals_data =
 		useMemo(
 			() =>
 				data?.patient_vitals_data?.map((v) => ({
-					id: `${v.id}`,
-					date_created: `${v.date_created}`,
-					patient_id: `${v.patient_id}`,
-					vitals: v.vitals,
+					...v,
 					profile: `${v.profile?.first_name} ${v.profile?.middle_name ?? ""} ${v.profile?.last_name}`,
 				})),
 			[data?.patient_vitals_data],

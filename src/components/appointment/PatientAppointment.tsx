@@ -4,13 +4,13 @@ import {
 	Callout,
 	Card,
 	Flex,
+	Spinner,
 	Strong,
 	Text,
 } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { FileQuestion, UserCheck } from "lucide-react";
-import supabase from "../../supabase/client";
-import PendingComponent from "../PendingComponent";
+import supabase from "@/supabase/client";
 
 export function PatientAppointments({ patientId }: { patientId: string }) {
 	const { data: appointments, isPending: isAppointmentPending } = useQuery({
@@ -26,9 +26,9 @@ export function PatientAppointments({ patientId }: { patientId: string }) {
 
 	const appointment_data = appointments;
 
-	if (isAppointmentPending) return <PendingComponent />;
-
-	return appointment_data?.length === 0 ? (
+	return isAppointmentPending ? (
+		<Spinner />
+	) : appointment_data?.length === 0 ? (
 		<Flex justify={"center"}>
 			<Callout.Root mt={"9"}>
 				<Callout.Icon>

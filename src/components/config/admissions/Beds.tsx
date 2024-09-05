@@ -3,21 +3,17 @@ import { useQuery } from "@tanstack/react-query";
 import { bedsQueryOptions } from "../../../actions/queries";
 import { CreateBedForm } from "../../../forms/config/admission/BedForm";
 import { DataTable } from "../../table/DataTable";
-import { BedProps, beds_column } from "../../table/columns/admission/beds";
+import { beds_column } from "../../table/columns/admission/beds";
 import { useMemo } from "react";
 
 export function Beds() {
 	const { data, isPending } = useQuery(bedsQueryOptions);
 
-	const bed_datas: BedProps[] =
+	const bed_datas =
 		useMemo(
 			() =>
 				data?.beds_data?.map((b) => ({
-					default_price: b.default_price,
-					id: b.id,
-					is_available: b.is_available,
-					name: b.name,
-					ward_id: b.ward_id,
+					...b,
 					ward: `${b.wards?.name}`,
 				})),
 			[data?.beds_data],

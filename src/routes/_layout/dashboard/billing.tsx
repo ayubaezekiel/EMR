@@ -1,11 +1,16 @@
 import { DateRangePicker } from "@nextui-org/react";
-import { Card, Heading, SegmentedControl, Tabs } from "@radix-ui/themes";
+import {
+	Card,
+	Heading,
+	SegmentedControl,
+	Spinner,
+	Tabs,
+} from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { appointmentsTypesQueryOptions } from "../../../actions/queries";
 
-import PendingComponent from "../../../components/PendingComponent";
 import { AdmissionBillingCard } from "../../../components/billing/AdmissionBillingCard";
 import { AppointmentBillingCards } from "../../../components/billing/AppointmentBillingCard";
 import { ConsumableBillingCard } from "../../../components/billing/ConsumableBillingCard";
@@ -29,11 +34,11 @@ const Billing = () => {
 	const { data: appointment_type, isPending: isAppointmentTypePending } =
 		useQuery(appointmentsTypesQueryOptions);
 
-	if (isAppointmentTypePending) return <PendingComponent />;
-
 	const default_app_type = appointment_type?.appointment_type_data?.at(0)?.id;
 
-	return (
+	return isAppointmentTypePending ? (
+		<Spinner />
+	) : (
 		<div>
 			<Card variant="ghost" my={"4"} style={{ background: "var(--accent-2)" }}>
 				<div className="flex justify-between flex-col gap-2 md:flex-row">

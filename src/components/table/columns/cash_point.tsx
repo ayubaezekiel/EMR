@@ -4,7 +4,7 @@ import { DeleteActionForm } from "../../../actions/DeleteAction";
 import { deleteCashpointAction } from "../../../actions/config/cashpoint";
 import { UpdateCashpointForm } from "../../../forms/config/CashpointForm";
 
-export const cashpoint_column: ColumnDef<CashpointType["Row"]>[] = [
+export const cashpoint_column: ColumnDef<DB["cash_points"]["Row"]>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -44,7 +44,7 @@ export const cashpoint_column: ColumnDef<CashpointType["Row"]>[] = [
 					<UpdateCashpointForm {...cash} />
 					<DeleteActionForm
 						id={cash.id}
-						inValidate="cashpoint"
+						inValidate="cashpoints"
 						title="Delete Cashpoint"
 						warning="Are you sure? this cashpoint will be parmanently deleted from the
           database."

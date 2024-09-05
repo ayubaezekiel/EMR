@@ -53,32 +53,25 @@ export const procedures_column: ColumnDef<DB["procedure"]["Row"]>[] = [
 		),
 	},
 	{
-		accessorKey: "anaesthesia_id",
+		accessorKey: "anaesthesia",
 		header: "Anaesthesia",
-		cell: ({ row }) => (
-			<div className="capitalize">{row.getValue("anaesthesia")}</div>
-		),
-	},
-	{
-		accessorKey: "anaesthesia_id",
-		header: "Anaesthesia Price",
 		cell: ({ row }) => (
 			<div className="capitalize">{row.getValue("anaesthesia")}</div>
 		),
 	},
 
 	{
-		accessorKey: "theatre_id",
-		header: "Theatre Price",
+		accessorKey: "theatre",
+		header: "Theatre",
 		cell: ({ row }) => (
-			<div className="capitalize">{row.getValue("anaesthesia")}</div>
+			<div className="capitalize">{row.getValue("theatre")}</div>
 		),
 	},
 	{
-		accessorKey: "theatre_id",
+		accessorKey: "procedure_category",
 		header: "Category",
 		cell: ({ row }) => (
-			<div className="capitalize">{row.getValue("anaesthesia")}</div>
+			<div className="capitalize">{row.getValue("procedure_category")}</div>
 		),
 	},
 	{
@@ -106,7 +99,16 @@ export const procedures_column: ColumnDef<DB["procedure"]["Row"]>[] = [
 
 			return (
 				<div className="flex gap-4">
-					<UpdateProceduresForm {...params} />
+					<UpdateProceduresForm
+						anaesthesia_id={params.anaesthesia_id}
+						id={params.id}
+						is_theatre={params.is_theatre}
+						name={params.name}
+						procedure_category_id={params.procedure_category_id}
+						procedure_price={params.procedure_price}
+						surgeon_price={params.surgeon_price}
+						theatre_id={params.theatre_id}
+					/>
 					<DeleteActionForm
 						id={params.id}
 						inValidate="procedure"

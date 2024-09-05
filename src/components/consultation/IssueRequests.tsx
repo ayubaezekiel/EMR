@@ -15,37 +15,49 @@ export function IssueRequests({ patientId }: { patientId: string }) {
 						<Badge color="red" mb={"5"}>
 							Issue Laboratory Request
 						</Badge>
-						<CreateLabRequestForm patientId={patientId} />
+						<div>
+							<CreateLabRequestForm patientId={patientId} />
+						</div>
 					</Card>
 					<Card>
 						<Badge color="red" mb={"5"}>
 							Issue Pharmacy Request
 						</Badge>
-						<CreatePharmRequestForm patientId={patientId} />
+						<div>
+							<CreatePharmRequestForm patientId={patientId} />
+						</div>
 					</Card>
 					<Card>
 						<Badge color="red" mb={"5"}>
 							Issue Radiology Request
 						</Badge>
-						<CreateRadiologyRequestForm patientId={patientId} />
+						<div>
+							<CreateRadiologyRequestForm patientId={patientId} />
+						</div>
 					</Card>
 					<Card>
 						<Badge color="red" mb={"5"}>
 							Issue Antenatal Request
 						</Badge>
-						<CreateAntenatalRequestForm />
+						<div>
+							<CreateAntenatalRequestForm />
+						</div>
 					</Card>
 					<Card>
 						<Badge color="red" mb={"5"}>
 							Issue Consumable Request
 						</Badge>
-						<CreateConsumableRequestForm patientId={patientId} />
+						<div>
+							<CreateConsumableRequestForm patientId={patientId} />
+						</div>
 					</Card>
 					<Card>
 						<Badge color="red" mb={"5"}>
 							Issue Procedure Request
 						</Badge>
-						<CreateProcedureRequestForm patientId={patientId} />
+						<div>
+							<CreateProcedureRequestForm patientId={patientId} />
+						</div>
 					</Card>
 				</div>
 			</Card>

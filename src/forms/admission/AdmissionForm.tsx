@@ -22,9 +22,9 @@ import {
 	bedsQueryOptions,
 	patientsQueryOptions,
 	wardsQueryOptions,
-} from "../../actions/queries";
+} from "@/actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
-import { useProfile } from "../../lib/hooks";
+import { useProfile } from "@/lib/hooks";
 
 export function CreateAdmissionForm() {
 	const [open, onOpenChange] = useState(false);

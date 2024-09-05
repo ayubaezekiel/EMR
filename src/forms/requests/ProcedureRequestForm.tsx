@@ -17,9 +17,9 @@ import { toast } from "sonner";
 import {
 	patientsQueryOptions,
 	proceduresQueryOptions,
-} from "../../actions/queries";
-import { getProfile } from "../../lib/utils";
-import supabase from "../../supabase/client";
+} from "@/actions/queries";
+import { getProfile } from "@/lib/utils";
+import supabase from "@/supabase/client";
 
 export function CreateProcedureRequestForm({
 	patientId,

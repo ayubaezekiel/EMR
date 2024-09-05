@@ -11,6 +11,7 @@ import {
 	Flex,
 	Heading,
 	IconButton,
+	Spinner,
 	Strong,
 	Tabs,
 	Text,
@@ -19,7 +20,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { UserCheck, X } from "lucide-react";
 import { changeRequestStatus } from "../../../../actions/actions";
 import { requestQueryOptions } from "../../../../actions/queries";
-import PendingComponent from "../../../../components/PendingComponent";
 import { CreateAntenatalRequestForm } from "../../../../forms/requests/AntenatalRequestForm";
 
 export const Route = createFileRoute("/_layout/dashboard/antenatal/")({
@@ -69,8 +69,6 @@ function LabRequestCard({ isCompleted, isWaiting }: LabRequestStatus) {
 	const { data: request_data, isPending: isRequestPending } =
 		useQuery(requestQueryOptions);
 
-	if (isRequestPending) return <PendingComponent />;
-
 	const lab_request_waiting = request_data?.request_data?.filter(
 		(a) => a.is_waiting === isWaiting && a.is_lab === true,
 	);
@@ -79,7 +77,9 @@ function LabRequestCard({ isCompleted, isWaiting }: LabRequestStatus) {
 		(a) => a.is_completed === isCompleted && a.is_lab === true,
 	);
 
-	return (
+	return isRequestPending ? (
+		<Spinner />
+	) : (
 		<div className="w-full">
 			<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
 				{isWaiting &&

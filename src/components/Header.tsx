@@ -10,6 +10,7 @@ import {
 	Flex,
 	Grid,
 	IconButton,
+	Separator,
 	Spinner,
 	Tooltip,
 } from "@radix-ui/themes";
@@ -23,6 +24,7 @@ import {
 import {
 	AlignJustify,
 	BookCheck,
+	Cog,
 	Home,
 	Hospital,
 	LogOutIcon,
@@ -102,16 +104,26 @@ export function Header({
 										</Link>
 									</div>
 								))}
-
-								<SheetFooter className="mt-10">
+								<Separator />
+								<SheetFooter className="mt-2">
 									<div className="hover:bg-red-500/10  items-center p-2 w-full rounded-md">
 										<Button
 											onClick={() => {
 												onOpenChange(!open), LogOut();
 											}}
 										>
-											Logout <LogOutIcon className="size-5 ml-2" />
+											<LogOutIcon className="size-5 mr-2" />
+											Logout
 										</Button>
+									</div>
+									<div className="hover:bg-red-500/10  items-center p-2 w-full rounded-md">
+										<Link
+											search={{ active: "settings" }}
+											className="flex gap-1"
+											to="/dashboard/config"
+										>
+											<Cog /> Admin
+										</Link>
 									</div>
 								</SheetFooter>
 							</div>

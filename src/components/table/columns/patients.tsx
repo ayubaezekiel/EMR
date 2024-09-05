@@ -55,11 +55,9 @@ export const patients: ColumnDef<DB["patients"]["Row"]>[] = [
 	},
 
 	{
-		accessorKey: "hmo_plans.name",
+		accessorKey: "hmo_plans",
 		header: "HMO Plan",
-		cell: ({ row }) => (
-			<div className="lowercase">{row.getValue("hmo_plans.name")}</div>
-		),
+		cell: ({ row }) => <div>{row.getValue("hmo_plans")}</div>,
 	},
 	{
 		accessorKey: "hmo_code",
@@ -100,11 +98,7 @@ export const patients: ColumnDef<DB["patients"]["Row"]>[] = [
 
 			return (
 				<div className="flex gap-4">
-					<UpdatePatientForm
-						{...patient}
-						hmo_plan_id={patient.hmo_plan_id}
-						id={patient.id}
-					/>
+					<UpdatePatientForm {...patient} hmo_plan_id={patient.hmo_plan_id} />
 					<DeleteActionForm
 						id={patient.id}
 						inValidate="patients"

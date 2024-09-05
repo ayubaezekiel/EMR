@@ -8,17 +8,16 @@ import { HistoryTaking } from "../../../../components/consultation/HistoryTaking
 import { IssueRequests } from "../../../../components/consultation/IssueRequests";
 import { PatientVitals } from "../../../../components/consultation/PatientVitals";
 import { TreatmentPlan } from "../../../../components/consultation/TreatmentPlan";
+import { changeAppointmentStatus } from "../../../../actions/actions";
 
 type AdmissionStatus = {
 	admission: boolean;
+	appointmentId?: string;
 	patientId?: string;
 };
 export const Route = createFileRoute(
 	"/_layout/dashboard/appointments/$patientId",
 )({
-	validateSearch: ({ admission }: AdmissionStatus) => {
-		return { admission };
-	},
 	component: () => (
 		<div>
 			<Heading mb={"6"}>Patient Consultation</Heading>
@@ -73,7 +72,7 @@ function ConsultationStepperForm() {
 	const prevStep = () =>
 		setActive((current) => (current > 0 ? current - 1 : current));
 
-	const { admission } = Route.useSearch();
+	const { admission, appointmentId } = Route.useSearch<AdmissionStatus>();
 	const { patientId } = Route.useParams();
 
 	return (
@@ -88,7 +87,20 @@ function ConsultationStepperForm() {
 					Back
 				</Button>
 				{active === 5 ? (
-					<Button size={"4"}>Mark as completed</Button>
+					<Button
+						size={"4"}
+						onClick={() => {
+							changeAppointmentStatus({
+								id: `${appointmentId}`,
+								isCheckedIn: false,
+								isCompleted: true,
+								isMissed: false,
+								isWaiting: false,
+							});
+						}}
+					>
+						Mark as completed
+					</Button>
 				) : (
 					<Button size={"4"} onClick={nextStep}>
 						Next step

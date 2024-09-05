@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import supabase from "../../supabase/client";
+import supabase from "@/supabase/client";
 
 export const createLabTestAction = async (
 	values: DB["lab_tests"]["Insert"],

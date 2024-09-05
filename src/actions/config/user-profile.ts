@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import supabase from "../../supabase/client";
+import supabase from "@/supabase/client";
 
 export const updateProfileAction = async (values: DB["profile"]["Update"]) => {
 	if (values.id) {

@@ -5,7 +5,7 @@ import { zodValidator } from "@tanstack/zod-form-adapter";
 import { useState } from "react";
 import { z } from "zod";
 import { createConsultationAction } from "../../actions/config/admission";
-import { admissionsQueryOptions } from "../../actions/queries";
+import { admissionsQueryOptions } from "@/actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
 
 export function CreateConsultationRequestForm() {

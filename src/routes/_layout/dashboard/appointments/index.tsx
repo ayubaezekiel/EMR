@@ -3,6 +3,7 @@ import {
 	Card,
 	Heading,
 	Select,
+	Spinner,
 	Tabs,
 	TextField,
 } from "@radix-ui/themes";
@@ -16,7 +17,6 @@ import { AppointmentCheckedIn } from "../../../../components/appointment/Appoint
 import { AppointmentCompleted } from "../../../../components/appointment/AppointmentCompleted";
 import { AppointmentMissed } from "../../../../components/appointment/AppointmentMissed";
 import { AppointmentWaiting } from "../../../../components/appointment/AppointmentWaiting";
-import PendingComponent from "../../../../components/PendingComponent";
 import { DateRangePicker } from "../../../../components/ui/date-range-picker";
 import { CreateAppointmentForm } from "../../../../forms/AppointmentForm";
 
@@ -37,9 +37,8 @@ function AppointmentCard() {
 		to: "2000-01-01 16:00",
 	});
 
-	const { data: appointment_type, isPending: appointmentType } = useQuery(
-		appointmentsTypesQueryOptions,
-	);
+	const { data: appointment_type, isPending: isAppointmentTypePending } =
+		useQuery(appointmentsTypesQueryOptions);
 
 	const appointment_type_data = appointment_type?.appointment_type_data;
 
@@ -48,14 +47,12 @@ function AppointmentCard() {
 		setRange({ from: "2000-01-01 16:00", to: "2000-01-01 15:00" });
 	};
 
-	if (appointmentType) return <PendingComponent />;
-
 	return (
 		<div className="w-full">
 			<Card variant="ghost" my={"3"} style={{ background: "var(--accent-2)" }}>
 				<div className="flex justify-between flex-col gap-2 md:flex-row">
 					<div className="flex flex-col gap-2">
-						<CreateAppointmentForm />
+						{isAppointmentTypePending ? <Spinner /> : <CreateAppointmentForm />}
 						<TextField.Root
 							disabled={
 								`[${range.from}, ${range.to})`.length > 10 &&

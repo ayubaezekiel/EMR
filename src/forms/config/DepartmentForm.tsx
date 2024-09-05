@@ -1,28 +1,19 @@
-import {
-	AlertDialog,
-	Button,
-	Dialog,
-	Flex,
-	Text,
-	TextField,
-} from "@radix-ui/themes";
+import { Button, Dialog, Flex, Text, TextField } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { Edit, Trash } from "lucide-react";
+import { Edit } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import { z } from "zod";
 import {
 	createDepartmentAction,
 	updateDepartmentAction,
 } from "../../actions/config/department";
 import { FieldInfo } from "../../components/FieldInfo";
-import supabase from "../../supabase/client";
 
 export function CreateDepartmentForm() {
 	const [open, onOpenChange] = useState(false);
-	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 
 	const form = useForm({
 		defaultValues: {
@@ -33,70 +24,67 @@ export function CreateDepartmentForm() {
 			await createDepartmentAction(value);
 			form.reset();
 			onOpenChange(false);
-			navigate({ to: "/dashboard/config" });
+			queryClient.invalidateQueries({ queryKey: ["departments"] });
 		},
 	});
-
 	return (
-		<div>
-			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button variant="soft">New</Button>
-				</Dialog.Trigger>
+		<Dialog.Root open={open} onOpenChange={onOpenChange}>
+			<Dialog.Trigger>
+				<Button variant="soft">New</Button>
+			</Dialog.Trigger>
 
-				<Dialog.Content>
-					<Dialog.Title>New Department</Dialog.Title>
-					<Dialog.Description size="2" mb="4">
-						Fill out the form information
-					</Dialog.Description>
+			<Dialog.Content>
+				<Dialog.Title>New Department</Dialog.Title>
+				<Dialog.Description size="2" mb="4">
+					Fill out the form information
+				</Dialog.Description>
 
-					<form
-						onSubmit={(e) => {
-							e.stopPropagation();
-							e.preventDefault();
-							form.handleSubmit();
+				<form
+					onSubmit={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+						form.handleSubmit();
+					}}
+				>
+					<form.Field
+						name="name"
+						validators={{
+							onChange: z
+								.string()
+								.min(3, { message: "field must be atleast 3 characters" }),
 						}}
-					>
-						<form.Field
-							name="name"
-							validators={{
-								onChange: z
-									.string()
-									.min(3, { message: "field must be atleast 3 characters" }),
-							}}
-							children={(field) => (
-								<label htmlFor={field.name}>
-									<Text size={"3"}>Name*</Text>
-									<TextField.Root
-										name={field.name}
-										id={field.name}
-										value={field.state.value}
-										onChange={(e) => field.handleChange(e.target.value)}
-										onBlur={field.handleBlur}
-									/>
-									<FieldInfo field={field} />
-								</label>
+						children={(field) => (
+							<label htmlFor={field.name}>
+								<Text size={"3"}>Name*</Text>
+								<TextField.Root
+									name={field.name}
+									id={field.name}
+									value={field.state.value}
+									onChange={(e) => field.handleChange(e.target.value)}
+									onBlur={field.handleBlur}
+								/>
+								<FieldInfo field={field} />
+							</label>
+						)}
+					/>
+					<Flex gap="3" mt="4" justify="end">
+						<form.Subscribe
+							selector={(state) => [state.canSubmit, state.isSubmitting]}
+							children={([canSubmit, isSubmitting]) => (
+								<Button
+									loading={isSubmitting}
+									type="submit"
+									disabled={!canSubmit || isSubmitting}
+									size={"4"}
+								>
+									Save
+								</Button>
 							)}
 						/>
-						<Flex gap="3" mt="4" justify="end">
-							<form.Subscribe
-								selector={(state) => [state.canSubmit, state.isSubmitting]}
-								children={([canSubmit, isSubmitting]) => (
-									<Button
-										loading={isSubmitting}
-										type="submit"
-										disabled={!canSubmit || isSubmitting}
-										size={"4"}
-									>
-										Save
-									</Button>
-								)}
-							/>
-						</Flex>
-					</form>
-				</Dialog.Content>
-			</Dialog.Root>
-		</div>
+					</Flex>
+				</form>
+			</Dialog.Content>
+		</Dialog.Root>
 	);
 }
 
@@ -105,7 +93,7 @@ export function UpdateDepartmentForm({
 	...values
 }: DB["departments"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
-	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 
 	const form = useForm({
 		defaultValues: {
@@ -118,127 +106,68 @@ export function UpdateDepartmentForm({
 			form.reset();
 			onOpenChange(false);
 
-			navigate({ to: "/dashboard/config" });
+			queryClient.invalidateQueries({ queryKey: ["departments"] });
 		},
 	});
 
 	return (
-		<div>
-			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button variant="ghost">
-						<Edit size={16} />
-					</Button>
-				</Dialog.Trigger>
+		<Dialog.Root open={open} onOpenChange={onOpenChange}>
+			<Dialog.Trigger>
+				<Button variant="ghost">
+					<Edit size={16} />
+				</Button>
+			</Dialog.Trigger>
 
-				<Dialog.Content>
-					<Dialog.Title>Update Department</Dialog.Title>
-					<Dialog.Description size="2" mb="4">
-						Fill out the form information
-					</Dialog.Description>
-					<form
-						onSubmit={(e) => {
-							e.stopPropagation();
-							e.preventDefault();
-							form.handleSubmit();
+			<Dialog.Content>
+				<Dialog.Title>Update Department</Dialog.Title>
+				<Dialog.Description size="2" mb="4">
+					Fill out the form information
+				</Dialog.Description>
+				<form
+					onSubmit={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+						form.handleSubmit();
+					}}
+				>
+					<form.Field
+						name="name"
+						validators={{
+							onChange: z
+								.string()
+								.min(3, { message: "field must be atleast 3 characters" }),
 						}}
-					>
-						<form.Field
-							name="name"
-							validators={{
-								onChange: z
-									.string()
-									.min(3, { message: "field must be atleast 3 characters" }),
-							}}
-							children={(field) => (
-								<label htmlFor={field.name}>
-									<Text size={"3"}>Name*</Text>
-									<TextField.Root
-										name={field.name}
-										id={field.name}
-										value={field.state.value}
-										onChange={(e) => field.handleChange(e.target.value)}
-										onBlur={field.handleBlur}
-									/>
-									<FieldInfo field={field} />
-								</label>
+						children={(field) => (
+							<label htmlFor={field.name}>
+								<Text size={"3"}>Name*</Text>
+								<TextField.Root
+									name={field.name}
+									id={field.name}
+									value={field.state.value}
+									onChange={(e) => field.handleChange(e.target.value)}
+									onBlur={field.handleBlur}
+								/>
+								<FieldInfo field={field} />
+							</label>
+						)}
+					/>
+					<Flex gap="3" mt="4" justify="end">
+						<form.Subscribe
+							selector={(state) => [state.canSubmit, state.isSubmitting]}
+							children={([canSubmit, isSubmitting]) => (
+								<Button
+									loading={isSubmitting}
+									type="submit"
+									disabled={!canSubmit || isSubmitting}
+									size={"4"}
+								>
+									Save
+								</Button>
 							)}
 						/>
-						<Flex gap="3" mt="4" justify="end">
-							<form.Subscribe
-								selector={(state) => [state.canSubmit, state.isSubmitting]}
-								children={([canSubmit, isSubmitting]) => (
-									<Button
-										loading={isSubmitting}
-										type="submit"
-										disabled={!canSubmit || isSubmitting}
-										size={"4"}
-									>
-										Save
-									</Button>
-								)}
-							/>
-						</Flex>
-					</form>
-				</Dialog.Content>
-			</Dialog.Root>
-		</div>
-	);
-}
-export function DeleteDepartmentForm({ id }: { id: string }) {
-	const navigate = useNavigate();
-	const form = useForm({
-		defaultValues: {
-			id: id,
-		},
-		onSubmit: async ({ value }) => {
-			const { error } = await supabase
-				.from("departments")
-				.delete()
-				.eq("id", value.id);
-			if (error) {
-				toast.error(error.message);
-			} else {
-				navigate({ to: "/dashboard/config" });
-				toast.success("department deleted successfull");
-			}
-		},
-	});
-
-	return (
-		<AlertDialog.Root>
-			<AlertDialog.Trigger>
-				<Button color="red" variant="ghost">
-					<Trash size={16} />
-				</Button>
-			</AlertDialog.Trigger>
-			<AlertDialog.Content maxWidth="450px">
-				<AlertDialog.Title>Delete Department</AlertDialog.Title>
-				<AlertDialog.Description size="2">
-					Are you sure? This department will be parmanently deleted from the
-					database.
-				</AlertDialog.Description>
-
-				<Flex gap="3" mt="4" justify="end">
-					<AlertDialog.Cancel>
-						<Button variant="soft" color="gray">
-							Cancel
-						</Button>
-					</AlertDialog.Cancel>
-					<AlertDialog.Action>
-						<form
-							onSubmit={(e) => {
-								e.stopPropagation(), e.preventDefault(), form.handleSubmit();
-								form.reset();
-							}}
-						>
-							<Button type="submit" variant="solid" color="red">
-								Confirm
-							</Button>
-						</form>
-					</AlertDialog.Action>
-				</Flex>
-			</AlertDialog.Content>
-		</AlertDialog.Root>
+					</Flex>
+				</form>
+			</Dialog.Content>
+		</Dialog.Root>
 	);
 }

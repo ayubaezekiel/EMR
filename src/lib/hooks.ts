@@ -19,6 +19,31 @@ export const useRequestById = ({ patientId }: { patientId: string }) => {
 	return { request_data, isRequestPending };
 };
 
+export const useQuantityType = () => {
+	const { data: quantity_type_data, isPending: isQuantityTypePending } =
+		useQuery({
+			queryFn: async () => {
+				const { data } = await supabase.from("quantity_type").select("*");
+				return data;
+			},
+			queryKey: ["quantityType"],
+		});
+	return { quantity_type_data, isQuantityTypePending };
+};
+
+export const useBilling = () => {
+	const { data: billing_data, isPending: isBillingPending } = useQuery({
+		queryFn: async () => {
+			const { data } = await supabase
+				.from("payments")
+				.select("*,patients(*),cash_points(*),payment_methods(*),profile(*)");
+			return data;
+		},
+		queryKey: ["payments"],
+	});
+	return { billing_data, isBillingPending };
+};
+
 export const useUser = async () => {
 	const { data } = await supabase.auth.getSession();
 	const user = data.session?.user;

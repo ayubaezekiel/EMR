@@ -14,12 +14,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, Edit, Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import {
-	imagingQueryOptions,
-	patientsQueryOptions,
-} from "../../actions/queries";
-import { getProfile } from "../../lib/utils";
-import supabase from "../../supabase/client";
+import { imagingQueryOptions, patientsQueryOptions } from "@/actions/queries";
+import { getProfile } from "@/lib/utils";
+import supabase from "@/supabase/client";
 
 export function CreateRadiologyRequestForm({
 	patientId,

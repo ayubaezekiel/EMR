@@ -13,8 +13,8 @@ import {
 	createExaminationAction,
 	updateExaminationAction,
 } from "../../actions/consultation/actions";
-import { consultationTemplatesQueryOptions } from "../../actions/queries";
-import { getProfile } from "../../lib/utils";
+import { consultationTemplatesQueryOptions } from "@/actions/queries";
+import { getProfile } from "@/lib/utils";
 import { FieldInfo } from "../FieldInfo";
 import { DataTable } from "../table/DataTable";
 import { patient_examination_column } from "../table/columns/consultation/patient_examination";

@@ -13,8 +13,8 @@ import {
 	createHistoryTakingAction,
 	updateHistoryTakingAction,
 } from "../../actions/consultation/actions";
-import { consultationTemplatesQueryOptions } from "../../actions/queries";
-import { getProfile } from "../../lib/utils";
+import { consultationTemplatesQueryOptions } from "@/actions/queries";
+import { getProfile } from "@/lib/utils";
 import { FieldInfo } from "../FieldInfo";
 import { DataTable } from "../table/DataTable";
 import { history_taking_column } from "../table/columns/consultation/history_taking";
@@ -92,6 +92,7 @@ export function CreateHistoryTakingForm({
 			});
 			form.reset();
 			queryClient.invalidateQueries({ queryKey: ["historyTaking"] });
+			close();
 		},
 	});
 

@@ -1,7 +1,7 @@
 import { Badge, Callout, Card, Flex, Spinner, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { requestQueryOptions } from "../../actions/queries";
+import { requestQueryOptions } from "@/actions/queries";
 import { UpdateProcedureRequestForm } from "../../forms/requests/ProcedureRequestForm";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";

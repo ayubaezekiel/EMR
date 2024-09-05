@@ -1,7 +1,7 @@
 import { Badge, Card, DataList, Flex, Spinner, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { bedsQueryOptions } from "../../actions/queries";
+import { bedsQueryOptions } from "@/actions/queries";
 
 export function AvailableBeds() {
 	const { data, isPending } = useQuery(bedsQueryOptions);

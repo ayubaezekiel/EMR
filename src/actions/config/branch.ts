@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import supabase from "../../supabase/client";
+import supabase from "@/supabase/client";
 
 export const createBranchAction = async (values: DB["branch"]["Insert"]) => {
 	const { error } = await supabase.from("branch").insert(values);

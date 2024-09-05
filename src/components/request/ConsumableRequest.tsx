@@ -6,16 +6,16 @@ import {
 	Dialog,
 	Flex,
 	IconButton,
+	Spinner,
 } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { Eye, FileQuestion, Printer, X } from "lucide-react";
 import { useMemo } from "react";
 import { changeRequestStatus } from "../../actions/actions";
-import { requestQueryOptions } from "../../actions/queries";
+import { requestQueryOptions } from "@/actions/queries";
 import { ConfirmRequestStatusUpdate } from "../../forms/requests/ConfirmRequestStatusUpdate";
-import { useRequestById } from "../../lib/hooks";
+import { useRequestById } from "@/lib/hooks";
 import { PatientCardHeader } from "../PatientCardHeader";
-import PendingComponent from "../PendingComponent";
 
 export function ConsumableRequestWaitingCard() {
 	const { data: request_data, isPending: isRequestPending } =
@@ -29,9 +29,18 @@ export function ConsumableRequestWaitingCard() {
 		[request_data?.request_data],
 	);
 
-	if (isRequestPending) return <PendingComponent />;
-
-	return (
+	return isRequestPending ? (
+		<Spinner />
+	) : pharm_request_waiting?.length === 0 ? (
+		<Flex justify={"center"}>
+			<Callout.Root mt={"9"}>
+				<Callout.Icon>
+					<FileQuestion />
+				</Callout.Icon>
+				<Callout.Text ml={"1"}>No result found</Callout.Text>
+			</Callout.Root>
+		</Flex>
+	) : (
 		<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
 			{pharm_request_waiting?.map((a) => (
 				<Card key={a.id}>
@@ -70,10 +79,10 @@ export function ConsumableRequestWaitingCard() {
 						<ConfirmRequestStatusUpdate
 							inValidate="requests"
 							id={a.id}
-							title="Mark As Missed?"
+							title="Mark As Completed?"
 							triggleLabel="Complete"
 							disabled={a.is_completed!}
-							warning="Are you sure you want to mark this appointment as missed?"
+							warning="Are you sure you want to mark this consumable request as completed?"
 							actionFn={async () => {
 								await changeRequestStatus({
 									id: a.id,
@@ -119,17 +128,28 @@ export function ConsumableRequestCompletedCard() {
 	const { data: request_data, isPending: isRequestPending } =
 		useQuery(requestQueryOptions);
 
-	const pharm_request_completed = useMemo(
+	const consumable_request_completed = useMemo(
 		() =>
-			request_data?.request_data?.filter((a) => a.is_completed && a.is_pharm),
+			request_data?.request_data?.filter(
+				(a) => a.is_completed && a.is_consumable,
+			),
 		[request_data?.request_data],
 	);
 
-	if (isRequestPending) return <PendingComponent />;
-
-	return (
+	return isRequestPending ? (
+		<Spinner />
+	) : consumable_request_completed?.length === 0 ? (
+		<Flex justify={"center"}>
+			<Callout.Root mt={"9"}>
+				<Callout.Icon>
+					<FileQuestion />
+				</Callout.Icon>
+				<Callout.Text ml={"1"}>No result found</Callout.Text>
+			</Callout.Root>
+		</Flex>
+	) : (
 		<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
-			{pharm_request_completed?.map((a) => (
+			{consumable_request_completed?.map((a) => (
 				<Card key={a.id}>
 					<PatientCardHeader
 						createdAt={a.created_at}
@@ -153,7 +173,7 @@ export function ConsumableRequestCompletedCard() {
 							id={a.id}
 							title="Move To Waiting?"
 							triggleLabel="Waiting"
-							disabled={a.is_waiting!}
+							disabled={true}
 							warning="Are you sure you want to move this request to waiting?"
 							actionFn={async () => {
 								await changeRequestStatus({
@@ -166,10 +186,10 @@ export function ConsumableRequestCompletedCard() {
 						<ConfirmRequestStatusUpdate
 							inValidate="requests"
 							id={a.id}
-							title="Mark As Missed?"
+							title="Mark As Completed?"
 							triggleLabel="Complete"
 							disabled={a.is_completed!}
-							warning="Are you sure you want to mark this appointment as missed?"
+							warning="Are you sure you want to mark this consumable request as completed?"
 							actionFn={async () => {
 								await changeRequestStatus({
 									id: a.id,
@@ -241,9 +261,18 @@ export function PatientConsumableRequestCard({
 		[request_data],
 	);
 
-	if (isRequestPending) return <PendingComponent />;
-
-	return (
+	return isRequestPending ? (
+		<Spinner />
+	) : consumable_data_filtered?.length === 0 ? (
+		<Flex justify={"center"}>
+			<Callout.Root mt={"9"}>
+				<Callout.Icon>
+					<FileQuestion />
+				</Callout.Icon>
+				<Callout.Text ml={"1"}>No result found</Callout.Text>
+			</Callout.Root>
+		</Flex>
+	) : (
 		<div className="w-full">
 			{consumable_data_filtered?.length === 0 ? (
 				<Flex justify={"center"}>

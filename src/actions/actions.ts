@@ -144,7 +144,7 @@ export const getDrugOrGeneric = async () => {
 	const { data: drug_or_generic_data, error: drug_or_generic_err } =
 		await supabase
 			.from("drug_or_generic")
-			.select("*,drug_or_generic_brand(name),profile(*)");
+			.select("*,drug_or_generic_brand(name),profile(*),quantity_type(*)");
 	if (drug_or_generic_err) {
 		toast.error(drug_or_generic_err.message);
 	}
@@ -367,7 +367,7 @@ export const getLabTestParams = async () => {
 export const getLabTest = async () => {
 	const { data: lab_test_data, error: lab_test_err } = await supabase
 		.from("lab_tests")
-		.select("*");
+		.select("*,lab_test_category(*),lab_test_template(*)");
 
 	if (lab_test_err) {
 		toast.error(lab_test_err.message);
@@ -409,7 +409,7 @@ export const getProcedureCategories = async () => {
 export const getProcedures = async () => {
 	const { data: procedure_data, error: procedure_err } = await supabase
 		.from("procedure")
-		.select("*,anaesthesia(*),theatre(*)");
+		.select("*,anaesthesia(*),theatre(*),procedure_category(*)");
 
 	if (procedure_err) {
 		toast.error(procedure_err.message);
@@ -442,7 +442,7 @@ export const getTheatres = async () => {
 export const getAnaesthesia = async () => {
 	const { data: anaesthesia_data, error: anaesthesia_err } = await supabase
 		.from("anaesthesia")
-		.select("*");
+		.select("*,anaesthesia_type(*)");
 
 	if (anaesthesia_err) {
 		toast.error(anaesthesia_err.message);
@@ -471,7 +471,7 @@ export const getLabTestCategories = async () => {
 export const getImaging = async () => {
 	const { data: imaging_data, error: imaging_err } = await supabase
 		.from("imaging")
-		.select("*");
+		.select("*,imaging_category(*)");
 
 	if (imaging_err) {
 		toast.error(imaging_err.message);
@@ -594,6 +594,15 @@ export const changeRequestStatus = async ({
 		toast.error(error.message);
 	} else {
 		toast.success("status updated successfully");
+	}
+};
+
+export const deleteRequestAction = async (id: string) => {
+	const { error } = await supabase.from("requests").delete().eq("id", id);
+	if (error) {
+		toast.error(error.message);
+	} else {
+		toast.success("request deleted successfully");
 	}
 };
 

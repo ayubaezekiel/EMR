@@ -26,6 +26,7 @@ export function NavPatientFilters() {
 			p.middle_name?.toLowerCase().includes(patient.match.toLowerCase()) ||
 			p.last_name.toLowerCase().includes(patient.match.toLowerCase()),
 	);
+
 	return (
 		<div className="">
 			<Popover.Root open={open} onOpenChange={onOpenChange}>
@@ -34,16 +35,15 @@ export function NavPatientFilters() {
 						<Search />
 					</IconButton>
 				</Popover.Trigger>
-				<Popover.Content width="360px">
+				<Popover.Content width="360px" maxHeight={"250px"}>
 					<Flex gap="3">
 						<Box flexGrow="1">
 							<TextField.Root
-								onInput={(e) =>
+								onChange={(e) =>
 									setPatient({
-										match: e.currentTarget.value,
+										match: e.target.value,
 										startLoading:
-											e.currentTarget.value.length < 3 &&
-											e.currentTarget.value.length > 0
+											e.target.value.length < 3 && e.target.value.length > 0
 												? true
 												: false,
 									})
@@ -66,8 +66,14 @@ export function NavPatientFilters() {
 									<Callout.Text ml={"2"}>No patient found</Callout.Text>
 								</Callout.Root>
 							) : (
+								patient.match.length > 2 &&
+								patient.match.length > 0 &&
 								filtered_patients?.map((f) => (
-									<Card mt={"2"} style={{ background: "var(--accent-3)" }}>
+									<Card
+										mt={"5"}
+										variant="ghost"
+										style={{ background: "var(--accent-3)" }}
+									>
 										<Link
 											onClick={() => onOpenChange(false)}
 											to={`/dashboard/patients/${f.id}/`}

@@ -6,7 +6,7 @@ import {
 	deleteImagingCategoryAction,
 	deleteImagingTemplateAction,
 } from "../../../actions/config/radiology";
-import { UpdateLabCategoriesForm } from "../../../forms/config/lab/LabTestCategoriesForm";
+import { UpdateImagingCategoriesForm } from "../../../forms/config/radiology/ImagingCategoriesForm";
 import { UpdateImagingForm } from "../../../forms/config/radiology/ImagingForm";
 import { UpdateImagingTemplateForm } from "../../../forms/config/radiology/ImagingTemplateForm";
 
@@ -48,9 +48,11 @@ export const imaging_column: ColumnDef<DB["imaging"]["Row"]>[] = [
 		),
 	},
 	{
-		accessorKey: "imaging_category_id",
+		accessorKey: "imaging_category",
 		header: "Category",
-		cell: ({ row }) => <div className="capitalize">{row.getValue("unit")}</div>,
+		cell: ({ row }) => (
+			<div className="capitalize">{row.getValue("imaging_category")}</div>
+		),
 	},
 	{
 		id: "actions",
@@ -60,7 +62,12 @@ export const imaging_column: ColumnDef<DB["imaging"]["Row"]>[] = [
 
 			return (
 				<div className="flex gap-4">
-					<UpdateImagingForm {...params} />
+					<UpdateImagingForm
+						default_price={params.default_price}
+						id={params.id}
+						imaging_category_id={params.imaging_category_id}
+						name={params.name}
+					/>
 					<DeleteActionForm
 						id={params.id}
 						inValidate="imaging"
@@ -111,7 +118,7 @@ export const imaging_cat_column: ColumnDef<DB["imaging_category"]["Row"]>[] = [
 
 			return (
 				<div className="flex gap-4">
-					<UpdateLabCategoriesForm {...cat} />
+					<UpdateImagingCategoriesForm {...cat} />
 					<DeleteActionForm
 						id={cat.id}
 						inValidate="imagingCat"

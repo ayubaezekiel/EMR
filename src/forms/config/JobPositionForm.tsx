@@ -3,12 +3,11 @@ import {
 	Button,
 	Dialog,
 	Flex,
-	Spinner,
 	Text,
 	TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit, Trash } from "lucide-react";
 import { useState } from "react";
@@ -19,11 +18,11 @@ import {
 	updateJobPositionAction,
 } from "../../actions/config/job-positions";
 import { FieldInfo } from "../../components/FieldInfo";
-import supabase from "../../supabase/client";
+import supabase from "@/supabase/client";
 
 export function CreateJobPositionForm() {
 	const [open, onOpenChange] = useState(false);
-	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 
 	const form = useForm({
 		defaultValues: {
@@ -34,7 +33,7 @@ export function CreateJobPositionForm() {
 			await createJobPositionAction(value);
 			form.reset();
 			onOpenChange(false);
-			navigate({ to: "/dashboard/config" });
+			queryClient.invalidateQueries({ queryKey: ["jobPositions"] });
 		},
 	});
 
@@ -104,9 +103,9 @@ export function CreateJobPositionForm() {
 export function UpdateJobPositionForm({
 	id,
 	...values
-}: JobPostionType["Update"]) {
+}: DB["job_positions"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
-	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 
 	const form = useForm({
 		defaultValues: {
@@ -119,7 +118,7 @@ export function UpdateJobPositionForm({
 			form.reset();
 			onOpenChange(false);
 
-			navigate({ to: "/dashboard/config" });
+			queryClient.invalidateQueries({ queryKey: ["jobPositions"] });
 		},
 	});
 
@@ -188,7 +187,7 @@ export function UpdateJobPositionForm({
 }
 
 export function DeleteJobPositionForm({ id }: { id: string }) {
-	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 	const form = useForm({
 		defaultValues: {
 			id: id,
@@ -201,7 +200,7 @@ export function DeleteJobPositionForm({ id }: { id: string }) {
 			if (error) {
 				toast.error(error.message);
 			} else {
-				navigate({ to: "/dashboard/config" });
+				queryClient.invalidateQueries({ queryKey: ["jobPositions"] });
 				toast.success("job position deleted successfull");
 			}
 		},

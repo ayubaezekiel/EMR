@@ -2,8 +2,9 @@ import { Badge, Callout, Card, Flex, Spinner, Text } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { FileQuestion } from "lucide-react";
 import { useMemo } from "react";
-import { requestQueryOptions } from "../../actions/queries";
-import { UpdatePharmRequestForm } from "../../forms/requests/PharmRequestForm";
+import { DeleteActionForm } from "../../actions/DeleteAction";
+import { deleteRequestAction } from "../../actions/actions";
+import { requestQueryOptions } from "@/actions/queries";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";
 
@@ -44,7 +45,14 @@ export function PharmBillingCard() {
 									patientId={a.patients_id}
 									middleName={a.patients?.middle_name as string}
 								/>
-								<UpdatePharmRequestForm {...a} />
+								<DeleteActionForm
+									id={a.id}
+									inValidate="requests"
+									title="Delete Request"
+									warning="Are you sure? this request will be parmanently deleted from the
+          database."
+									actionFn={async () => await deleteRequestAction(a.id)}
+								/>
 							</Flex>
 
 							<Flex direction={"column"} mt={"4"} height={"100px"}>
@@ -53,11 +61,21 @@ export function PharmBillingCard() {
 										(d: {
 											note: string;
 											brand: string;
+											quantity: number;
+											quantity_type: string;
 											generic_drug: { name: string; amount: string };
 										}) => (
 											<Badge key={d.note}>
-												{d.generic_drug.name} - {d.brand}
-												<Text color="red">N{d.generic_drug.amount}</Text>
+												{d.generic_drug.name}
+												<Text color="red">
+													N
+													{new Intl.NumberFormat().format(
+														Number(d.generic_drug.amount) * d.quantity,
+													)}{" "}
+													<Badge>
+														{d.quantity} {d.quantity_type}
+													</Badge>
+												</Text>
 											</Badge>
 										),
 									)}
