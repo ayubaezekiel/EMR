@@ -37,7 +37,7 @@ export function CreateConsultationTemplateForm() {
 				<Button variant="soft">New</Button>
 			</Dialog.Trigger>
 
-			<Dialog.Content minWidth={"50rem"}>
+			<Dialog.Content minWidth={"60rem"}>
 				<Dialog.Title>New Consultation Template</Dialog.Title>
 				<Dialog.Description size="2" mb="4">
 					Fill out the form information
@@ -144,7 +144,7 @@ export function UpdateConsultationTemplateForm({
 				</Button>
 			</Dialog.Trigger>
 
-			<Dialog.Content minWidth={"50rem"}>
+			<Dialog.Content minWidth={"60rem"}>
 				<Dialog.Title>Update Consultation Template</Dialog.Title>
 				<Dialog.Description size="2" mb="4">
 					Fill out the form information

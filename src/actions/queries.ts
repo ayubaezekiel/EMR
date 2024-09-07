@@ -1,4 +1,4 @@
-import { queryOptions } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
 	getAdmissions,
 	getAnaesthesia,
@@ -43,201 +43,324 @@ import {
 	getWards,
 } from "./actions";
 
-export const bedsQueryOptions = queryOptions({
-	queryKey: ["beds"],
-	queryFn: () => getBeds(),
-});
+export const useBedsQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["beds"],
+		queryFn: () => getBeds(),
+	});
+	return { data, isPending };
+};
 
-export const wardsQueryOptions = queryOptions({
-	queryKey: ["wards"],
-	queryFn: () => getWards(),
-});
+export const useWardsQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["wards"],
+		queryFn: () => getWards(),
+	});
+	return { data, isPending };
+};
 
-export const fluidRoutesQueryOptions = queryOptions({
-	queryKey: ["fluidRoutes"],
-	queryFn: () => getFluidRoutes(),
-});
-export const admissionsQueryOptions = queryOptions({
-	queryKey: ["admissions"],
-	queryFn: () => getAdmissions(),
-});
-export const vitalsQueryOptions = queryOptions({
-	queryKey: ["vitals"],
-	queryFn: () => getVitals(),
-});
+export const useFluidRoutesQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["fluidRoutes"],
+		queryFn: () => getFluidRoutes(),
+	});
+	return { data, isPending };
+};
+export const useAdmissionsQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["admissions"],
+		queryFn: () => getAdmissions(),
+	});
+	return { data, isPending };
+};
+export const useVitalsQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["vitals"],
+		queryFn: () => getVitals(),
+	});
+	return { data, isPending };
+};
 
-export const patientVitalsQueryOptions = queryOptions({
-	queryKey: ["patientVitals"],
-	queryFn: () => getPatientVitals(),
-});
+export const usePatientVitalsQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["patientVitals"],
+		queryFn: () => getPatientVitals(),
+	});
+	return { data, isPending };
+};
 
-export const nursingReportQueryOptions = queryOptions({
-	queryKey: ["nursingReports"],
-	queryFn: () => getNursingReports(),
-});
+export const useNursingReportQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["nursingReports"],
+		queryFn: () => getNursingReports(),
+	});
+	return { data, isPending };
+};
 
-export const patientsQueryOptions = queryOptions({
-	queryKey: ["patients"],
-	queryFn: () => getPatients(),
-});
+export const usePatientsQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["patients"],
+		queryFn: () => getPatients(),
+	});
+	return { data, isPending };
+};
 
-export const labTestParamsQueryOptions = queryOptions({
-	queryKey: ["labTestParams"],
-	queryFn: () => getLabTestParams(),
-});
+export const useLabTestParamsQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["labTestParams"],
+		queryFn: () => getLabTestParams(),
+	});
+	return { data, isPending };
+};
 
-export const requestQueryOptions = queryOptions({
-	queryKey: ["requests"],
-	queryFn: () => getRequest(),
-});
+export const useRequestQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["requests"],
+		queryFn: () => getRequest(),
+	});
+	return { data, isPending };
+};
 
-export const labTestQueryOptions = queryOptions({
-	queryKey: ["labTest"],
-	queryFn: () => getLabTest(),
-});
+export const useLabTestQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["labTest"],
+		queryFn: () => getLabTest(),
+	});
+	return { data, isPending };
+};
 
-export const labTestCatQueryOptions = queryOptions({
-	queryKey: ["labTestCat"],
-	queryFn: () => getLabTestCategories(),
-});
+export const useLabTestCatQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["labTestCat"],
+		queryFn: () => getLabTestCategories(),
+	});
+	return { data, isPending };
+};
 
-export const imagingCatQueryOptions = queryOptions({
-	queryKey: ["imagingCat"],
-	queryFn: () => getImagingCategories(),
-});
-export const procedureCatQueryOptions = queryOptions({
-	queryKey: ["procedureCat"],
-	queryFn: () => getProcedureCategories(),
-});
+export const useImagingCatQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["imagingCat"],
+		queryFn: () => getImagingCategories(),
+	});
+	return { data, isPending };
+};
+export const useProcedureCatQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["procedureCat"],
+		queryFn: () => getProcedureCategories(),
+	});
+	return { data, isPending };
+};
 
-export const proceduresQueryOptions = queryOptions({
-	queryKey: ["procedure"],
-	queryFn: () => getProcedures(),
-});
+export const useProceduresQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["procedure"],
+		queryFn: () => getProcedures(),
+	});
+	return { data, isPending };
+};
 
-export const consultationQueryOptions = queryOptions({
-	queryKey: ["consultations"],
-	queryFn: () => getConsultations(),
-});
+export const useConsultationQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["consultations"],
+		queryFn: () => getConsultations(),
+	});
+	return { data, isPending };
+};
 
-export const anaesthesiaQueryOptions = queryOptions({
-	queryKey: ["anaesthesia"],
-	queryFn: () => getAnaesthesia(),
-});
-export const anaesthesiaTypeQueryOptions = queryOptions({
-	queryKey: ["anaesthesiaType"],
-	queryFn: () => getAnaesthesiaType(),
-});
+export const useAnaesthesiaQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["anaesthesia"],
+		queryFn: () => getAnaesthesia(),
+	});
+	return { data, isPending };
+};
+export const useAnaesthesiaTypeQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["anaesthesiaType"],
+		queryFn: () => getAnaesthesiaType(),
+	});
+	return { data, isPending };
+};
 
-export const theatreQueryOptions = queryOptions({
-	queryKey: ["theatre"],
-	queryFn: () => getTheatres(),
-});
-export const imagingTempQueryOptions = queryOptions({
-	queryKey: ["imagingTemp"],
-	queryFn: () => getImagingTemplate(),
-});
+export const useTheatreQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["theatre"],
+		queryFn: () => getTheatres(),
+	});
+	return { data, isPending };
+};
+export const useImagingTempQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["imagingTemp"],
+		queryFn: () => getImagingTemplate(),
+	});
+	return { data, isPending };
+};
 
-export const imagingQueryOptions = queryOptions({
-	queryKey: ["imaging"],
-	queryFn: () => getImaging(),
-});
+export const useImagingQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["imaging"],
+		queryFn: () => getImaging(),
+	});
+	return { data, isPending };
+};
 
-export const labTestTempQueryOptions = queryOptions({
-	queryKey: ["labTestTemps"],
-	queryFn: () => getLabTestTemplate(),
-});
+export const useLabTestTempQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["labTestTemps"],
+		queryFn: () => getLabTestTemplate(),
+	});
+	return { data, isPending };
+};
 
-export const specialtiesQueryOptions = queryOptions({
-	queryKey: ["specialties"],
-	queryFn: () => getSpecialties(),
-});
+export const useSpecialtiesQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["specialties"],
+		queryFn: () => getSpecialties(),
+	});
+	return { data, isPending };
+};
 
-export const consultationTemplatesQueryOptions = queryOptions({
-	queryKey: ["consultationTemplates"],
-	queryFn: () => getConsultationTemplates(),
-});
+export const useConsultationTemplatesQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["consultationTemplates"],
+		queryFn: () => getConsultationTemplates(),
+	});
+	return { data, isPending };
+};
 
-export const clinicsQueryOptions = queryOptions({
-	queryKey: ["clinics"],
-	queryFn: () => getClinics(),
-});
+export const useClinicsQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["clinics"],
+		queryFn: () => getClinics(),
+	});
+	return { data, isPending };
+};
 
-export const appointmentsQueryOptions = queryOptions({
-	queryKey: ["appointments"],
-	queryFn: () => getAppointments(),
-});
+export const useAppointmentsQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["appointments"],
+		queryFn: () => getAppointments(),
+	});
+	return { data, isPending };
+};
 
-export const appointmentsTypesQueryOptions = queryOptions({
-	queryKey: ["appointmentsTypes"],
-	queryFn: () => getAppointmentTypes(),
-});
+export const useAppointmentsTypesQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["appointmentsTypes"],
+		queryFn: () => getAppointmentTypes(),
+	});
+	return { data, isPending };
+};
 
-export const branchQueryOptions = queryOptions({
-	queryKey: ["branch"],
-	queryFn: () => getBranch(),
-});
+export const useBranchQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["branch"],
+		queryFn: () => getBranch(),
+	});
+	return { data, isPending };
+};
 
-export const jobPositionsQueryOptions = queryOptions({
-	queryKey: ["jobPositions"],
-	queryFn: () => getJobPositions(),
-});
+export const useJobPositionsQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["jobPositions"],
+		queryFn: () => getJobPositions(),
+	});
+	return { data, isPending };
+};
 
-export const hmoPlansQueryOptions = queryOptions({
-	queryKey: ["hmoPlans"],
-	queryFn: () => getHMOPlans(),
-});
+export const useHmoPlansQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["hmoPlans"],
+		queryFn: () => getHMOPlans(),
+	});
+	return { data, isPending };
+};
 
-export const hmoGroupsQueryOptions = queryOptions({
-	queryKey: ["hmoGroups"],
-	queryFn: () => getHMOGroups(),
-});
+export const useHmoGroupsQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["hmoGroups"],
+		queryFn: () => getHMOGroups(),
+	});
+	return { data, isPending };
+};
 
-export const hmoCompaniesQueryOptions = queryOptions({
-	queryKey: ["hmoCompanies"],
-	queryFn: () => getHMOCompanies(),
-});
+export const useHmoCompaniesQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["hmoCompanies"],
+		queryFn: () => getHMOCompanies(),
+	});
+	return { data, isPending };
+};
 
-export const historyTakingQueryOptions = queryOptions({
-	queryKey: ["historyTaking"],
-	queryFn: () => getHistoryTaking(),
-});
+export const useHistoryTakingQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["historyTaking"],
+		queryFn: () => getHistoryTaking(),
+	});
+	return { data, isPending };
+};
 
-export const examinationQueryOptions = queryOptions({
-	queryKey: ["examination"],
-	queryFn: () => getExamination(),
-});
+export const useExaminationQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["examination"],
+		queryFn: () => getExamination(),
+	});
+	return { data, isPending };
+};
 
-export const diagnosisQueryOptions = queryOptions({
-	queryKey: ["diagnosis"],
-	queryFn: () => getDiagnosis(),
-});
+export const useDiagnosisQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["diagnosis"],
+		queryFn: () => getDiagnosis(),
+	});
+	return { data, isPending };
+};
 
-export const treatmentPlanQueryOptions = queryOptions({
-	queryKey: ["treatmentPlan"],
-	queryFn: () => getTreatmentPlan(),
-});
+export const useTreatmentPlanQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["treatmentPlan"],
+		queryFn: () => getTreatmentPlan(),
+	});
+	return { data, isPending };
+};
 
-export const paymentMethodsQueryOptions = queryOptions({
-	queryKey: ["paymentMethod"],
-	queryFn: () => getPaymentMethods(),
-});
+export const usePaymentMethodsQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["paymentMethod"],
+		queryFn: () => getPaymentMethods(),
+	});
+	return { data, isPending };
+};
 
-export const cashpointsQueryOptions = queryOptions({
-	queryKey: ["cashpoints"],
-	queryFn: () => getCashPoints(),
-});
+export const useCashpointsQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["cashpoints"],
+		queryFn: () => getCashPoints(),
+	});
+	return { data, isPending };
+};
 
-export const drugOrGenericQueryOptions = queryOptions({
-	queryKey: ["drugOrGeneric"],
-	queryFn: () => getDrugOrGeneric(),
-});
+export const useDrugOrGenericQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["drugOrGeneric"],
+		queryFn: () => getDrugOrGeneric(),
+	});
+	return { data, isPending };
+};
 
-export const drugOrGenericBrandQueryOptions = queryOptions({
-	queryKey: ["brand"],
-	queryFn: () => getDrugOrGenericBrand(),
-});
-export const departmentsQueryOptions = queryOptions({
-	queryKey: ["departments"],
-	queryFn: () => getDepartments(),
-});
+export const useDrugOrGenericBrandQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["brand"],
+		queryFn: () => getDrugOrGenericBrand(),
+	});
+	return { data, isPending };
+};
+export const useDepartmentsQuery = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["departments"],
+		queryFn: () => getDepartments(),
+	});
+	return { data, isPending };
+};

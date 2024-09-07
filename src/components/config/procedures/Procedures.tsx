@@ -1,13 +1,12 @@
 import { Flex, Heading, Spinner } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
-import { proceduresQueryOptions } from "../../../actions/queries";
+import { useMemo } from "react";
+import { useProceduresQuery } from "../../../actions/queries";
 import { CreateProceduresForm } from "../../../forms/config/procedures/ProceduresForm";
 import { DataTable } from "../../table/DataTable";
 import { procedures_column } from "../../table/columns/procedure/procedure";
-import { useMemo } from "react";
 
 export function Procedures() {
-	const { data, isPending } = useQuery(proceduresQueryOptions);
+	const { data, isPending } = useProceduresQuery();
 
 	const procedures =
 		useMemo(

@@ -8,7 +8,7 @@ import {
 	TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
@@ -18,20 +18,16 @@ import {
 	updateLabTestAction,
 } from "../../../actions/config/lab-test";
 import {
-	labTestCatQueryOptions,
-	labTestTempQueryOptions,
+	useLabTestCatQuery,
+	useLabTestTempQuery,
 } from "../../../actions/queries";
 import { FieldInfo } from "../../../components/FieldInfo";
 
 export function CreateLabTestForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
-	const { data: cat, isPending: isCatPending } = useQuery(
-		labTestCatQueryOptions,
-	);
-	const { data: temp, isPending: isTempPending } = useQuery(
-		labTestTempQueryOptions,
-	);
+	const { data: cat, isPending: isCatPending } = useLabTestCatQuery();
+	const { data: temp, isPending: isTempPending } = useLabTestTempQuery();
 
 	const form = useForm({
 		defaultValues: {
@@ -191,12 +187,8 @@ export function UpdateLabTestForm({
 }: DB["lab_tests"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 
-	const { data: cat, isPending: isCatPending } = useQuery(
-		labTestCatQueryOptions,
-	);
-	const { data: temp, isPending: isTempPending } = useQuery(
-		labTestTempQueryOptions,
-	);
+	const { data: cat, isPending: isCatPending } = useLabTestCatQuery();
+	const { data: temp, isPending: isTempPending } = useLabTestTempQuery();
 
 	const queryClient = useQueryClient();
 

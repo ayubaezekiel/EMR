@@ -1,3 +1,6 @@
+import { useLabTestQuery, usePatientsQuery } from "@/actions/queries";
+import { getProfile } from "@/lib/utils";
+import supabase from "@/supabase/client";
 import { useForm } from "@mantine/form";
 import { randomId } from "@mantine/hooks";
 import {
@@ -12,21 +15,17 @@ import {
 	Text,
 	TextField,
 } from "@radix-ui/themes";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, Edit, Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { labTestQueryOptions, patientsQueryOptions } from "@/actions/queries";
-import { getProfile } from "@/lib/utils";
-import supabase from "@/supabase/client";
 
 export function CreateLabRequestForm({ patientId }: { patientId?: string }) {
 	const [isLoading, setIsLoading] = useState(false);
-	const { data: lab_test_data, isPending: isLabPending } =
-		useQuery(labTestQueryOptions);
+	const { data: lab_test_data, isPending: isLabPending } = useLabTestQuery();
 
 	const { data: patient_data, isPending: isPatientsPending } =
-		useQuery(patientsQueryOptions);
+		usePatientsQuery();
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 
@@ -211,8 +210,7 @@ export function CreateLabRequestForm({ patientId }: { patientId?: string }) {
 
 export function UpdateLabRequestForm(labData: DB["requests"]["Update"]) {
 	const [isLoading, setIsLoading] = useState(false);
-	const { data: lab_test_data, isPending: isLabPending } =
-		useQuery(labTestQueryOptions);
+	const { data: lab_test_data, isPending: isLabPending } = useLabTestQuery();
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 

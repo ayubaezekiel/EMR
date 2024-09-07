@@ -1,12 +1,11 @@
+import { usePaymentMethodsQuery } from "@/actions/queries";
 import { Flex, Heading, Spinner } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
-import { paymentMethodsQueryOptions } from "@/actions/queries";
 import { CreatePaymentMethodForm } from "../../forms/config/PaymentMethodForm";
 import { DataTable } from "../table/DataTable";
 import { payment_method_column } from "../table/columns/payment_method";
 
 export function PaymentMethod() {
-	const { data, isPending } = useQuery(paymentMethodsQueryOptions);
+	const { data, isPending } = usePaymentMethodsQuery();
 
 	return (
 		<div>

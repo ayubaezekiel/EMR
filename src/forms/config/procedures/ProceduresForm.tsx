@@ -8,7 +8,7 @@ import {
 	TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
@@ -18,25 +18,22 @@ import {
 	updateProcedureAction,
 } from "../../../actions/config/procedure";
 import {
-	anaesthesiaQueryOptions,
-	procedureCatQueryOptions,
-	theatreQueryOptions,
+	useAnaesthesiaQuery,
+	useProcedureCatQuery,
+	useTheatreQuery,
 } from "../../../actions/queries";
 import { FieldInfo } from "../../../components/FieldInfo";
 
 export function CreateProceduresForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
-	const { data: procedure_cat, isPending: isProcedureCatPending } = useQuery(
-		procedureCatQueryOptions,
-	);
+	const { data: procedure_cat, isPending: isProcedureCatPending } =
+		useProcedureCatQuery();
 
-	const { data: anaesthesia, isPending: isAnaesthesiaPending } = useQuery(
-		anaesthesiaQueryOptions,
-	);
+	const { data: anaesthesia, isPending: isAnaesthesiaPending } =
+		useAnaesthesiaQuery();
 
-	const { data: theatre, isPending: isTheatrePending } =
-		useQuery(theatreQueryOptions);
+	const { data: theatre, isPending: isTheatrePending } = useTheatreQuery();
 
 	const form = useForm({
 		defaultValues: {
@@ -278,16 +275,13 @@ export function UpdateProceduresForm({
 }: DB["procedure"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 
-	const { data: procedure_cat, isPending: isProcedureCatPending } = useQuery(
-		procedureCatQueryOptions,
-	);
+	const { data: procedure_cat, isPending: isProcedureCatPending } =
+		useProcedureCatQuery();
 
-	const { data: anaesthesia, isPending: isAnaesthesiaPending } = useQuery(
-		anaesthesiaQueryOptions,
-	);
+	const { data: anaesthesia, isPending: isAnaesthesiaPending } =
+		useAnaesthesiaQuery();
 
-	const { data: theatre, isPending: isTheatrePending } =
-		useQuery(theatreQueryOptions);
+	const { data: theatre, isPending: isTheatrePending } = useTheatreQuery();
 
 	const queryClient = useQueryClient();
 

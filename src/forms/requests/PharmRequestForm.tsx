@@ -1,3 +1,11 @@
+import {
+	useDrugOrGenericBrandQuery,
+	useDrugOrGenericQuery,
+	usePatientsQuery,
+} from "@/actions/queries";
+import { useQuantityType } from "@/lib/hooks";
+import { getProfile } from "@/lib/utils";
+import supabase from "@/supabase/client";
 import { useForm } from "@mantine/form";
 import { randomId } from "@mantine/hooks";
 import {
@@ -12,18 +20,10 @@ import {
 	Text,
 	TextField,
 } from "@radix-ui/themes";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import {
-	drugOrGenericBrandQueryOptions,
-	drugOrGenericQueryOptions,
-	patientsQueryOptions,
-} from "@/actions/queries";
-import { useQuantityType } from "@/lib/hooks";
-import { getProfile } from "@/lib/utils";
-import supabase from "@/supabase/client";
 
 const time = [
 	"minute(s)",
@@ -36,16 +36,13 @@ const time = [
 
 export function CreatePharmRequestForm({ patientId }: { patientId?: string }) {
 	const [isLoading, setIsLoading] = useState(false);
-	const { data: brand_data, isPending: isBrandPending } = useQuery(
-		drugOrGenericBrandQueryOptions,
-	);
-	const { data: drug_data, isPending: isDrugPending } = useQuery(
-		drugOrGenericQueryOptions,
-	);
+	const { data: brand_data, isPending: isBrandPending } =
+		useDrugOrGenericBrandQuery();
+	const { data: drug_data, isPending: isDrugPending } = useDrugOrGenericQuery();
 	const { isQuantityTypePending, quantity_type_data } = useQuantityType();
 
 	const { data: patient_data, isPending: isPatientsPending } =
-		useQuery(patientsQueryOptions);
+		usePatientsQuery();
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 
@@ -242,7 +239,7 @@ export function CreatePharmRequestForm({ patientId }: { patientId?: string }) {
 				</Button>
 			</Dialog.Trigger>
 
-			<Dialog.Content minWidth={"50rem"}>
+			<Dialog.Content minWidth={"60rem"}>
 				<Dialog.Title>Pharmacy Request</Dialog.Title>
 				<Dialog.Description size="2" mb="4">
 					Fill out the form information
@@ -566,7 +563,7 @@ export function CreatePharmRequestForm({ patientId }: { patientId?: string }) {
 // 				</Button>
 // 			</Dialog.Trigger>
 
-// 			<Dialog.Content minWidth={"50rem"}>
+// 			<Dialog.Content minWidth={"60rem"}>
 // 				<Dialog.Title>Update Pharmacy Request</Dialog.Title>
 // 				<Dialog.Description size="2" mb="4">
 // 					Fill out the form information

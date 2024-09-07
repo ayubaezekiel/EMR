@@ -156,6 +156,27 @@ export type Database = {
         }
         Relationships: []
       }
+      antenatal_package: {
+        Row: {
+          default_price: number | null
+          id: string
+          name: string
+          with_delivary: boolean | null
+        }
+        Insert: {
+          default_price?: number | null
+          id?: string
+          name: string
+          with_delivary?: boolean | null
+        }
+        Update: {
+          default_price?: number | null
+          id?: string
+          name?: string
+          with_delivary?: boolean | null
+        }
+        Relationships: []
+      }
       appointment_types: {
         Row: {
           created_at: string | null

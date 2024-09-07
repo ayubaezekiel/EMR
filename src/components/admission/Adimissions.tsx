@@ -1,3 +1,4 @@
+import { useAdmissionsQuery } from "@/actions/queries";
 import {
 	Badge,
 	Button,
@@ -9,20 +10,18 @@ import {
 	Spinner,
 	Text,
 } from "@radix-ui/themes";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { endOfDay } from "date-fns";
 import { ArrowRightCircle, FileQuestion } from "lucide-react";
 import { useMemo } from "react";
 import { changeAdmissionStatus } from "../../actions/actions";
-import { admissionsQueryOptions } from "@/actions/queries";
 import { ConfirmAdmissionUpdate } from "../../forms/requests/ConfirmAdmissionUpdate";
 import { PatientCardHeader } from "../PatientCardHeader";
 
 export function AdmissionActiveCard() {
-	const { data: admission_data, isPending: isAdmissionPending } = useQuery(
-		admissionsQueryOptions,
-	);
+	const { data: admission_data, isPending: isAdmissionPending } =
+		useAdmissionsQuery();
 	const queryClient = useQueryClient();
 	const admission_data_filtered = useMemo(
 		() =>
@@ -153,9 +152,8 @@ export function AdmissionActiveCard() {
 }
 
 export function AdmissionDischargedCard() {
-	const { data: admission_data, isPending: isAdmissionPending } = useQuery(
-		admissionsQueryOptions,
-	);
+	const { data: admission_data, isPending: isAdmissionPending } =
+		useAdmissionsQuery();
 	const queryClient = useQueryClient();
 	const admission_data_filtered = useMemo(
 		() => admission_data?.admissions_data?.filter((a) => a.is_discharged),

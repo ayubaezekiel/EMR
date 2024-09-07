@@ -4,6 +4,18 @@ import { getPerms } from "../actions/actions";
 import { getProfile } from "./utils";
 import { toast } from "sonner";
 
+export const useAntenatalPackage = () => {
+	const { data: antenatal_package_data, isPending: isAntenatalPackagePending } =
+		useQuery({
+			queryFn: async () => {
+				const { data } = await supabase.from("antenatal_package").select("*");
+				return data;
+			},
+			queryKey: ["antenatalPackage"],
+		});
+	return { antenatal_package_data, isAntenatalPackagePending };
+};
+
 export const useRequestById = ({ patientId }: { patientId: string }) => {
 	const { data: request_data, isPending: isRequestPending } = useQuery({
 		queryFn: async () => {

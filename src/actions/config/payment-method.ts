@@ -2,7 +2,7 @@ import { toast } from "sonner";
 import supabase from "@/supabase/client";
 
 export const createPaymentMethodAction = async (
-	values: PaymentMethodType["Insert"],
+	values: DB["payment_methods"]["Insert"],
 ) => {
 	const { error } = await supabase.from("payment_methods").insert(values);
 	if (error) {
@@ -13,7 +13,7 @@ export const createPaymentMethodAction = async (
 };
 
 export const updatePaymentMethodAction = async (
-	values: PaymentMethodType["Update"],
+	values: DB["payment_methods"]["Update"],
 ) => {
 	if (values.id) {
 		const { error } = await supabase

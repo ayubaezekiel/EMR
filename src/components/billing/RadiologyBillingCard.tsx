@@ -1,15 +1,14 @@
+import { useRequestQuery } from "@/actions/queries";
 import { Badge, Callout, Card, Flex, Spinner, Text } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
 import { FileQuestion } from "lucide-react";
 import { useMemo } from "react";
-import { requestQueryOptions } from "@/actions/queries";
 import { UpdateRadiologyRequestForm } from "../../forms/requests/RadioloyRequestForm";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";
 
 export function RadiologyBillingCard() {
 	const { data: request_data, isPending: isRadiologyPending } =
-		useQuery(requestQueryOptions);
+		useRequestQuery();
 
 	const radiology_data_filtered = useMemo(
 		() =>

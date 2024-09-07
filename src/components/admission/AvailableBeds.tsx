@@ -1,10 +1,9 @@
+import { useBedsQuery } from "@/actions/queries";
 import { Badge, Card, DataList, Flex, Spinner, Text } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { bedsQueryOptions } from "@/actions/queries";
 
 export function AvailableBeds() {
-	const { data, isPending } = useQuery(bedsQueryOptions);
+	const { data, isPending } = useBedsQuery();
 
 	const filtered_beds = useMemo(
 		() => data?.beds_data?.filter((b) => b.is_available),

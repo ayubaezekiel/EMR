@@ -1,3 +1,5 @@
+import { useConsultationTemplatesQuery } from "@/actions/queries";
+import { getProfile } from "@/lib/utils";
 import { Button, Modal, Select } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Flex, Spinner, Text } from "@radix-ui/themes";
@@ -13,8 +15,6 @@ import {
 	createPatientDiagnosisAction,
 	updatePatientDiagnosisAction,
 } from "../../actions/consultation/actions";
-import { consultationTemplatesQueryOptions } from "@/actions/queries";
-import { getProfile } from "@/lib/utils";
 import { FieldInfo } from "../FieldInfo";
 import { DataTable } from "../table/DataTable";
 import { patient_diagnosis_column } from "../table/columns/consultation/diagnosis";
@@ -68,7 +68,7 @@ export function CreateDiagnosisForm({
 	patientId,
 }: { isAdmission: boolean; patientId: string }) {
 	const [opened, { close, open }] = useDisclosure(false);
-	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
+	const { data, isPending } = useConsultationTemplatesQuery();
 
 	const queryClient = useQueryClient();
 
@@ -101,7 +101,7 @@ export function CreateDiagnosisForm({
 				opened={opened}
 				onClose={close}
 				title={"New Diagnosis"}
-				size={"xl"}
+				size={"60rem"}
 			>
 				<form
 					onSubmit={(e) => {
@@ -178,7 +178,7 @@ export function UpdateDiagnosisForm({
 	...values
 }: DB["patient_diagnosis"]["Update"] & { isAdmission: boolean }) {
 	const [opened, { close, open }] = useDisclosure(false);
-	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
+	const { data, isPending } = useConsultationTemplatesQuery();
 	const queryClient = useQueryClient();
 
 	const form = useForm({
@@ -212,7 +212,7 @@ export function UpdateDiagnosisForm({
 				opened={opened}
 				onClose={close}
 				title={"Update Diagnosis"}
-				size={"xl"}
+				size={"60rem"}
 			>
 				<form
 					onSubmit={(e) => {

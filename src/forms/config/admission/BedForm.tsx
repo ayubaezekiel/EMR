@@ -8,7 +8,7 @@ import {
 	TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
@@ -17,15 +17,14 @@ import {
 	createBedAction,
 	updateBedAction,
 } from "../../../actions/config/admission";
-import { wardsQueryOptions } from "../../../actions/queries";
+import { useWardsQuery } from "../../../actions/queries";
 import { FieldInfo } from "../../../components/FieldInfo";
 
 export function CreateBedForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 
-	const { data: wards_data, isPending: isWardPending } =
-		useQuery(wardsQueryOptions);
+	const { data: wards_data, isPending: isWardPending } = useWardsQuery();
 
 	const form = useForm({
 		defaultValues: {
@@ -176,8 +175,7 @@ export function CreateBedForm() {
 
 export function UpdateBedForm({ id, ...values }: DB["beds"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
-	const { data: wards_data, isPending: isWardPending } =
-		useQuery(wardsQueryOptions);
+	const { data: wards_data, isPending: isWardPending } = useWardsQuery();
 
 	const queryClient = useQueryClient();
 

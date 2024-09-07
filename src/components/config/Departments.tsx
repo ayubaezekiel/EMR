@@ -1,12 +1,11 @@
+import { useDepartmentsQuery } from "@/actions/queries";
 import { Flex, Heading, Spinner } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
-import { departmentsQueryOptions } from "@/actions/queries";
 import { CreateDepartmentForm } from "../../forms/config/DepartmentForm";
 import { DataTable } from "../table/DataTable";
 import { departemnt_column } from "../table/columns/department";
 
 export function Departments() {
-	const { data, isPending } = useQuery(departmentsQueryOptions);
+	const { data, isPending } = useDepartmentsQuery();
 
 	return (
 		<div>

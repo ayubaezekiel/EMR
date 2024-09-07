@@ -7,7 +7,7 @@ import {
 	TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
@@ -16,7 +16,7 @@ import {
 	createAnaesthesiaAction,
 	updateAnaesthesiaAction,
 } from "../../../actions/config/procedure";
-import { anaesthesiaTypeQueryOptions } from "../../../actions/queries";
+import { useAnaesthesiaTypeQuery } from "../../../actions/queries";
 import { FieldInfo } from "../../../components/FieldInfo";
 
 export function CreateAnaesthesiaForm() {
@@ -24,7 +24,7 @@ export function CreateAnaesthesiaForm() {
 	const queryClient = useQueryClient();
 
 	const { data: anaesthesia_type, isPending: isAnaesthesiaTypePending } =
-		useQuery(anaesthesiaTypeQueryOptions);
+		useAnaesthesiaTypeQuery();
 
 	const form = useForm({
 		defaultValues: {
@@ -154,7 +154,7 @@ export function UpdateAnaesthesiaForm({
 }: DB["anaesthesia"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 	const { data: anaesthesia_type, isPending: isAnaesthesiaTypePending } =
-		useQuery(anaesthesiaTypeQueryOptions);
+		useAnaesthesiaTypeQuery();
 
 	const queryClient = useQueryClient();
 

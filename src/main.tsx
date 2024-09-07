@@ -3,7 +3,6 @@ import ReactDOM from "react-dom/client";
 import "./globals.css";
 import "@radix-ui/themes/styles.css";
 import "@radix-ui/themes/layout.css";
-
 import { Theme } from "@radix-ui/themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
@@ -11,6 +10,7 @@ import { routeTree } from "./routeTree.gen";
 import { Toaster } from "sonner";
 import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
 
 const queryClient = new QueryClient();
 

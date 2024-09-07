@@ -7,7 +7,7 @@ import {
 	TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
@@ -16,15 +16,13 @@ import {
 	createImagingAction,
 	updateImagingAction,
 } from "../../../actions/config/radiology";
-import { imagingCatQueryOptions } from "../../../actions/queries";
+import { useImagingCatQuery } from "../../../actions/queries";
 import { FieldInfo } from "../../../components/FieldInfo";
 
 export function CreateImagingForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
-	const { data: imaging, isPending: isImagingPending } = useQuery(
-		imagingCatQueryOptions,
-	);
+	const { data: imaging, isPending: isImagingPending } = useImagingCatQuery();
 
 	const form = useForm({
 		defaultValues: {
@@ -158,9 +156,7 @@ export function CreateImagingForm() {
 export function UpdateImagingForm({ ...values }: DB["imaging"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 
-	const { data: imaging, isPending: isImagingPending } = useQuery(
-		imagingCatQueryOptions,
-	);
+	const { data: imaging, isPending: isImagingPending } = useImagingCatQuery();
 
 	const queryClient = useQueryClient();
 

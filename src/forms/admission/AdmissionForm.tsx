@@ -1,4 +1,10 @@
 import {
+	useBedsQuery,
+	usePatientsQuery,
+	useWardsQuery,
+} from "@/actions/queries";
+import { useProfile } from "@/lib/hooks";
+import {
 	Button,
 	Checkbox,
 	Dialog,
@@ -9,7 +15,7 @@ import {
 	TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -18,25 +24,17 @@ import {
 	createAdmissionAction,
 	updateAdmissionAction,
 } from "../../actions/config/admission";
-import {
-	bedsQueryOptions,
-	patientsQueryOptions,
-	wardsQueryOptions,
-} from "@/actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
-import { useProfile } from "@/lib/hooks";
 
 export function CreateAdmissionForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 
-	const { data: wards_data, isPending: isWardPending } =
-		useQuery(wardsQueryOptions);
+	const { data: wards_data, isPending: isWardPending } = useWardsQuery();
 	const { isProfilePending, profile_data } = useProfile();
-	const { data: bed_data, isPending: isBedPending } =
-		useQuery(bedsQueryOptions);
+	const { data: bed_data, isPending: isBedPending } = useBedsQuery();
 	const { data: patient_data, isPending: isPatientPending } =
-		useQuery(patientsQueryOptions);
+		usePatientsQuery();
 
 	const form = useForm({
 		defaultValues: {
@@ -248,11 +246,9 @@ export function UpdateAdmissionForm({
 }: DB["admissions"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 
-	const { data: wards_data, isPending: isWardPending } =
-		useQuery(wardsQueryOptions);
+	const { data: wards_data, isPending: isWardPending } = useWardsQuery();
 	const { isProfilePending, profile_data } = useProfile();
-	const { data: bed_data, isPending: isBedPending } =
-		useQuery(bedsQueryOptions);
+	const { data: bed_data, isPending: isBedPending } = useBedsQuery();
 
 	const queryClient = useQueryClient();
 

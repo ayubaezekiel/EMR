@@ -1,4 +1,9 @@
 import {
+	createAntenatalPackageAction,
+	updateAntenatalPackageAction,
+} from "@/actions/config/antenatal";
+import { FieldInfo } from "@/components/FieldInfo";
+import {
 	Button,
 	Checkbox,
 	Dialog,
@@ -12,27 +17,23 @@ import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
-import {
-	createPaymentMethodAction,
-	updatePaymentMethodAction,
-} from "../../actions/config/payment-method";
-import { FieldInfo } from "../../components/FieldInfo";
 
-export function CreatePaymentMethodForm() {
+export function CreateAntenatalPackageForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 
 	const form = useForm({
 		defaultValues: {
 			name: "",
-			allow_only_financial_admin: false,
+			default_price: 0,
+			with_delivary: true,
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await createPaymentMethodAction(value);
+			await createAntenatalPackageAction(value);
 			form.reset();
 			onOpenChange(false);
-			queryClient.invalidateQueries({ queryKey: ["paymentMethod"] });
+			queryClient.invalidateQueries({ queryKey: ["antenatalPackage"] });
 		},
 	});
 
@@ -44,7 +45,7 @@ export function CreatePaymentMethodForm() {
 				</Dialog.Trigger>
 
 				<Dialog.Content>
-					<Dialog.Title>New Payment Method</Dialog.Title>
+					<Dialog.Title>New Antenatal Package</Dialog.Title>
 					<Dialog.Description size="2" mb="4">
 						Fill out the form information
 					</Dialog.Description>
@@ -77,15 +78,36 @@ export function CreatePaymentMethodForm() {
 								</label>
 							)}
 						/>
-
 						<form.Field
-							name="allow_only_financial_admin"
+							name="default_price"
+							validators={{
+								onChange: z.number().min(0, { message: "required" }),
+							}}
+							children={(field) => (
+								<label htmlFor={field.name}>
+									<Text size={"3"}>Default Price*</Text>
+									<TextField.Root
+										type="number"
+										name={field.name}
+										id={field.name}
+										value={field.state.value}
+										onChange={(e) =>
+											field.handleChange(parseFloat(e.target.value))
+										}
+										onBlur={field.handleBlur}
+									/>
+									<FieldInfo field={field} />
+								</label>
+							)}
+						/>
+						<form.Field
+							name="with_delivary"
 							children={(field) => (
 								<label
 									htmlFor={field.name}
 									className="flex gap-2 items-center mt-4"
 								>
-									<Text size={"3"}>Allow only financial admin?</Text>
+									<Text size={"3"}>With Delivary?</Text>
 									<Checkbox
 										name={field.name}
 										id={field.name}
@@ -119,9 +141,9 @@ export function CreatePaymentMethodForm() {
 	);
 }
 
-export function UpdatePaymentMethodForm({
+export function UpdateAntenatalPackageForm({
 	...values
-}: DB["payment_methods"]["Update"]) {
+}: DB["antenatal_package"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 
@@ -131,10 +153,10 @@ export function UpdatePaymentMethodForm({
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await updatePaymentMethodAction(value);
+			await updateAntenatalPackageAction(value);
 			form.reset();
 			onOpenChange(false);
-			queryClient.invalidateQueries({ queryKey: ["paymentMethod"] });
+			queryClient.invalidateQueries({ queryKey: ["antenatalPackage"] });
 		},
 	});
 
@@ -148,7 +170,7 @@ export function UpdatePaymentMethodForm({
 				</Dialog.Trigger>
 
 				<Dialog.Content>
-					<Dialog.Title>Update Payment Method</Dialog.Title>
+					<Dialog.Title>Update Antenatal Package</Dialog.Title>
 					<Dialog.Description size="2" mb="4">
 						Fill out the form information
 					</Dialog.Description>
@@ -181,13 +203,35 @@ export function UpdatePaymentMethodForm({
 							)}
 						/>
 						<form.Field
-							name="allow_only_financial_admin"
+							name="default_price"
+							validators={{
+								onChange: z.number().min(0, { message: "required" }),
+							}}
+							children={(field) => (
+								<label htmlFor={field.name}>
+									<Text size={"3"}>Default Price*</Text>
+									<TextField.Root
+										type="number"
+										name={field.name}
+										id={field.name}
+										value={field.state.value!}
+										onChange={(e) =>
+											field.handleChange(parseFloat(e.target.value))
+										}
+										onBlur={field.handleBlur}
+									/>
+									<FieldInfo field={field} />
+								</label>
+							)}
+						/>
+						<form.Field
+							name="with_delivary"
 							children={(field) => (
 								<label
 									htmlFor={field.name}
 									className="flex gap-2 items-center mt-4"
 								>
-									<Text size={"3"}>Allow only financial admin?</Text>
+									<Text size={"3"}>With Delivary?</Text>
 									<Checkbox
 										name={field.name}
 										id={field.name}

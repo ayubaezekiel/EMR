@@ -6,11 +6,11 @@ import {
 	Spinner,
 	Tabs,
 } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { appointmentsTypesQueryOptions } from "../../../actions/queries";
+import { useAppointmentsTypesQuery } from "../../../actions/queries";
 
+import { AntenatalBillingCard } from "@/components/billing/AntenatalBillingCard";
 import { AdmissionBillingCard } from "../../../components/billing/AdmissionBillingCard";
 import { AppointmentBillingCards } from "../../../components/billing/AppointmentBillingCard";
 import { ConsumableBillingCard } from "../../../components/billing/ConsumableBillingCard";
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_layout/dashboard/billing")({
 const Billing = () => {
 	const [segment, setSegment] = useState("appointments");
 	const { data: appointment_type, isPending: isAppointmentTypePending } =
-		useQuery(appointmentsTypesQueryOptions);
+		useAppointmentsTypesQuery();
 
 	const default_app_type = appointment_type?.appointment_type_data?.at(0)?.id;
 
@@ -93,9 +93,7 @@ const Billing = () => {
 							Consumable Requests
 						</Tabs.Trigger>
 						<Tabs.Trigger value={"procedure"}>Procedure Requests</Tabs.Trigger>
-						{/* <Tabs.Trigger value={"consultation"}>
-							Consultation Requests
-						</Tabs.Trigger> */}
+						<Tabs.Trigger value={"antenatal"}>Antenatal Requests</Tabs.Trigger>
 					</Tabs.List>
 					<Tabs.Content value={"lab"} mt={"2"}>
 						<LabBillingCard />
@@ -112,9 +110,9 @@ const Billing = () => {
 					<Tabs.Content value={"procedure"} mt={"2"}>
 						<ProcedureBillingCard />
 					</Tabs.Content>
-					{/* <Tabs.Content value={"consultation"} mt={"2"}>
-						<ConsultationBillingCard />
-					</Tabs.Content> */}
+					<Tabs.Content value={"antenatal"} mt={"2"}>
+						<AntenatalBillingCard />
+					</Tabs.Content>
 				</Tabs.Root>
 			)}
 			{segment === "admissions" && <AdmissionBillingCard />}

@@ -1,13 +1,12 @@
 import { Flex, Heading, Spinner } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
-import { anaesthesiaQueryOptions } from "../../../actions/queries";
+import { useMemo } from "react";
+import { useAnaesthesiaQuery } from "@/actions/queries";
 import { CreateAnaesthesiaForm } from "../../../forms/config/procedures/AnaesthesiaForm";
 import { DataTable } from "../../table/DataTable";
 import { anaesthesia_column } from "../../table/columns/procedure/anaesthesia";
-import { useMemo } from "react";
 
 export function Anaesthesia() {
-	const { data, isPending } = useQuery(anaesthesiaQueryOptions);
+	const { data, isPending } = useAnaesthesiaQuery();
 
 	const anaesthesia =
 		useMemo(

@@ -37,6 +37,7 @@ import { Route as LayoutDashboardConfigProceduresImport } from './routes/_layout
 import { Route as LayoutDashboardConfigLabImport } from './routes/_layout/dashboard/config/lab'
 import { Route as LayoutDashboardConfigConsultationImport } from './routes/_layout/dashboard/config/consultation'
 import { Route as LayoutDashboardConfigBillingImport } from './routes/_layout/dashboard/config/billing'
+import { Route as LayoutDashboardConfigAntenatalImport } from './routes/_layout/dashboard/config/antenatal'
 import { Route as LayoutDashboardConfigAdmissionsImport } from './routes/_layout/dashboard/config/admissions'
 import { Route as LayoutDashboardAppointmentsPatientIdImport } from './routes/_layout/dashboard/appointments/$patientId'
 import { Route as LayoutDashboardAdmissionsPatientIdImport } from './routes/_layout/dashboard/admissions/$patientId'
@@ -194,6 +195,12 @@ const LayoutDashboardConfigBillingRoute =
     getParentRoute: () => LayoutRoute,
   } as any)
 
+const LayoutDashboardConfigAntenatalRoute =
+  LayoutDashboardConfigAntenatalImport.update({
+    path: '/dashboard/config/antenatal',
+    getParentRoute: () => LayoutRoute,
+  } as any)
+
 const LayoutDashboardConfigAdmissionsRoute =
   LayoutDashboardConfigAdmissionsImport.update({
     path: '/dashboard/config/admissions',
@@ -270,6 +277,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/config/admissions'
       fullPath: '/dashboard/config/admissions'
       preLoaderRoute: typeof LayoutDashboardConfigAdmissionsImport
+      parentRoute: typeof LayoutImport
+    }
+    '/_layout/dashboard/config/antenatal': {
+      id: '/_layout/dashboard/config/antenatal'
+      path: '/dashboard/config/antenatal'
+      fullPath: '/dashboard/config/antenatal'
+      preLoaderRoute: typeof LayoutDashboardConfigAntenatalImport
       parentRoute: typeof LayoutImport
     }
     '/_layout/dashboard/config/billing': {
@@ -425,6 +439,7 @@ export const routeTree = rootRoute.addChildren({
     LayoutDashboardAdmissionsPatientIdRoute,
     LayoutDashboardAppointmentsPatientIdRoute,
     LayoutDashboardConfigAdmissionsRoute,
+    LayoutDashboardConfigAntenatalRoute,
     LayoutDashboardConfigBillingRoute,
     LayoutDashboardConfigConsultationRoute,
     LayoutDashboardConfigLabRoute,
@@ -473,6 +488,7 @@ export const routeTree = rootRoute.addChildren({
         "/_layout/dashboard/admissions/$patientId",
         "/_layout/dashboard/appointments/$patientId",
         "/_layout/dashboard/config/admissions",
+        "/_layout/dashboard/config/antenatal",
         "/_layout/dashboard/config/billing",
         "/_layout/dashboard/config/consultation",
         "/_layout/dashboard/config/lab",
@@ -516,6 +532,10 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_layout/dashboard/config/admissions": {
       "filePath": "_layout/dashboard/config/admissions.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/dashboard/config/antenatal": {
+      "filePath": "_layout/dashboard/config/antenatal.tsx",
       "parent": "/_layout"
     },
     "/_layout/dashboard/config/billing": {

@@ -17,6 +17,7 @@ import { DataTable } from "../../../../components/table/DataTable";
 import { patient_vitals_column } from "../../../../components/table/columns/vitals";
 import { UpdatePatientForm } from "../../../../forms/PatientForm";
 import { CreatePatientVitalsForm } from "../../../../forms/config/Vitals";
+import { PatientAntenatalRequestCard } from "@/components/request/AntenatalRequest";
 
 export const Route = createFileRoute("/_layout/dashboard/patients/$patientId")({
 	component: () => (
@@ -149,7 +150,7 @@ const PatientProfileLayout = () => {
 						<PatientProcedureRequestCard patientId={patientId} />
 					</Tabs.Content>
 					<Tabs.Content value="antenatal">
-						<PatientAppointments patientId={patientId} />
+						<PatientAntenatalRequestCard patientId={patientId} />
 					</Tabs.Content>
 				</Tabs.Root>
 			</Tabs.Content>

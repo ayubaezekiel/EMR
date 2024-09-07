@@ -294,7 +294,7 @@ const SendRequest = () => {
 			<Dialog.Trigger>
 				<Button>Issue Requests</Button>
 			</Dialog.Trigger>
-			<Dialog.Content maxWidth={"50rem"}>
+			<Dialog.Content maxWidth={"60rem"}>
 				<IssueRequests patientId={patientId} />
 			</Dialog.Content>
 		</Dialog.Root>

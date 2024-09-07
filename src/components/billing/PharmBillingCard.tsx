@@ -1,16 +1,14 @@
+import { useRequestQuery } from "@/actions/queries";
 import { Badge, Callout, Card, Flex, Spinner, Text } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
 import { FileQuestion } from "lucide-react";
 import { useMemo } from "react";
 import { DeleteActionForm } from "../../actions/DeleteAction";
 import { deleteRequestAction } from "../../actions/actions";
-import { requestQueryOptions } from "@/actions/queries";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";
 
 export function PharmBillingCard() {
-	const { data: request_data, isPending: isPharmPending } =
-		useQuery(requestQueryOptions);
+	const { data: request_data, isPending: isPharmPending } = useRequestQuery();
 
 	const pharm_data_filtered = useMemo(
 		() =>

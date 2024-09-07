@@ -1,12 +1,11 @@
+import { useCashpointsQuery } from "@/actions/queries";
 import { Flex, Heading, Spinner } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
-import { cashpointsQueryOptions } from "@/actions/queries";
 import { CreateCashpointForm } from "../../forms/config/CashpointForm";
 import { DataTable } from "../table/DataTable";
 import { cashpoint_column } from "../table/columns/cash_point";
 
 export function Cashpoint() {
-	const { data, isPending } = useQuery(cashpointsQueryOptions);
+	const { data, isPending } = useCashpointsQuery();
 
 	return (
 		<div>

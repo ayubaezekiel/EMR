@@ -1,3 +1,4 @@
+import { useBranchQuery, useClinicsQuery } from "@/actions/queries";
 import {
 	Button,
 	Dialog,
@@ -7,7 +8,7 @@ import {
 	TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
@@ -16,16 +17,13 @@ import {
 	createCashpointAction,
 	updateCashpointAction,
 } from "../../actions/config/cashpoint";
-import { branchQueryOptions, clinicsQueryOptions } from "@/actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
 
 export function CreateCashpointForm() {
 	const [open, onOpenChange] = useState(false);
 
-	const { data: branch, isPending: isBranchPending } =
-		useQuery(branchQueryOptions);
-	const { data: clinics, isPending: isClinicsPending } =
-		useQuery(clinicsQueryOptions);
+	const { data: branch, isPending: isBranchPending } = useBranchQuery();
+	const { data: clinics, isPending: isClinicsPending } = useClinicsQuery();
 	const queryClient = useQueryClient();
 
 	const form = useForm({
@@ -168,10 +166,8 @@ export function UpdateCashpointForm({
 }: DB["cash_points"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 
-	const { data: branch, isPending: isBranchPending } =
-		useQuery(branchQueryOptions);
-	const { data: clinics, isPending: isClinicsPending } =
-		useQuery(clinicsQueryOptions);
+	const { data: branch, isPending: isBranchPending } = useBranchQuery();
+	const { data: clinics, isPending: isClinicsPending } = useClinicsQuery();
 	const queryClient = useQueryClient();
 
 	const form = useForm({

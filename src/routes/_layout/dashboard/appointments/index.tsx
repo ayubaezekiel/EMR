@@ -7,12 +7,11 @@ import {
 	Tabs,
 	TextField,
 } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { endOfDay, format } from "date-fns";
 import { CopyMinus, Search } from "lucide-react";
 import { useState } from "react";
-import { appointmentsTypesQueryOptions } from "../../../../actions/queries";
+import { useAppointmentsTypesQuery } from "../../../../actions/queries";
 import { AppointmentCheckedIn } from "../../../../components/appointment/AppointmentCheckedIn";
 import { AppointmentCompleted } from "../../../../components/appointment/AppointmentCompleted";
 import { AppointmentMissed } from "../../../../components/appointment/AppointmentMissed";
@@ -38,7 +37,7 @@ function AppointmentCard() {
 	});
 
 	const { data: appointment_type, isPending: isAppointmentTypePending } =
-		useQuery(appointmentsTypesQueryOptions);
+		useAppointmentsTypesQuery();
 
 	const appointment_type_data = appointment_type?.appointment_type_data;
 

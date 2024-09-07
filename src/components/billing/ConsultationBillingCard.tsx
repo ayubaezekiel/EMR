@@ -1,16 +1,14 @@
+import { useAdmissionsQuery } from "@/actions/queries";
 import { Badge, Callout, Card, Flex, Spinner, Text } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
 import { FileQuestion } from "lucide-react";
 import { useMemo } from "react";
-import { admissionsQueryOptions } from "@/actions/queries";
 import { UpdateAdmissionForm } from "../../forms/admission/AdmissionForm";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";
 
 export function ConsultationBillingCard() {
-	const { data: admission_data, isPending: isAdmissionPending } = useQuery(
-		admissionsQueryOptions,
-	);
+	const { data: admission_data, isPending: isAdmissionPending } =
+		useAdmissionsQuery();
 
 	const admission_data_filtered = useMemo(
 		() =>

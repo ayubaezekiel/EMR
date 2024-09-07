@@ -1,15 +1,14 @@
+import { useRequestQuery } from "@/actions/queries";
 import { Badge, Callout, Card, Flex, Spinner, Text } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
+import { FileQuestion } from "lucide-react";
 import { useMemo } from "react";
-import { requestQueryOptions } from "@/actions/queries";
 import { UpdateProcedureRequestForm } from "../../forms/requests/ProcedureRequestForm";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";
-import { FileQuestion } from "lucide-react";
 
 export function ProcedureBillingCard() {
 	const { data: request_data, isPending: isProcedurePending } =
-		useQuery(requestQueryOptions);
+		useRequestQuery();
 
 	const procedure_data_filtered = useMemo(
 		() =>

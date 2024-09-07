@@ -1,203 +1,211 @@
-import { useForm } from "@mantine/form";
-import { randomId } from "@mantine/hooks";
 import {
-	Button,
-	Callout,
-	Checkbox,
-	Dialog,
-	Flex,
-	IconButton,
-	Select,
-	Text,
-	TextField,
-} from "@radix-ui/themes";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertCircle, Trash } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-import { labTestQueryOptions, patientsQueryOptions } from "@/actions/queries";
-import { checkAuth } from "@/lib/utils";
+	useConsultationTemplatesQuery,
+	usePatientsQuery,
+} from "@/actions/queries";
+import { FieldInfo } from "@/components/FieldInfo";
+import { editor_plugins } from "@/components/textEditor/RichTextEditor";
+import { useAntenatalPackage } from "@/lib/hooks";
+import { getProfile } from "@/lib/utils";
 import supabase from "@/supabase/client";
+import { Button, Group, Modal, Select } from "@mantine/core";
+import { DateInput } from "@mantine/dates";
+import { useDisclosure } from "@mantine/hooks";
+import { Text } from "@radix-ui/themes";
+import { useForm } from "@tanstack/react-form";
+import { useQueryClient } from "@tanstack/react-query";
+import { zodValidator } from "@tanstack/zod-form-adapter";
+import { Editor } from "@tinymce/tinymce-react";
+import { addMonths } from "date-fns";
+import { toast } from "sonner";
+import { z } from "zod";
 
 export function CreateAntenatalRequestForm() {
-	const [isLoading, setIsLoading] = useState(false);
-	const { data: lab_test_data, isPending: isLabPending } =
-		useQuery(labTestQueryOptions);
+	const [opened, { open, close }] = useDisclosure(false);
+	const { antenatal_package_data, isAntenatalPackagePending } =
+		useAntenatalPackage();
+	const { data, isPending } = useConsultationTemplatesQuery();
+	const { data: patient_data, isPending: isPatientsPending } =
+		usePatientsQuery();
 
-	const { data: patient_data, isPending: patientsPending } =
-		useQuery(patientsQueryOptions);
-	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 
 	const form = useForm({
-		mode: "uncontrolled",
-		initialValues: {
-			services: [{ service: "", note: "", is_urgent: false, key: randomId() }],
+		defaultValues: {
+			services: {
+				package: "",
+				note: "",
+				expected_delivary_date: addMonths(new Date(), 9),
+				amount: 0,
+			},
 			patients_id: "",
+		},
+		validatorAdapter: zodValidator(),
+		onSubmit: async ({ value }) => {
+			const prof = await getProfile();
+			const { error } = await supabase.from("requests").insert({
+				patients_id: `${value.patients_id}`,
+				taken_by: `${prof?.id}`,
+				is_antenatal: true,
+				services: {
+					package: value.services.package,
+					note: value.services.note,
+					expected_delivary_date: addMonths(new Date(), 9).toISOString(),
+					amount: value.services.amount,
+				},
+			});
+			if (error) {
+				toast.error(error.message);
+				console.log(value.services);
+			} else {
+				toast.success("patient enrolled successfully");
+				form.reset();
+				queryClient.invalidateQueries({ queryKey: ["requests"] });
+				close();
+			}
 		},
 	});
 
-	const fields = form.getValues().services.map((item, index) => (
-		<Flex key={item.key} gap={"2"} mt={"4"}>
-			<div className="flex flex-col gap-1 w-full">
-				<Text size={"3"}>Test*</Text>
-				<Select.Root
-					required
-					size={"3"}
-					key={form.key(`services.${index}.service`)}
-					onValueChange={(e) =>
-						form.getInputProps(`services.${index}.service`).onChange(e)
-					}
-				>
-					<Select.Trigger placeholder="select a test..." />
-					<Select.Content position="popper">
-						{lab_test_data?.lab_test_data?.map((v) => (
-							<Select.Item
-								key={v.id}
-								value={JSON.stringify({
-									name: v.name,
-									amount: v.default_price,
-								})}
-							>
-								{v.name}
-							</Select.Item>
-						))}
-					</Select.Content>
-				</Select.Root>
-			</div>
-
-			<div className="flex flex-col gap-1">
-				<Text size={"3"}>Note*</Text>
-				<TextField.Root
-					required
-					size={"3"}
-					style={{ flex: 1 }}
-					key={form.key(`services.${index}.note`)}
-					{...form.getInputProps(`services.${index}.note`)}
-				/>
-			</div>
-			<div className="flex flex-col gap-1 w-40 items-center mt-6">
-				<Text size={"1"}>urgent?</Text>
-				<Checkbox
-					size={"3"}
-					key={form.key(`services.${index}.is_urgent`)}
-					onCheckedChange={(e) => {
-						form.getInputProps(`services.${index}.is_urgent`).onChange(e);
-					}}
-				/>
-			</div>
-			<div className="flex flex-col mt-8 items-center">
-				<IconButton
-					type="button"
-					color="red"
-					size={"1"}
-					onClick={() => form.removeListItem("services", index)}
-				>
-					<Trash size="1rem" />
-				</IconButton>
-			</div>
-		</Flex>
-	));
-
 	return (
-		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={patientsPending || isLabPending}>
-				<Button size={"4"} loading={patientsPending || isLabPending}>
-					New Request
-				</Button>
-			</Dialog.Trigger>
-
-			<Dialog.Content>
-				<Dialog.Title>Laboratory Request</Dialog.Title>
-				<Dialog.Description size="2" mb="4">
-					Fill out the form information
-				</Dialog.Description>
-
+		<>
+			<Button
+				size={"md"}
+				onClick={open}
+				loading={isPatientsPending || isPending || isAntenatalPackagePending}
+			>
+				New Request
+			</Button>
+			<Modal
+				opened={opened}
+				onClose={close}
+				title={"Antenatal Request"}
+				size={"60rem"}
+			>
 				<form
-					onSubmit={form.onSubmit(async (values) => {
-						setIsLoading(true);
-
-						const user = await checkAuth();
-						const { error } = await supabase.from("requests").insert([
-							{
-								patients_id: `${values.patients_id}`,
-								taken_by: `${user?.id}`,
-								is_lab: true,
-								services: values.services.map((v) => ({
-									service: JSON.parse(v.service),
-									note: v.note,
-									is_urgent: v.is_urgent,
-								})),
-							},
-						]);
-						if (error) {
-							toast.error(error.message);
-							setIsLoading(false);
-						} else {
-							toast.success("request issued successfully");
-							form.reset();
-							queryClient.invalidateQueries({ queryKey: ["requests"] });
-							setIsLoading(false);
-							onOpenChange(false);
-						}
-					})}
+					onSubmit={(e) => {
+						e.preventDefault();
+						e.stopPropagation();
+						form.handleSubmit();
+					}}
 				>
-					<div className="flex flex-col">
-						<Text size={"3"}>Patient*</Text>
-						<Select.Root
-							size={"3"}
-							onValueChange={(e) =>
-								form.getInputProps("patients_id").onChange(e)
-							}
-						>
-							<Select.Trigger placeholder="select patient..." />
-							<Select.Content position="popper">
-								{patient_data?.patient_data?.map((p) => (
-									<Select.Item key={p.id} value={p.id}>
-										{p.first_name} {p.middle_name} {p.last_name} - [
-										{p.id.slice(0, 8).toUpperCase()}]
-									</Select.Item>
-								))}
-							</Select.Content>
-						</Select.Root>
+					<Select
+						label="Use a template?"
+						onChange={(e) => {
+							form.setFieldValue("services.note", e!);
+						}}
+						data={
+							data?.consultation_templates_data?.map((t) => ({
+								value: t.content,
+								label: t.name,
+							})) ?? []
+						}
+					/>
+
+					<div className="grid grid-cols-3 gap-2 mt-4">
+						<form.Field
+							name="patients_id"
+							validators={{
+								onChange: z.string().min(2, { message: "required" }),
+							}}
+							children={(field) => (
+								<div className="flex flex-col">
+									<Select
+										allowDeselect={false}
+										label="Patient"
+										nothingFoundMessage="No Antenatal Package Fount"
+										required
+										name={field.name}
+										value={field.state.value}
+										onChange={(e) => field.handleChange(e!)}
+										data={patient_data?.patient_data?.map((p) => ({
+											label: `${p.first_name} ${p.middle_name ?? ""} ${p.last_name} - [${p.id.slice(0, 8).toUpperCase()}]`,
+											value: p.id,
+										}))}
+									/>
+									<FieldInfo field={field} />
+								</div>
+							)}
+						/>
+						<form.Field
+							name="services.expected_delivary_date"
+							validators={{
+								onChange: z.date(),
+							}}
+							children={(field) => (
+								<div className="flex flex-col">
+									<DateInput
+										required
+										value={field.state.value}
+										onChange={(e) => field.handleChange(e!)}
+										label="Expected Delivary Date"
+										placeholder="Select date"
+									/>
+									<FieldInfo field={field} />
+								</div>
+							)}
+						/>
+						<form.Field
+							name="services.package"
+							validators={{
+								onChange: z.string().min(2, { message: "required" }),
+							}}
+							children={(field) => (
+								<div className="flex flex-col">
+									<Select
+										allowDeselect={false}
+										label="Antenatal Package"
+										required
+										name={field.name}
+										nothingFoundMessage="No Antenatal Package Fount"
+										value={field.state.value}
+										onChange={(e) => field.handleChange(e!)}
+										data={antenatal_package_data?.map((p) => p.name)}
+									/>
+
+									<FieldInfo field={field} />
+								</div>
+							)}
+						/>
 					</div>
 
-					{fields.length < 0 && (
-						<Callout.Root color="red">
-							<Callout.Icon>
-								<AlertCircle />
-								<Callout.Text ml={"2"}>Empty</Callout.Text>
-							</Callout.Icon>
-						</Callout.Root>
-					)}
-
-					{fields}
-					<Flex justify="end" mt="4">
-						<Button
-							type="button"
-							variant="soft"
-							onClick={() =>
-								form.insertListItem("services", {
-									service: "",
-									note: "",
-									is_urgent: false,
-									key: randomId(),
-								})
-							}
-						>
-							Add more
-						</Button>
-					</Flex>
-					<Button
-						loading={isLoading}
-						disabled={!form.isValid() || isLoading}
-						size={"4"}
-						type="submit"
+					<form.Field
+						name="services.note"
+						validators={{
+							onChange: z
+								.string()
+								.min(10, { message: "must be atleast 3 characters" }),
+						}}
 					>
-						Request
-					</Button>
+						{(field) => (
+							<label htmlFor={field.name} className="flex flex-col">
+								<Text size={"3"}>Note*</Text>
+								<Editor
+									tinymceScriptSrc="/tinymce/tinymce.min.js"
+									licenseKey="gpl"
+									onChange={(e) => field.handleChange(e.target.getContent())}
+									initialValue={field.state.value}
+									init={editor_plugins}
+								/>
+								<FieldInfo field={field} />
+							</label>
+						)}
+					</form.Field>
+					<Group gap="3" mt="lg" justify="end">
+						<form.Subscribe
+							selector={(state) => [state.canSubmit, state.isSubmitting]}
+							children={([canSubmit, isSubmitting]) => (
+								<Button
+									loading={isSubmitting}
+									type="submit"
+									disabled={!canSubmit || isSubmitting}
+									size={"md"}
+								>
+									Enroll Patient
+								</Button>
+							)}
+						/>
+					</Group>
 				</form>
-			</Dialog.Content>
-		</Dialog.Root>
+			</Modal>
+		</>
 	);
 }

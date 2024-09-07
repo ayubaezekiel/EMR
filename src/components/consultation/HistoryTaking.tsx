@@ -1,3 +1,5 @@
+import { useConsultationTemplatesQuery } from "@/actions/queries";
+import { getProfile } from "@/lib/utils";
 import { Button, Modal, Select } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Flex, Spinner, Text } from "@radix-ui/themes";
@@ -13,8 +15,6 @@ import {
 	createHistoryTakingAction,
 	updateHistoryTakingAction,
 } from "../../actions/consultation/actions";
-import { consultationTemplatesQueryOptions } from "@/actions/queries";
-import { getProfile } from "@/lib/utils";
 import { FieldInfo } from "../FieldInfo";
 import { DataTable } from "../table/DataTable";
 import { history_taking_column } from "../table/columns/consultation/history_taking";
@@ -71,7 +71,7 @@ export function CreateHistoryTakingForm({
 	patientId,
 }: { isAdmission: boolean; patientId: string }) {
 	const [opened, { open, close }] = useDisclosure(false);
-	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
+	const { data, isPending } = useConsultationTemplatesQuery();
 
 	const queryClient = useQueryClient();
 
@@ -102,7 +102,7 @@ export function CreateHistoryTakingForm({
 				Add New
 			</Button>
 
-			<Modal opened={opened} onClose={close} title={"History"} size={"xl"}>
+			<Modal opened={opened} onClose={close} title={"History"} size={"60rem"}>
 				<form
 					onSubmit={(e) => {
 						e.stopPropagation();
@@ -177,7 +177,7 @@ export function UpdateHistoryTakingForm({
 	id,
 	...values
 }: DB["history_taking"]["Update"]) {
-	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
+	const { data, isPending } = useConsultationTemplatesQuery();
 	const [opened, { open, close }] = useDisclosure(false);
 
 	const queryClient = useQueryClient();
@@ -211,7 +211,7 @@ export function UpdateHistoryTakingForm({
 				opened={opened}
 				onClose={close}
 				title={"Update History"}
-				size={"xl"}
+				size={"60rem"}
 			>
 				<form
 					onSubmit={(e) => {

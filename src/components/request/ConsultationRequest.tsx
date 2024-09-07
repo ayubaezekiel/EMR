@@ -1,3 +1,5 @@
+import { useConsultationQuery } from "@/actions/queries";
+import { useRequestById } from "@/lib/hooks";
 import {
 	Badge,
 	Button,
@@ -8,18 +10,14 @@ import {
 	IconButton,
 	Spinner,
 } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { FileQuestion, Printer, X } from "lucide-react";
 import { useMemo } from "react";
-import { consultationQueryOptions } from "@/actions/queries";
-import { useRequestById } from "@/lib/hooks";
 import { PatientCardHeader } from "../PatientCardHeader";
 
 export function ConsultationRequestWaitingCard() {
-	const { data: request_data, isPending: isRequestPending } = useQuery(
-		consultationQueryOptions,
-	);
+	const { data: request_data, isPending: isRequestPending } =
+		useConsultationQuery();
 
 	const consultation_request_waiting = useMemo(
 		() => request_data?.consultation_data?.filter((a) => !a.is_completed),
@@ -89,9 +87,8 @@ export function ConsultationRequestWaitingCard() {
 }
 
 export function ConsultationRequestCompletedCard() {
-	const { data: request_data, isPending: isRequestPending } = useQuery(
-		consultationQueryOptions,
-	);
+	const { data: request_data, isPending: isRequestPending } =
+		useConsultationQuery();
 
 	const consultation_request_completed = useMemo(
 		() => request_data?.consultation_data?.filter((a) => a.is_completed),

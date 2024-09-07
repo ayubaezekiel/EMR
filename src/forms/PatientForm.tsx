@@ -7,13 +7,13 @@ import {
 	TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import { patientAction, updatePatientAction } from "../actions/patient";
-import { hmoPlansQueryOptions } from "../actions/queries";
+import { useHmoPlansQuery } from "../actions/queries";
 import { FieldInfo } from "../components/FieldInfo";
 import states from "../lib/statesAndLocalGov.json";
 import { checkAuth } from "../lib/utils";
@@ -23,7 +23,7 @@ export function PatientForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 
-	const { data, isPending } = useQuery(hmoPlansQueryOptions);
+	const { data, isPending } = useHmoPlansQuery();
 
 	const form = useForm({
 		defaultValues: {
@@ -520,7 +520,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
 	const [myStates, setMyState] = useState<string[] | undefined>([]);
 	const [open, onOpenChange] = useState(false);
 
-	const { data, isPending } = useQuery(hmoPlansQueryOptions);
+	const { data, isPending } = useHmoPlansQuery();
 	const queryClient = useQueryClient();
 
 	const form = useForm({
@@ -557,8 +557,8 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
 			<Dialog.Trigger disabled={isPending}>
-				<Button variant="ghost" color="red">
-					<Edit />
+				<Button variant="ghost">
+					<Edit size={16} />
 				</Button>
 			</Dialog.Trigger>
 

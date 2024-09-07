@@ -7,7 +7,7 @@ import {
 	TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
@@ -16,16 +16,14 @@ import {
 	createLabTestTemplateAction,
 	updateLabTestTemplateAction,
 } from "../../../actions/config/lab-test";
-import { labTestParamsQueryOptions } from "../../../actions/queries";
+import { useLabTestParamsQuery } from "../../../actions/queries";
 import { FieldInfo } from "../../../components/FieldInfo";
 
 export function CreateLabTemplateForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 
-	const { data: params, isPending: isParamPending } = useQuery(
-		labTestParamsQueryOptions,
-	);
+	const { data: params, isPending: isParamPending } = useLabTestParamsQuery();
 
 	const form = useForm({
 		defaultValues: {
@@ -138,9 +136,7 @@ export function UpdateLabTemplateForm({
 }: DB["lab_test_template"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
-	const { data: params, isPending: isParamPending } = useQuery(
-		labTestParamsQueryOptions,
-	);
+	const { data: params, isPending: isParamPending } = useLabTestParamsQuery();
 
 	const form = useForm({
 		defaultValues: {

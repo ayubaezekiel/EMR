@@ -8,7 +8,7 @@ import {
 	TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
@@ -18,22 +18,18 @@ import {
 	updateAppointmentAction,
 } from "../actions/appointment";
 import {
-	appointmentsTypesQueryOptions,
-	clinicsQueryOptions,
-	patientsQueryOptions,
+	useAppointmentsTypesQuery,
+	useClinicsQuery,
+	usePatientsQuery,
 } from "../actions/queries";
 import { FieldInfo } from "../components/FieldInfo";
 import { checkAuth } from "../lib/utils";
 
 export function CreateAppointmentForm() {
-	const { data: appointment_types, isPending } = useQuery(
-		appointmentsTypesQueryOptions,
-	);
-	const { data: clinics, isPending: isClinicsPending } =
-		useQuery(clinicsQueryOptions);
+	const { data: appointment_types, isPending } = useAppointmentsTypesQuery();
+	const { data: clinics, isPending: isClinicsPending } = useClinicsQuery();
 
-	const { data: patients, isPending: isPatientsPending } =
-		useQuery(patientsQueryOptions);
+	const { data: patients, isPending: isPatientsPending } = usePatientsQuery();
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 
@@ -282,14 +278,10 @@ export function CreateAppointmentForm() {
 export function UpdateAppointmentForm({
 	...values
 }: DB["appointments"]["Update"]) {
-	const { data: appointment_types, isPending } = useQuery(
-		appointmentsTypesQueryOptions,
-	);
-	const { data: clinics, isPending: isClinicsPending } =
-		useQuery(clinicsQueryOptions);
+	const { data: appointment_types, isPending } = useAppointmentsTypesQuery();
+	const { data: clinics, isPending: isClinicsPending } = useClinicsQuery();
 
-	const { data: patients, isPending: isPatientsPending } =
-		useQuery(patientsQueryOptions);
+	const { data: patients, isPending: isPatientsPending } = usePatientsQuery();
 
 	const queryClient = useQueryClient();
 

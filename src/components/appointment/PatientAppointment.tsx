@@ -11,6 +11,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { FileQuestion, UserCheck } from "lucide-react";
 import supabase from "@/supabase/client";
+import { format } from "date-fns";
 
 export function PatientAppointments({ patientId }: { patientId: string }) {
 	const { data: appointments, isPending: isAppointmentPending } = useQuery({
@@ -58,7 +59,7 @@ export function PatientAppointments({ patientId }: { patientId: string }) {
 									</Text>
 									.
 									<Text size={"1"}>
-										{new Date(a.created_at!).toLocaleString()}
+										{format(a.created_at!, "LLL MM yyy, HH:mm a")}
 									</Text>
 								</Flex>
 							</Flex>

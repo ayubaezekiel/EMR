@@ -1,13 +1,12 @@
 import { Flex, Heading, Spinner } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
-import { imagingCatQueryOptions } from "../../../actions/queries";
+import { useMemo } from "react";
+import { useImagingCatQuery } from "../../../actions/queries";
 import { CreateImagingCategoriesForm } from "../../../forms/config/radiology/ImagingCategoriesForm";
 import { DataTable } from "../../table/DataTable";
 import { imaging_cat_column } from "../../table/columns/radiology";
-import { useMemo } from "react";
 
 export function ImagingCategories() {
-	const { data, isPending } = useQuery(imagingCatQueryOptions);
+	const { data, isPending } = useImagingCatQuery();
 
 	const imaging_cat =
 		useMemo(

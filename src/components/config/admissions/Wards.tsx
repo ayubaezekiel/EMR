@@ -1,12 +1,11 @@
 import { Flex, Heading, Spinner } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
-import { wardsQueryOptions } from "../../../actions/queries";
+import { useWardsQuery } from "../../../actions/queries";
 import { CreateWardForm } from "../../../forms/config/admission/WardForm";
 import { DataTable } from "../../table/DataTable";
 import { wards_column } from "../../table/columns/admission/wards";
 
 export function Wards() {
-	const { data, isPending } = useQuery(wardsQueryOptions);
+	const { data, isPending } = useWardsQuery();
 
 	return (
 		<div>

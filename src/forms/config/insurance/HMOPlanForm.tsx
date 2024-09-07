@@ -7,7 +7,7 @@ import {
 	TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
@@ -17,9 +17,9 @@ import {
 	updateHMOPlanAction,
 } from "../../../actions/config/insurance";
 import {
-	branchQueryOptions,
-	hmoCompaniesQueryOptions,
-	hmoGroupsQueryOptions,
+	useBranchQuery,
+	useHmoCompaniesQuery,
+	useHmoGroupsQuery,
 } from "../../../actions/queries";
 import { FieldInfo } from "../../../components/FieldInfo";
 
@@ -27,16 +27,13 @@ export function CreateHMOPlanForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 
-	const { data: hmo_companies, isPending: isHMOCompaniesPending } = useQuery(
-		hmoCompaniesQueryOptions,
-	);
+	const { data: hmo_companies, isPending: isHMOCompaniesPending } =
+		useHmoCompaniesQuery();
 
-	const { data: branch, isPending: isBranchPending } =
-		useQuery(branchQueryOptions);
+	const { data: branch, isPending: isBranchPending } = useBranchQuery();
 
-	const { data: hmo_groups, isPending: isHMOGroupPending } = useQuery(
-		hmoGroupsQueryOptions,
-	);
+	const { data: hmo_groups, isPending: isHMOGroupPending } =
+		useHmoGroupsQuery();
 
 	const form = useForm({
 		defaultValues: {
@@ -280,16 +277,13 @@ export function UpdateHMOPlanForm({
 
 	const queryClient = useQueryClient();
 
-	const { data: hmo_companies, isPending: isHMOCompaniesPending } = useQuery(
-		hmoCompaniesQueryOptions,
-	);
+	const { data: hmo_companies, isPending: isHMOCompaniesPending } =
+		useHmoCompaniesQuery();
 
-	const { data: branch, isPending: isBranchPending } =
-		useQuery(branchQueryOptions);
+	const { data: branch, isPending: isBranchPending } = useBranchQuery();
 
-	const { data: hmo_groups, isPending: isHMOGroupPending } = useQuery(
-		hmoGroupsQueryOptions,
-	);
+	const { data: hmo_groups, isPending: isHMOGroupPending } =
+		useHmoGroupsQuery();
 
 	const form = useForm({
 		defaultValues: {

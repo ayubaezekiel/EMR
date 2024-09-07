@@ -1,3 +1,5 @@
+import { useConsultationTemplatesQuery } from "@/actions/queries";
+import { getProfile } from "@/lib/utils";
 import { Button, Modal, Select } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Flex, Spinner, Text } from "@radix-ui/themes";
@@ -13,8 +15,6 @@ import {
 	createExaminationAction,
 	updateExaminationAction,
 } from "../../actions/consultation/actions";
-import { consultationTemplatesQueryOptions } from "@/actions/queries";
-import { getProfile } from "@/lib/utils";
 import { FieldInfo } from "../FieldInfo";
 import { DataTable } from "../table/DataTable";
 import { patient_examination_column } from "../table/columns/consultation/patient_examination";
@@ -72,7 +72,7 @@ export function CreateExaminationForm({
 }: { isAdmission: boolean; patientId: string }) {
 	const [opened, { open, close }] = useDisclosure(false);
 
-	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
+	const { data, isPending } = useConsultationTemplatesQuery();
 	const queryClient = useQueryClient();
 
 	const form = useForm({
@@ -100,7 +100,12 @@ export function CreateExaminationForm({
 				Add New
 			</Button>
 
-			<Modal opened={opened} onClose={close} title={"Examination"} size={"xl"}>
+			<Modal
+				opened={opened}
+				onClose={close}
+				title={"Examination"}
+				size={"60rem"}
+			>
 				<form
 					onSubmit={(e) => {
 						e.stopPropagation();
@@ -175,7 +180,7 @@ export function UpdateExaminationForm({
 	id,
 	...values
 }: DB["patient_examination"]["Update"]) {
-	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
+	const { data, isPending } = useConsultationTemplatesQuery();
 	const [opened, { open, close }] = useDisclosure(false);
 
 	const queryClient = useQueryClient();
@@ -209,7 +214,7 @@ export function UpdateExaminationForm({
 				opened={opened}
 				onClose={close}
 				title={"Update Examination"}
-				size={"xl"}
+				size={"60rem"}
 			>
 				<form
 					onSubmit={(e) => {

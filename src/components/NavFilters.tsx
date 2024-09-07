@@ -1,3 +1,4 @@
+import { usePatientsQuery } from "@/actions/queries";
 import {
 	Box,
 	Callout,
@@ -8,17 +9,15 @@ import {
 	Spinner,
 	TextField,
 } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { AlertCircle, Search } from "lucide-react";
 import { useState } from "react";
-import { patientsQueryOptions } from "../actions/queries";
 
 export function NavPatientFilters() {
 	const [patient, setPatient] = useState({ match: "", startLoading: false });
 	const [open, onOpenChange] = useState(false);
 
-	const { data, isPending } = useQuery(patientsQueryOptions);
+	const { data, isPending } = usePatientsQuery();
 
 	const filtered_patients = data?.patient_data?.filter(
 		(p) =>

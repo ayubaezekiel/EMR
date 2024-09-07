@@ -9,27 +9,27 @@ import {
 	Flex,
 	IconButton,
 	Spinner,
+	Text,
 } from "@radix-ui/themes";
+import { format } from "date-fns";
 import { Eye, FileQuestion, Printer, X } from "lucide-react";
 import { useMemo } from "react";
 import { changeRequestStatus } from "../../actions/actions";
 import { ConfirmRequestStatusUpdate } from "../../forms/requests/ConfirmRequestStatusUpdate";
 import { PatientCardHeader } from "../PatientCardHeader";
 
-export function ConsumableRequestWaitingCard() {
+export function AntenatalRequestWaitingCard() {
 	const { data: request_data, isPending: isRequestPending } = useRequestQuery();
 
-	const pharm_request_waiting = useMemo(
+	const antenatal_request_waiting = useMemo(
 		() =>
-			request_data?.request_data?.filter(
-				(a) => a.is_waiting && a.is_consumable,
-			),
+			request_data?.request_data?.filter((a) => a.is_waiting && a.is_antenatal),
 		[request_data?.request_data],
 	);
 
 	return isRequestPending ? (
 		<Spinner />
-	) : pharm_request_waiting?.length === 0 ? (
+	) : antenatal_request_waiting?.length === 0 ? (
 		<Flex justify={"center"}>
 			<Callout.Root mt={"9"}>
 				<Callout.Icon>
@@ -40,7 +40,7 @@ export function ConsumableRequestWaitingCard() {
 		</Flex>
 	) : (
 		<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
-			{pharm_request_waiting?.map((a) => (
+			{antenatal_request_waiting?.map((a) => (
 				<Card key={a.id}>
 					<PatientCardHeader
 						createdAt={a.created_at}
@@ -49,21 +49,24 @@ export function ConsumableRequestWaitingCard() {
 						patientId={a.patients_id}
 						middleName={a.patients?.middle_name as string}
 					/>
-					<Flex direction={"column"} mt={"4"} height={"100px"}>
-						<div className="flex flex-wrap gap-2 mt-4">
-							{JSON.parse(JSON.stringify(a.services)).map(
-								(d: { note: string; consumable: { name: string } }) => (
-									<Badge key={d.note}>{d.consumable.name}</Badge>
-								),
-							)}
-						</div>
+					<Flex direction={"row"} justify={"between"} mt={"4"} height={"100px"}>
+						<Badge>{JSON.parse(JSON.stringify(a.services)).package}</Badge>
+						<Badge>
+							Expected Delivary Date:{" "}
+							<Text color="red">
+								{format(
+									JSON.parse(JSON.stringify(a.services)).expected_delivary_date,
+									"LLLL dd, yyyy",
+								)}
+							</Text>
+						</Badge>
 					</Flex>
 					<Flex justify={"between"} mt={"4"}>
 						<ConfirmRequestStatusUpdate
 							inValidate="requests"
 							id={a.id}
-							title="Move To Waiting?"
-							triggleLabel="Waiting"
+							title="Move To Active?"
+							triggleLabel="Active"
 							disabled={a.is_waiting!}
 							warning="Are you sure you want to move this request to waiting?"
 							actionFn={async () => {
@@ -80,7 +83,7 @@ export function ConsumableRequestWaitingCard() {
 							title="Mark As Completed?"
 							triggleLabel="Complete"
 							disabled={a.is_completed!}
-							warning="Are you sure you want to mark this consumable request as completed?"
+							warning="Are you sure you want to mark this antenatal request as completed?"
 							actionFn={async () => {
 								await changeRequestStatus({
 									id: a.id,
@@ -104,14 +107,13 @@ export function ConsumableRequestWaitingCard() {
 										</IconButton>
 									</Dialog.Close>
 								</div>
-								{JSON.parse(JSON.stringify(a.services)).map(
-									(d: { note: string; consumable: { name: string } }) => (
-										<Card my={"4"} key={d.note}>
-											<Badge mb={"2"}>{d.consumable.name}</Badge>{" "}
-											<Card>{d.note}</Card>
-										</Card>
-									),
-								)}
+								<Card my={"4"}>
+									<div
+										dangerouslySetInnerHTML={{
+											__html: JSON.parse(JSON.stringify(a.services)).note,
+										}}
+									/>
+								</Card>
 							</Dialog.Content>
 						</Dialog.Root>
 						<ProcessLabRequest {...a} />
@@ -122,20 +124,20 @@ export function ConsumableRequestWaitingCard() {
 	);
 }
 
-export function ConsumableRequestCompletedCard() {
+export function AntenatalRequestCompletedCard() {
 	const { data: request_data, isPending: isRequestPending } = useRequestQuery();
 
-	const consumable_request_completed = useMemo(
+	const antenatal_request_completed = useMemo(
 		() =>
 			request_data?.request_data?.filter(
-				(a) => a.is_completed && a.is_consumable,
+				(a) => a.is_completed && a.is_antenatal,
 			),
 		[request_data?.request_data],
 	);
 
 	return isRequestPending ? (
 		<Spinner />
-	) : consumable_request_completed?.length === 0 ? (
+	) : antenatal_request_completed?.length === 0 ? (
 		<Flex justify={"center"}>
 			<Callout.Root mt={"9"}>
 				<Callout.Icon>
@@ -146,7 +148,7 @@ export function ConsumableRequestCompletedCard() {
 		</Flex>
 	) : (
 		<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
-			{consumable_request_completed?.map((a) => (
+			{antenatal_request_completed?.map((a) => (
 				<Card key={a.id}>
 					<PatientCardHeader
 						createdAt={a.created_at}
@@ -155,21 +157,24 @@ export function ConsumableRequestCompletedCard() {
 						patientId={a.patients_id}
 						middleName={a.patients?.middle_name as string}
 					/>
-					<Flex direction={"column"} mt={"4"} height={"100px"}>
-						<div className="flex flex-wrap gap-2 mt-4">
-							{JSON.parse(JSON.stringify(a.services)).map(
-								(d: { test: string; note: string }) => (
-									<Badge key={d.note}>{d.test}</Badge>
-								),
-							)}
-						</div>
+					<Flex direction={"row"} justify={"between"} mt={"4"} height={"100px"}>
+						<Badge>{JSON.parse(JSON.stringify(a.services)).package}</Badge>
+						<Badge>
+							Expected Delivary Date:{" "}
+							<Text color="red">
+								{format(
+									JSON.parse(JSON.stringify(a.services)).expected_delivary_date,
+									"LLLL dd, yyyy",
+								)}
+							</Text>
+						</Badge>
 					</Flex>
 					<Flex justify={"between"} mt={"4"}>
 						<ConfirmRequestStatusUpdate
 							inValidate="requests"
 							id={a.id}
-							title="Move To Waiting?"
-							triggleLabel="Waiting"
+							title="Move To Active?"
+							triggleLabel="Active"
 							disabled={true}
 							warning="Are you sure you want to move this request to waiting?"
 							actionFn={async () => {
@@ -186,7 +191,7 @@ export function ConsumableRequestCompletedCard() {
 							title="Mark As Completed?"
 							triggleLabel="Complete"
 							disabled={a.is_completed!}
-							warning="Are you sure you want to mark this consumable request as completed?"
+							warning="Are you sure you want to mark this antenatal request as completed?"
 							actionFn={async () => {
 								await changeRequestStatus({
 									id: a.id,
@@ -210,13 +215,13 @@ export function ConsumableRequestCompletedCard() {
 										</IconButton>
 									</Dialog.Close>
 								</div>
-								{JSON.parse(JSON.stringify(a.services)).map(
-									(d: { test: string; note: string }) => (
-										<Card my={"4"} key={d.note}>
-											{d.note}
-										</Card>
-									),
-								)}
+								<Card my={"4"}>
+									<div
+										dangerouslySetInnerHTML={{
+											__html: JSON.parse(JSON.stringify(a.services)).note,
+										}}
+									/>
+								</Card>
 							</Dialog.Content>
 						</Dialog.Root>
 						<ProcessLabRequest {...a} />
@@ -248,19 +253,19 @@ const ProcessLabRequest = (data: DB["requests"]["Row"]) => {
 	);
 };
 
-export function PatientConsumableRequestCard({
+export function PatientAntenatalRequestCard({
 	patientId,
 }: { patientId: string }) {
 	const { request_data, isRequestPending } = useRequestById({ patientId });
 
-	const consumable_data_filtered = useMemo(
-		() => request_data?.filter((a) => a.is_consumable),
+	const antenatal_data_filtered = useMemo(
+		() => request_data?.filter((a) => a.is_antenatal),
 		[request_data],
 	);
 
 	return isRequestPending ? (
 		<Spinner />
-	) : consumable_data_filtered?.length === 0 ? (
+	) : antenatal_data_filtered?.length === 0 ? (
 		<Flex justify={"center"}>
 			<Callout.Root mt={"9"}>
 				<Callout.Icon>
@@ -271,7 +276,7 @@ export function PatientConsumableRequestCard({
 		</Flex>
 	) : (
 		<div className="w-full">
-			{consumable_data_filtered?.length === 0 ? (
+			{antenatal_data_filtered?.length === 0 ? (
 				<Flex justify={"center"}>
 					<Callout.Root mt={"9"}>
 						<Callout.Icon>
@@ -282,7 +287,7 @@ export function PatientConsumableRequestCard({
 				</Flex>
 			) : (
 				<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
-					{consumable_data_filtered?.map((a) => (
+					{antenatal_data_filtered?.map((a) => (
 						<Card key={a.id}>
 							<Flex justify={"between"}>
 								<PatientCardHeader
@@ -293,17 +298,31 @@ export function PatientConsumableRequestCard({
 									middleName={a.patients?.middle_name as string}
 								/>
 							</Flex>
-							<Flex direction={"column"} mt={"4"} height={"100px"}>
-								<div className="flex flex-wrap gap-2 mt-4">
-									{JSON.parse(JSON.stringify(a.services)).map(
-										(d: {
-											note: string;
-											consumable: { name: string; amount: string };
-										}) => (
-											<Badge key={d.note}>{d.consumable.name}</Badge>
-										),
-									)}
-								</div>
+							<Flex
+								direction={"row"}
+								justify={"between"}
+								mt={"4"}
+								height={"100px"}
+							>
+								<Badge>
+									{JSON.parse(JSON.stringify(a.services)).package}
+									<Text color="red">
+										N
+										{new Intl.NumberFormat().format(
+											Number(JSON.parse(JSON.stringify(a.services)).amount),
+										)}{" "}
+									</Text>
+								</Badge>
+								<Badge>
+									Expected Delivary Date:{" "}
+									<Text color="red">
+										{format(
+											JSON.parse(JSON.stringify(a.services))
+												.expected_delivary_date,
+											"LLLL dd, yyyy",
+										)}
+									</Text>
+								</Badge>
 							</Flex>
 							<div className="flex gap-2">
 								{!a.is_waiting && !a.is_completed && (
@@ -341,22 +360,13 @@ export function PatientConsumableRequestCard({
 												</IconButton>
 											</Dialog.Close>
 										</div>
-										{JSON.parse(JSON.stringify(a.services)).map(
-											(d: {
-												note: string;
-												quantity: string;
-												consumable: { name: string; amount: string };
-											}) => (
-												<Card my={"4"} key={d.note}>
-													<Flex gap={"2"}>
-														<Badge>{d.consumable.name}</Badge>
-														<Badge>Qauntity: {d.quantity}</Badge>
-													</Flex>
-
-													<Card mt={"2"}>{d.note}</Card>
-												</Card>
-											),
-										)}
+										<Card my={"4"}>
+											<div
+												dangerouslySetInnerHTML={{
+													__html: JSON.parse(JSON.stringify(a.services)).note,
+												}}
+											/>
+										</Card>
 
 										<Flex justify={"end"}>
 											<Button>

@@ -1,8 +1,10 @@
+import { useConsultationTemplatesQuery } from "@/actions/queries";
+import { useProfile } from "@/lib/hooks";
 import { Button, Modal, Select } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Flex, Spinner, Text } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Editor } from "@tinymce/tinymce-react";
 import { Edit } from "lucide-react";
@@ -11,10 +13,8 @@ import {
 	createAdmissionReportsAction,
 	updateAdmissionReportsAction,
 } from "../../actions/config/admission";
-import { consultationTemplatesQueryOptions } from "@/actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
 import { editor_plugins } from "../../components/textEditor/RichTextEditor";
-import { useProfile } from "@/lib/hooks";
 
 export function RecordsAndTaskForm({
 	patientId,
@@ -28,7 +28,7 @@ export function RecordsAndTaskForm({
 	isProgressNote: boolean;
 }) {
 	const queryClient = useQueryClient();
-	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
+	const { data, isPending } = useConsultationTemplatesQuery();
 	const { isProfilePending, profile_data } = useProfile();
 	const [opened, { open, close }] = useDisclosure(false);
 
@@ -52,10 +52,14 @@ export function RecordsAndTaskForm({
 
 	return (
 		<>
-			<Button size={"md"} onClick={open} loading={isProfilePending}>
+			<Button
+				size={"md"}
+				onClick={open}
+				loading={isProfilePending || isPending}
+			>
 				{btnLable}
 			</Button>
-			<Modal opened={opened} onClose={close} title={dialogTitle} size={"xl"}>
+			<Modal opened={opened} onClose={close} title={dialogTitle} size={"60rem"}>
 				<form
 					onSubmit={(e) => {
 						e.stopPropagation();
@@ -64,22 +68,18 @@ export function RecordsAndTaskForm({
 					}}
 				>
 					<div className="flex flex-col gap-1 w-96">
-						{isPending ? (
-							<Spinner />
-						) : (
-							<Select
-								label="Use a template?"
-								onChange={(e) => {
-									form.setFieldValue("note", e!);
-								}}
-								data={
-									data?.consultation_templates_data?.map((t) => ({
-										value: t.content,
-										label: t.name,
-									})) ?? []
-								}
-							/>
-						)}
+						<Select
+							label="Use a template?"
+							onChange={(e) => {
+								form.setFieldValue("note", e!);
+							}}
+							data={
+								data?.consultation_templates_data?.map((t) => ({
+									value: t.content,
+									label: t.name,
+								})) ?? []
+							}
+						/>
 					</div>
 					<form.Field
 						name="note"
@@ -132,7 +132,7 @@ export function UpdateRecordsAndTaskForm(
 	const [opened, { open, close }] = useDisclosure(false);
 
 	const queryClient = useQueryClient();
-	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
+	const { data, isPending } = useConsultationTemplatesQuery();
 	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
@@ -166,7 +166,7 @@ export function UpdateRecordsAndTaskForm(
 				opened={opened}
 				onClose={close}
 				title={"Update Nursing Report"}
-				size={"xl"}
+				size={"60rem"}
 			>
 				<form
 					onSubmit={(e) => {

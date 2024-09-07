@@ -1,19 +1,18 @@
+import { useAdmissionsQuery } from "@/actions/queries";
 import { Button, Dialog, Flex, Select, Text, TextArea } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { useState } from "react";
 import { z } from "zod";
 import { createConsultationAction } from "../../actions/config/admission";
-import { admissionsQueryOptions } from "@/actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
 
 export function CreateConsultationRequestForm() {
 	const [open, onOpenChange] = useState(false);
 
-	const { data: admission_data, isPending: isAdmissionPending } = useQuery(
-		admissionsQueryOptions,
-	);
+	const { data: admission_data, isPending: isAdmissionPending } =
+		useAdmissionsQuery();
 
 	const queryClient = useQueryClient();
 

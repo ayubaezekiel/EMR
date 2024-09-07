@@ -1,3 +1,5 @@
+import { useConsultationTemplatesQuery } from "@/actions/queries";
+import { getProfile } from "@/lib/utils";
 import { Button, Modal, Select } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Flex, Spinner, Text } from "@radix-ui/themes";
@@ -13,8 +15,6 @@ import {
 	createPlanAction,
 	updatePlanAction,
 } from "../../actions/consultation/actions";
-import { consultationTemplatesQueryOptions } from "@/actions/queries";
-import { getProfile } from "@/lib/utils";
 import { FieldInfo } from "../FieldInfo";
 import { DataTable } from "../table/DataTable";
 import { treatment_plan_column } from "../table/columns/consultation/plan";
@@ -71,7 +71,7 @@ export function CreateTreatmentPlanForm({
 	patientId,
 }: { isAdmission: boolean; patientId: string }) {
 	const [opened, { close, open }] = useDisclosure(false);
-	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
+	const { data, isPending } = useConsultationTemplatesQuery();
 
 	const queryClient = useQueryClient();
 
@@ -106,7 +106,7 @@ export function CreateTreatmentPlanForm({
 				opened={opened}
 				onClose={close}
 				title={"Treatment Plan"}
-				size={"xl"}
+				size={"60rem"}
 			>
 				<form
 					onSubmit={(e) => {
@@ -181,7 +181,7 @@ export function CreateTreatmentPlanForm({
 export function UpdateTreatmentPlanForm({
 	...values
 }: DB["treatment_plan"]["Update"]) {
-	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
+	const { data, isPending } = useConsultationTemplatesQuery();
 	const [opened, { close, open }] = useDisclosure(false);
 	const queryClient = useQueryClient();
 
@@ -212,7 +212,7 @@ export function UpdateTreatmentPlanForm({
 				opened={opened}
 				onClose={close}
 				title={"Update Treatment Plan"}
-				size={"xl"}
+				size={"60rem"}
 			>
 				<form
 					onSubmit={(e) => {

@@ -1,14 +1,13 @@
+import { useDrugOrGenericBrandQuery } from "@/actions/queries";
 import { Callout, Flex, Heading, Spinner } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
-import { drugOrGenericBrandQueryOptions } from "@/actions/queries";
 import { CreateBrandForm } from "../../forms/config/DrugOrGenericBrand";
 
+import { FileQuestion } from "lucide-react";
 import { drug_or_generic_brand_column } from "../table/columns/drug_or_generic";
 import { DataTable } from "../table/DataTable";
-import { FileQuestion } from "lucide-react";
 
 export function DrugOrGenericBrand() {
-	const { data, isPending } = useQuery(drugOrGenericBrandQueryOptions);
+	const { data, isPending } = useDrugOrGenericBrandQuery();
 
 	return (
 		<div>

@@ -1,3 +1,5 @@
+import { useRequestQuery } from "@/actions/queries";
+import { useRequestById } from "@/lib/hooks";
 import {
 	Badge,
 	Button,
@@ -8,18 +10,14 @@ import {
 	IconButton,
 	Spinner,
 } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
 import { Eye, FileQuestion, Printer, X } from "lucide-react";
 import { useMemo } from "react";
 import { changeRequestStatus } from "../../actions/actions";
-import { requestQueryOptions } from "@/actions/queries";
 import { ConfirmRequestStatusUpdate } from "../../forms/requests/ConfirmRequestStatusUpdate";
-import { useRequestById } from "@/lib/hooks";
 import { PatientCardHeader } from "../PatientCardHeader";
 
 export function LabRequestWaitingCard() {
-	const { data: request_data, isPending: isRequestPending } =
-		useQuery(requestQueryOptions);
+	const { data: request_data, isPending: isRequestPending } = useRequestQuery();
 
 	const lab_request_waiting = useMemo(
 		() => request_data?.request_data?.filter((a) => a.is_waiting && a.is_lab),
@@ -123,8 +121,7 @@ export function LabRequestWaitingCard() {
 }
 
 export function LabRequestCompletedCard() {
-	const { data: request_data, isPending: isRequestPending } =
-		useQuery(requestQueryOptions);
+	const { data: request_data, isPending: isRequestPending } = useRequestQuery();
 
 	const lab_request_completed = useMemo(
 		() => request_data?.request_data?.filter((a) => a.is_completed && a.is_lab),

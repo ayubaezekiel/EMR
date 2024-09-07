@@ -1,3 +1,4 @@
+import { useAppointmentsQuery } from "@/actions/queries";
 import {
 	Avatar,
 	Badge,
@@ -9,14 +10,14 @@ import {
 	Strong,
 	Text,
 } from "@radix-ui/themes";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { FileQuestion, UserCheck } from "lucide-react";
 import { useMemo } from "react";
 import { changeAppointmentStatus } from "../../actions/actions";
-import { appointmentsQueryOptions } from "@/actions/queries";
 import { CreatePatientVitalsForm } from "../../forms/config/Vitals";
 import { ConfirmAppointmentUpdate } from "./ConfirmAppointmentUpdate";
+import { format } from "date-fns";
 
 export function AppointmentWaiting({
 	type,
@@ -31,9 +32,8 @@ export function AppointmentWaiting({
 }) {
 	const queryClient = useQueryClient();
 
-	const { data: appointments, isPending: isAppointmentPending } = useQuery(
-		appointmentsQueryOptions,
-	);
+	const { data: appointments, isPending: isAppointmentPending } =
+		useAppointmentsQuery();
 
 	const appointment_data_waiting = useMemo(
 		() =>
@@ -108,7 +108,7 @@ export function AppointmentWaiting({
 									</Text>
 									.
 									<Text size={"1"}>
-										{new Date(a.created_at!).toLocaleString()}
+										{format(a.created_at!, "LLL MM yyy, HH:mm a")}
 									</Text>
 								</Flex>
 							</Flex>

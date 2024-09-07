@@ -1,3 +1,10 @@
+import {
+	useBranchQuery,
+	useDepartmentsQuery,
+	useJobPositionsQuery,
+} from "@/actions/queries";
+import { usePerms } from "@/lib/hooks";
+import supabase from "@/supabase/client";
 import { Button, Flex, Select, Text, TextField } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -6,14 +13,7 @@ import { zodValidator } from "@tanstack/zod-form-adapter";
 import { toast } from "sonner";
 import { z } from "zod";
 import { updateProfileAction } from "../../actions/config/user-profile";
-import {
-	branchQueryOptions,
-	departmentsQueryOptions,
-	jobPositionsQueryOptions,
-} from "@/actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
-import { usePerms } from "@/lib/hooks";
-import supabase from "@/supabase/client";
 
 export function UpdateProfileForm() {
 	const queryClient = useQueryClient();
@@ -21,16 +21,12 @@ export function UpdateProfileForm() {
 
 	const { isPermPending, perm_data } = usePerms();
 
-	const { data: branch_data, isPending: isBranchPending } =
-		useQuery(branchQueryOptions);
+	const { data: branch_data, isPending: isBranchPending } = useBranchQuery();
 
-	const { data: dept_data, isPending: isDeptPending } = useQuery(
-		departmentsQueryOptions,
-	);
+	const { data: dept_data, isPending: isDeptPending } = useDepartmentsQuery();
 
-	const { data: job_pos_data, isPending: isJobPosPending } = useQuery(
-		jobPositionsQueryOptions,
-	);
+	const { data: job_pos_data, isPending: isJobPosPending } =
+		useJobPositionsQuery();
 
 	const { data: profile_data, isPending: isProfilePending } = useQuery({
 		queryKey: ["profile"],

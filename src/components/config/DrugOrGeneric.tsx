@@ -1,13 +1,12 @@
+import { useDrugOrGenericQuery } from "@/actions/queries";
 import { Flex, Heading, Spinner } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
-import { drugOrGenericQueryOptions } from "@/actions/queries";
+import { useMemo } from "react";
 import { CreateDrugOrGeneric } from "../../forms/config/DrugOrGenericForm";
 import { DataTable } from "../table/DataTable";
 import { drug_or_generic_column } from "../table/columns/drug_or_generic";
-import { useMemo } from "react";
 
 export function DrugOrGeneric() {
-	const { data, isPending } = useQuery(drugOrGenericQueryOptions);
+	const { data, isPending } = useDrugOrGenericQuery();
 
 	const drug_or_generic_data =
 		useMemo(

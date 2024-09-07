@@ -8,27 +8,27 @@ import {
 	TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 
+import { useDrugOrGenericBrandQuery } from "@/actions/queries";
+import { useQuantityType } from "@/lib/hooks";
+import { getProfile } from "@/lib/utils";
 import {
 	createDrugOrGenericAction,
 	updateDrugOrGenericAction,
 } from "../../actions/config/drug-or-generic";
-import { drugOrGenericBrandQueryOptions } from "@/actions/queries";
 import { FieldInfo } from "../../components/FieldInfo";
-import { getProfile } from "@/lib/utils";
-import { useQuantityType } from "@/lib/hooks";
 
 export function CreateDrugOrGeneric() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 	const { isQuantityTypePending, quantity_type_data } = useQuantityType();
 
-	const { data, isPending } = useQuery(drugOrGenericBrandQueryOptions);
+	const { data, isPending } = useDrugOrGenericBrandQuery();
 
 	const form = useForm({
 		defaultValues: {
@@ -262,7 +262,7 @@ export function UpdateDrugOrGeneric({
 	const queryClient = useQueryClient();
 	const { isQuantityTypePending, quantity_type_data } = useQuantityType();
 
-	const { data, isPending } = useQuery(drugOrGenericBrandQueryOptions);
+	const { data, isPending } = useDrugOrGenericBrandQuery();
 
 	const form = useForm({
 		defaultValues: {

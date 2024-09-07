@@ -1,3 +1,4 @@
+import { useCashpointsQuery, usePaymentMethodsQuery } from "@/actions/queries";
 import {
 	Button,
 	Dialog,
@@ -8,15 +9,11 @@ import {
 	TextField,
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import {
-	cashpointsQueryOptions,
-	paymentMethodsQueryOptions,
-} from "../actions/queries";
 import { getProfile } from "../lib/utils";
 import supabase from "../supabase/client";
 import { FieldInfo } from "./FieldInfo";
@@ -46,10 +43,9 @@ export const ApprovePayments = ({
 	admissionId,
 }: PaymentActionType) => {
 	const { isPending: isPaymentMethodPending, data: payment_method_data } =
-		useQuery(paymentMethodsQueryOptions);
-	const { isPending: isCashpointPending, data: cashpoint_data } = useQuery(
-		cashpointsQueryOptions,
-	);
+		usePaymentMethodsQuery();
+	const { isPending: isCashpointPending, data: cashpoint_data } =
+		useCashpointsQuery();
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 
@@ -87,11 +83,12 @@ export const ApprovePayments = ({
 					queryClient.invalidateQueries({
 						queryKey: ["appointments"],
 					});
-					if (is_request) {
-						queryClient.invalidateQueries({
-							queryKey: ["requests"],
-						});
-					}
+				}
+
+				if (is_request) {
+					queryClient.invalidateQueries({
+						queryKey: ["requests"],
+					});
 				}
 				if (isAdmission) {
 					queryClient.invalidateQueries({ queryKey: ["admissions"] });

@@ -1,10 +1,9 @@
 import { Heading, Spinner } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { patientsQueryOptions } from "../../../../actions/queries";
+import { useMemo } from "react";
+import { usePatientsQuery } from "../../../../actions/queries";
 import { DataTable } from "../../../../components/table/DataTable";
 import { patients } from "../../../../components/table/columns/patients";
-import { useMemo } from "react";
 
 export const Route = createFileRoute("/_layout/dashboard/patients/")({
 	component: () => (
@@ -16,7 +15,7 @@ export const Route = createFileRoute("/_layout/dashboard/patients/")({
 });
 
 const PatientTable = () => {
-	const { data, isPending } = useQuery(patientsQueryOptions);
+	const { data, isPending } = usePatientsQuery();
 
 	const patient_data =
 		useMemo(

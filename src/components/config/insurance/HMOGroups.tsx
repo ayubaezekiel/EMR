@@ -1,12 +1,11 @@
 import { Flex, Heading, Spinner } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
-import { hmoGroupsQueryOptions } from "../../../actions/queries";
+import { useHmoGroupsQuery } from "../../../actions/queries";
 import { CreateHMOGroupForm } from "../../../forms/config/insurance/HMOGroup";
 import { DataTable } from "../../table/DataTable";
 import { hmo_groups_column } from "../../table/columns/insurance/HMO_groups";
 
 export function HMOGroups() {
-	const { data, isPending } = useQuery(hmoGroupsQueryOptions);
+	const { data, isPending } = useHmoGroupsQuery();
 
 	return (
 		<div>

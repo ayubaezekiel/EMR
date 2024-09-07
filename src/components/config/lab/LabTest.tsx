@@ -1,13 +1,12 @@
 import { Flex, Heading, Spinner } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
-import { labTestQueryOptions } from "../../../actions/queries";
+import { useMemo } from "react";
+import { useLabTestQuery } from "../../../actions/queries";
 import { CreateLabTestForm } from "../../../forms/config/lab/LabTestForm";
 import { DataTable } from "../../table/DataTable";
 import { lab_test_column } from "../../table/columns/lab_test";
-import { useMemo } from "react";
 
 export function LabTests() {
-	const { data, isPending } = useQuery(labTestQueryOptions);
+	const { data, isPending } = useLabTestQuery();
 
 	const lab_test =
 		useMemo(

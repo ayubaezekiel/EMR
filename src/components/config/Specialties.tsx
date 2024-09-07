@@ -1,12 +1,11 @@
+import { useSpecialtiesQuery } from "@/actions/queries";
 import { Flex, Heading, Spinner } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
-import { specialtiesQueryOptions } from "@/actions/queries";
 import { CreateSpecialtiesForm } from "../../forms/config/SpecialtiesForm";
 import { DataTable } from "../table/DataTable";
 import { specialties_column } from "../table/columns/specialties";
 
 export function Specialties() {
-	const { data, isPending } = useQuery(specialtiesQueryOptions);
+	const { data, isPending } = useSpecialtiesQuery();
 
 	return (
 		<div>

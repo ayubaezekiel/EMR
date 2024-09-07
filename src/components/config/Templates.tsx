@@ -1,12 +1,11 @@
+import { useConsultationTemplatesQuery } from "@/actions/queries";
 import { Flex, Heading, Spinner } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
-import { consultationTemplatesQueryOptions } from "@/actions/queries";
 import { CreateConsultationTemplateForm } from "../../forms/config/TemplatesForm";
 import { DataTable } from "../table/DataTable";
 import { consultation_templates_column } from "../table/columns/templates";
 
 export function ConsultationTemplates() {
-	const { data, isPending } = useQuery(consultationTemplatesQueryOptions);
+	const { data, isPending } = useConsultationTemplatesQuery();
 
 	return (
 		<div>

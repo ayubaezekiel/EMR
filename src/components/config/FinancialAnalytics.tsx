@@ -53,6 +53,7 @@ export function FinancialAnalytics() {
 		to: new Date(),
 	});
 
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const data =
 		useMemo(() => {
 			return billing_data
@@ -140,11 +141,27 @@ export function FinancialAnalytics() {
 		}
 	};
 
+	const total_revenue = useMemo(
+		() =>
+			data
+				.map((r) => Number(r.amount))
+				.reduce((formal, current) => Number(formal) + Number(current), 0),
+		[data],
+	);
+
 	return isBillingPending ? (
 		<Spinner />
 	) : (
 		<div className="container flex flex-col gap-4 mx-auto p-4 space-y-4">
-			<h1 className="text-2xl font-bold">Financial Analytics</h1>
+			<div className="flex items-center justify-between font-bold">
+				<h1 className="text-2xl font-bold">Financial Analytics</h1>
+				<div className="flex flex-col text-xl">
+					<span className="underline">Total Revenue Filtered</span>
+					<span className="font-bold text-[var(--accent-10)]">
+						N{new Intl.NumberFormat().format(total_revenue)}
+					</span>
+				</div>
+			</div>
 
 			<div className="h-[400px]">
 				<Analytics

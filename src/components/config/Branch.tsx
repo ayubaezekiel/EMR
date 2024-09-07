@@ -1,3 +1,4 @@
+import { useBranchQuery } from "@/actions/queries";
 import {
 	Callout,
 	Card,
@@ -6,18 +7,16 @@ import {
 	Heading,
 	Spinner,
 } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
+import { FileQuestion } from "lucide-react";
 import { DeleteActionForm } from "../../actions/DeleteAction";
 import { deleteBranchAction } from "../../actions/config/branch";
-import { branchQueryOptions } from "@/actions/queries";
 import {
 	CreateBranchForm,
 	UpdateBranchForm,
 } from "../../forms/config/BranchForm";
-import { FileQuestion } from "lucide-react";
 
 export function Branch() {
-	const { data, isPending } = useQuery(branchQueryOptions);
+	const { data, isPending } = useBranchQuery();
 
 	return (
 		<Card>

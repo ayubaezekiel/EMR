@@ -1,12 +1,11 @@
+import { useClinicsQuery } from "@/actions/queries";
 import { Flex, Heading, Spinner } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
-import { clinicsQueryOptions } from "@/actions/queries";
 import { CreateClinicsForm } from "../../forms/config/ClinicsForm";
 import { clinic_column } from "../table/columns/clinics";
 import { DataTable } from "../table/DataTable";
 
 export function Clinics() {
-	const { data, isPending } = useQuery(clinicsQueryOptions);
+	const { data, isPending } = useClinicsQuery();
 
 	return (
 		<div>

@@ -1,13 +1,12 @@
 import { Flex, Heading, Spinner } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { hmoPlansQueryOptions } from "../../../actions/queries";
+import { useHmoPlansQuery } from "../../../actions/queries";
 import { CreateHMOPlanForm } from "../../../forms/config/insurance/HMOPlanForm";
 import { DataTable } from "../../table/DataTable";
 import { hmo_plans_column } from "../../table/columns/insurance/HMO_plans";
 
 export function HMOPlans() {
-	const { data, isPending } = useQuery(hmoPlansQueryOptions);
+	const { data, isPending } = useHmoPlansQuery();
 
 	const all_hmo_pans =
 		useMemo(

@@ -1,3 +1,4 @@
+import { useAppointmentsQuery } from "@/actions/queries";
 import {
 	Badge,
 	Callout,
@@ -7,10 +8,8 @@ import {
 	Strong,
 	Text,
 } from "@radix-ui/themes";
-import { useQuery } from "@tanstack/react-query";
 import { FileQuestion } from "lucide-react";
 import { useMemo } from "react";
-import { appointmentsQueryOptions } from "@/actions/queries";
 import { UpdateAppointmentForm } from "../../forms/AppointmentForm";
 import { PatientCardHeader } from "../PatientCardHeader";
 import { ApprovePayments } from "../Payments";
@@ -22,9 +21,8 @@ export function AppointmentBillingCards({
 	type: string;
 	typeName: string;
 }) {
-	const { data: appointments, isPending: isAppointmentPending } = useQuery(
-		appointmentsQueryOptions,
-	);
+	const { data: appointments, isPending: isAppointmentPending } =
+		useAppointmentsQuery();
 	const appointment_data_pending = useMemo(
 		() =>
 			appointments?.appointment_data?.filter(
