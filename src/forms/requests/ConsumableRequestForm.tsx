@@ -1,6 +1,5 @@
 import { useDrugOrGenericQuery, usePatientsQuery } from "@/actions/queries";
-import { useQuantityType } from "@/lib/hooks";
-import { getProfile } from "@/lib/utils";
+import { useProfile, useQuantityType } from "@/lib/hooks";
 import supabase from "@/supabase/client";
 import { useForm } from "@mantine/form";
 import { randomId } from "@mantine/hooks";
@@ -26,7 +25,7 @@ export function CreateConsumableRequestForm({
 	const [isLoading, setIsLoading] = useState(false);
 
 	const { isQuantityTypePending, quantity_type_data } = useQuantityType();
-
+	const { isProfilePending, profile_data } = useProfile();
 	const { data: drug_data, isPending: isDrugPending } = useDrugOrGenericQuery();
 
 	const { data: patient_data, isPending: isPatientsPending } =
@@ -147,9 +146,16 @@ export function CreateConsumableRequestForm({
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isDrugPending || isPatientsPending}>
+			<Dialog.Trigger
+				disabled={isDrugPending || isPatientsPending || isProfilePending}
+			>
 				<Button
-					loading={isDrugPending || isPatientsPending || isQuantityTypePending}
+					loading={
+						isDrugPending ||
+						isPatientsPending ||
+						isQuantityTypePending ||
+						isProfilePending
+					}
 					size={"4"}
 				>
 					New Request
@@ -165,11 +171,10 @@ export function CreateConsumableRequestForm({
 				<form
 					onSubmit={form.onSubmit(async (values) => {
 						setIsLoading(true);
-
-						const prof = await getProfile();
-						const { error } = await supabase.from("requests").insert({
+						const { error, data } = await supabase.from("requests").insert({
 							patients_id: patientId ?? `${values.patients_id}`,
-							taken_by: `${prof?.id}`,
+							taken_by: `${profile_data?.id}`,
+							branch_id: `${profile_data?.branch_id}`,
 							is_consumable: true,
 							services: values.services.map((v) => ({
 								consumable: JSON.parse(v.consumable),

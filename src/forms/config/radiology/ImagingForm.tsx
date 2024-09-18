@@ -18,10 +18,12 @@ import {
 } from "../../../actions/config/radiology";
 import { useImagingCatQuery } from "../../../actions/queries";
 import { FieldInfo } from "../../../components/FieldInfo";
+import { useProfile } from "@/lib/hooks";
 
 export function CreateImagingForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 	const { data: imaging, isPending: isImagingPending } = useImagingCatQuery();
 
 	const form = useForm({
@@ -32,7 +34,10 @@ export function CreateImagingForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await createImagingAction(value);
+			await createImagingAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["imaging"] });
@@ -41,8 +46,8 @@ export function CreateImagingForm() {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isImagingPending}>
-				<Button variant="soft" loading={isImagingPending}>
+			<Dialog.Trigger disabled={isImagingPending || isProfilePending}>
+				<Button variant="soft" loading={isImagingPending || isProfilePending}>
 					New
 				</Button>
 			</Dialog.Trigger>
@@ -159,6 +164,7 @@ export function UpdateImagingForm({ ...values }: DB["imaging"]["Update"]) {
 	const { data: imaging, isPending: isImagingPending } = useImagingCatQuery();
 
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -166,7 +172,10 @@ export function UpdateImagingForm({ ...values }: DB["imaging"]["Update"]) {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await updateImagingAction(value);
+			await updateImagingAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["imaging"] });
@@ -175,8 +184,8 @@ export function UpdateImagingForm({ ...values }: DB["imaging"]["Update"]) {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isImagingPending}>
-				<Button variant="ghost" loading={isImagingPending}>
+			<Dialog.Trigger disabled={isImagingPending || isProfilePending}>
+				<Button variant="ghost" loading={isImagingPending || isProfilePending}>
 					<Edit size={16} />
 				</Button>
 			</Dialog.Trigger>

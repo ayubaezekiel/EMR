@@ -10,10 +10,12 @@ import {
 	updateHMOGroupAction,
 } from "../../../actions/config/insurance";
 import { FieldInfo } from "../../../components/FieldInfo";
+import { useProfile } from "@/lib/hooks";
 
 export function CreateHMOGroupForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -21,7 +23,10 @@ export function CreateHMOGroupForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await createHMOGroupAction(value);
+			await createHMOGroupAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["hmoGroups"] });
@@ -30,8 +35,10 @@ export function CreateHMOGroupForm() {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button variant="soft">New</Button>
+			<Dialog.Trigger disabled={isProfilePending}>
+				<Button variant="soft" loading={isProfilePending}>
+					New
+				</Button>
 			</Dialog.Trigger>
 
 			<Dialog.Content>
@@ -96,6 +103,7 @@ export function UpdateHMOGroupForm({
 }: DB["hmo_group"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -104,7 +112,10 @@ export function UpdateHMOGroupForm({
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await updateHMOGroupAction(value);
+			await updateHMOGroupAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["hmoGroups"] });
@@ -113,8 +124,8 @@ export function UpdateHMOGroupForm({
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button variant="ghost">
+			<Dialog.Trigger disabled={isProfilePending}>
+				<Button variant="ghost" loading={isProfilePending}>
 					<Edit size={16} />
 				</Button>
 			</Dialog.Trigger>

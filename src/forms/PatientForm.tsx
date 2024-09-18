@@ -1,3 +1,4 @@
+import { useProfile } from "@/lib/hooks";
 import {
 	Button,
 	Dialog,
@@ -16,12 +17,12 @@ import { patientAction, updatePatientAction } from "../actions/patient";
 import { useHmoPlansQuery } from "../actions/queries";
 import { FieldInfo } from "../components/FieldInfo";
 import states from "../lib/statesAndLocalGov.json";
-import { checkAuth } from "../lib/utils";
 
 export function PatientForm() {
 	const [myStates, setMyState] = useState<string[] | undefined>([]);
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const { data, isPending } = useHmoPlansQuery();
 
@@ -47,8 +48,11 @@ export function PatientForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			const user = await checkAuth();
-			await patientAction({ ...value, created_by: `${user?.id}` });
+			await patientAction({
+				...value,
+				created_by: `${profile_data?.id}`,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["patients"] });
@@ -57,7 +61,11 @@ export function PatientForm() {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isPending}>
+			<Dialog.Trigger
+				disabled={
+					isPending || isProfilePending || !profile_data?.has_access_to_billing
+				}
+			>
 				<Button size={"4"} loading={isPending}>
 					New Patient File
 				</Button>
@@ -502,7 +510,11 @@ export function PatientForm() {
 								<Button
 									loading={isSubmitting}
 									type="submit"
-									disabled={!canSubmit || isSubmitting}
+									disabled={
+										!canSubmit ||
+										isSubmitting ||
+										!profile_data?.has_access_to_billing
+									}
 									size={"4"}
 								>
 									Save
@@ -522,6 +534,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
 
 	const { data, isPending } = useHmoPlansQuery();
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -546,8 +559,11 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			const user = await checkAuth();
-			await updatePatientAction({ ...value, created_by: `${user?.id}` });
+			await updatePatientAction({
+				...value,
+				created_by: `${profile_data?.id}`,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["patients"] });
@@ -556,8 +572,12 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isPending}>
-				<Button variant="ghost">
+			<Dialog.Trigger
+				disabled={
+					isPending || isProfilePending || !profile_data?.has_access_to_billing
+				}
+			>
+				<Button variant="ghost" loading={isProfilePending}>
 					<Edit size={16} />
 				</Button>
 			</Dialog.Trigger>
@@ -1001,7 +1021,11 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
 								<Button
 									loading={isSubmitting}
 									type="submit"
-									disabled={!canSubmit || isSubmitting}
+									disabled={
+										!canSubmit ||
+										isSubmitting ||
+										!profile_data?.has_access_to_billing
+									}
 									size={"4"}
 								>
 									Save

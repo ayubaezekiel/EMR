@@ -22,6 +22,7 @@ import {
 	useHmoGroupsQuery,
 } from "../../../actions/queries";
 import { FieldInfo } from "../../../components/FieldInfo";
+import { useProfile } from "@/lib/hooks";
 
 export function CreateHMOPlanForm() {
 	const [open, onOpenChange] = useState(false);
@@ -31,7 +32,7 @@ export function CreateHMOPlanForm() {
 		useHmoCompaniesQuery();
 
 	const { data: branch, isPending: isBranchPending } = useBranchQuery();
-
+	const { isProfilePending, profile_data } = useProfile();
 	const { data: hmo_groups, isPending: isHMOGroupPending } =
 		useHmoGroupsQuery();
 
@@ -47,7 +48,10 @@ export function CreateHMOPlanForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await createHMOPlanAction(value);
+			await createHMOPlanAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["hmoPlans"] });
@@ -57,11 +61,19 @@ export function CreateHMOPlanForm() {
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
 			<Dialog.Trigger
-				disabled={isBranchPending || isHMOCompaniesPending || isHMOGroupPending}
+				disabled={
+					isBranchPending ||
+					isHMOCompaniesPending ||
+					isHMOGroupPending ||
+					isProfilePending
+				}
 			>
 				<Button
 					loading={
-						isBranchPending || isHMOCompaniesPending || isHMOGroupPending
+						isBranchPending ||
+						isHMOCompaniesPending ||
+						isHMOGroupPending ||
+						isProfilePending
 					}
 					variant="soft"
 				>
@@ -276,6 +288,7 @@ export function UpdateHMOPlanForm({
 	const [open, onOpenChange] = useState(false);
 
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const { data: hmo_companies, isPending: isHMOCompaniesPending } =
 		useHmoCompaniesQuery();
@@ -292,7 +305,10 @@ export function UpdateHMOPlanForm({
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await updateHMOPlanAction(value);
+			await updateHMOPlanAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["hmoPlans"] });
@@ -302,12 +318,20 @@ export function UpdateHMOPlanForm({
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
 			<Dialog.Trigger
-				disabled={isBranchPending || isHMOCompaniesPending || isHMOGroupPending}
+				disabled={
+					isBranchPending ||
+					isHMOCompaniesPending ||
+					isHMOGroupPending ||
+					isProfilePending
+				}
 			>
 				<Button
 					variant="ghost"
 					disabled={
-						isBranchPending || isHMOCompaniesPending || isHMOGroupPending
+						isBranchPending ||
+						isHMOCompaniesPending ||
+						isHMOGroupPending ||
+						isProfilePending
 					}
 				>
 					<Edit size={16} />

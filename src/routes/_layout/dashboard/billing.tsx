@@ -1,4 +1,3 @@
-import { DateRangePicker } from "@nextui-org/react";
 import {
 	Card,
 	Heading,
@@ -43,14 +42,6 @@ const Billing = () => {
 			<Card variant="ghost" my={"4"} style={{ background: "var(--accent-2)" }}>
 				<div className="flex justify-between flex-col gap-2 md:flex-row">
 					<PatientForm />
-
-					<div className="flex gap-2 flex-col">
-						<DateRangePicker
-							label="Event duration"
-							hideTimeZone
-							visibleMonths={2}
-						/>
-					</div>
 				</div>
 			</Card>
 			<SegmentedControl.Root

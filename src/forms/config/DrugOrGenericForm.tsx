@@ -15,8 +15,7 @@ import { useState } from "react";
 import { z } from "zod";
 
 import { useDrugOrGenericBrandQuery } from "@/actions/queries";
-import { useQuantityType } from "@/lib/hooks";
-import { getProfile } from "@/lib/utils";
+import { useProfile, useQuantityType } from "@/lib/hooks";
 import {
 	createDrugOrGenericAction,
 	updateDrugOrGenericAction,
@@ -26,6 +25,7 @@ import { FieldInfo } from "../../components/FieldInfo";
 export function CreateDrugOrGeneric() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 	const { isQuantityTypePending, quantity_type_data } = useQuantityType();
 
 	const { data, isPending } = useDrugOrGenericBrandQuery();
@@ -42,8 +42,11 @@ export function CreateDrugOrGeneric() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			const prof = await getProfile();
-			await createDrugOrGenericAction({ ...value, created_by: `${prof?.id}` });
+			await createDrugOrGenericAction({
+				...value,
+				created_by: `${profile_data?.id}`,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["drugOrGeneric"] });
@@ -52,8 +55,13 @@ export function CreateDrugOrGeneric() {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isPending || isQuantityTypePending}>
-				<Button variant="soft" loading={isPending || isQuantityTypePending}>
+			<Dialog.Trigger
+				disabled={isPending || isQuantityTypePending || isProfilePending}
+			>
+				<Button
+					variant="soft"
+					loading={isPending || isQuantityTypePending || isProfilePending}
+				>
 					New
 				</Button>
 			</Dialog.Trigger>
@@ -260,6 +268,7 @@ export function UpdateDrugOrGeneric({
 }: DB["drug_or_generic"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 	const { isQuantityTypePending, quantity_type_data } = useQuantityType();
 
 	const { data, isPending } = useDrugOrGenericBrandQuery();
@@ -270,8 +279,11 @@ export function UpdateDrugOrGeneric({
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			const prof = await getProfile();
-			await updateDrugOrGenericAction({ ...value, created_by: `${prof?.id}` });
+			await updateDrugOrGenericAction({
+				...value,
+				created_by: `${profile_data?.id}`,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["drugOrGeneric"] });
@@ -280,8 +292,13 @@ export function UpdateDrugOrGeneric({
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isPending || isQuantityTypePending}>
-				<Button variant="ghost" loading={isPending || isQuantityTypePending}>
+			<Dialog.Trigger
+				disabled={isPending || isQuantityTypePending || isProfilePending}
+			>
+				<Button
+					variant="ghost"
+					loading={isPending || isQuantityTypePending || isProfilePending}
+				>
 					<Edit size={16} />
 				</Button>
 			</Dialog.Trigger>

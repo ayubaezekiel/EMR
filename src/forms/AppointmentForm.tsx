@@ -1,3 +1,4 @@
+import { useProfile } from "@/lib/hooks";
 import {
 	Button,
 	Checkbox,
@@ -23,7 +24,6 @@ import {
 	usePatientsQuery,
 } from "../actions/queries";
 import { FieldInfo } from "../components/FieldInfo";
-import { checkAuth } from "../lib/utils";
 
 export function CreateAppointmentForm() {
 	const { data: appointment_types, isPending } = useAppointmentsTypesQuery();
@@ -32,6 +32,7 @@ export function CreateAppointmentForm() {
 	const { data: patients, isPending: isPatientsPending } = usePatientsQuery();
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -45,7 +46,6 @@ export function CreateAppointmentForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			const user = await checkAuth();
 			await createAppointmentAction({
 				clinics_id: value.clinics_id,
 				patients_id: value.patients_id,
@@ -53,7 +53,8 @@ export function CreateAppointmentForm() {
 				follow_up: value.follow_up,
 				is_all_day: value.is_all_day,
 				duration: `[${value.start_date},${value.end_date})`,
-				created_by: `${user?.id}`,
+				created_by: `${profile_data?.id}`,
+				branch_id: `${profile_data?.branch_id}`,
 			});
 			form.reset();
 			onOpenChange(false);
@@ -63,8 +64,11 @@ export function CreateAppointmentForm() {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isPending}>
-				<Button size={"4"} loading={isClinicsPending || isPatientsPending}>
+			<Dialog.Trigger disabled={isPending || isProfilePending}>
+				<Button
+					size={"4"}
+					loading={isClinicsPending || isPatientsPending || isProfilePending}
+				>
 					New Patient Appointment
 				</Button>
 			</Dialog.Trigger>
@@ -284,6 +288,7 @@ export function UpdateAppointmentForm({
 	const { data: patients, isPending: isPatientsPending } = usePatientsQuery();
 
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const [open, onOpenChange] = useState(false);
 
@@ -303,11 +308,11 @@ export function UpdateAppointmentForm({
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			const user = await checkAuth();
 			await updateAppointmentAction({
 				...value,
 				duration: `[${value.start_date},${value.end_date})`,
-				created_by: `${user?.id}`,
+				created_by: `${profile_data?.id}`,
+				branch_id: `${profile_data?.branch_id}`,
 			});
 			form.reset();
 			onOpenChange(false);
@@ -322,9 +327,9 @@ export function UpdateAppointmentForm({
 	return (
 		<div>
 			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger disabled={isPending}>
+				<Dialog.Trigger disabled={isPending || isProfilePending}>
 					<Button
-						loading={isClinicsPending || isPatientsPending}
+						loading={isClinicsPending || isPatientsPending || isProfilePending}
 						size={"1"}
 						color="red"
 						variant="ghost"

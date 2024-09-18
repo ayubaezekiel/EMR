@@ -1,10 +1,10 @@
 import { useCashpointsQuery, usePaymentMethodsQuery } from "@/actions/queries";
+import { useProfile } from "@/lib/hooks";
 import {
 	Button,
 	Dialog,
 	Flex,
 	Select,
-	Spinner,
 	Text,
 	TextField,
 } from "@radix-ui/themes";
@@ -14,7 +14,6 @@ import { zodValidator } from "@tanstack/zod-form-adapter";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import { getProfile } from "../lib/utils";
 import supabase from "../supabase/client";
 import { FieldInfo } from "./FieldInfo";
 
@@ -49,6 +48,8 @@ export const ApprovePayments = ({
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 
+	const { isProfilePending, profile_data } = useProfile();
+
 	const form = useForm({
 		defaultValues: {
 			amount: `N${new Intl.NumberFormat().format(Number(amount))}`,
@@ -65,16 +66,16 @@ export const ApprovePayments = ({
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			const prof = await getProfile();
-			const { error } = await supabase
+			const { error, data } = await supabase
 				.from("payments")
 				.insert({
 					...value,
-					approved_by: `${prof?.id}`,
+					approved_by: `${profile_data?.id}`,
 					amount: amount,
+					branch_id: profile_data?.branch_id as string,
 				})
 				.select();
-			if (error) {
+			if (error && !data) {
 				toast.error(error.message);
 			} else {
 				toast.success("payment approved successfully");
@@ -99,10 +100,21 @@ export const ApprovePayments = ({
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isCashpointPending || isPaymentMethodPending}>
+			<Dialog.Trigger
+				disabled={
+					isCashpointPending ||
+					isPaymentMethodPending ||
+					isProfilePending ||
+					!profile_data?.has_access_to_billing
+				}
+			>
 				<Button
 					disabled={isApproved}
-					loading={isCashpointPending || isPaymentMethodPending}
+					loading={
+						isCashpointPending ||
+						isPaymentMethodPending ||
+						!profile_data?.has_access_to_billing
+					}
 					size={"2"}
 					radius="full"
 				>
@@ -203,10 +215,11 @@ export const ApprovePayments = ({
 								<Button
 									variant="soft"
 									type="submit"
-									disabled={!canSubmit}
+									loading={isSubmitting}
+									disabled={!canSubmit || !profile_data?.has_access_to_billing}
 									size={"4"}
 								>
-									{isSubmitting && <Spinner />} Confirm
+									Confirm
 								</Button>
 							)}
 						/>

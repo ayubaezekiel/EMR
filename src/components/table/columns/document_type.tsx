@@ -1,10 +1,10 @@
-import { deleteJobPositionAction } from "@/actions/config/job-positions";
-import { DeleteActionForm } from "@/actions/DeleteAction";
+import { deleteDocumentTypeAction } from "@/actions/config/document-type";
+import { UpdateDocumentType } from "@/forms/config/DocumentTypeForm";
 import { Checkbox } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
-import { UpdateJobPositionForm } from "../../../forms/config/JobPositionForm";
+import { DeleteActionForm } from "../../../actions/DeleteAction";
 
-export const job_position_column: ColumnDef<DB["job_positions"]["Row"]>[] = [
+export const document_type_column: ColumnDef<DB["document_types"]["Row"]>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -37,18 +37,18 @@ export const job_position_column: ColumnDef<DB["job_positions"]["Row"]>[] = [
 		id: "actions",
 		enableHiding: false,
 		cell: ({ row }) => {
-			const job = row.original;
+			const params = row.original;
 
 			return (
 				<div className="flex gap-4">
-					<UpdateJobPositionForm {...job} />
+					<UpdateDocumentType {...params} />
 					<DeleteActionForm
-						id={job.id}
-						inValidate="jobPositions"
-						title="Delete Job Positions"
-						warning="Are you sure? this lab test will be parmanently deleted from the
+						id={params.id}
+						inValidate="documentType"
+						title="Delete Document Type"
+						warning="Are you sure? this document type will be parmanently deleted from the
           database."
-						actionFn={() => deleteJobPositionAction({ id: job.id })}
+						actionFn={() => deleteDocumentTypeAction({ id: params.id })}
 					/>
 				</div>
 			);

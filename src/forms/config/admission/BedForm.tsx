@@ -19,11 +19,12 @@ import {
 } from "../../../actions/config/admission";
 import { useWardsQuery } from "../../../actions/queries";
 import { FieldInfo } from "../../../components/FieldInfo";
+import { useProfile } from "@/lib/hooks";
 
 export function CreateBedForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
-
+	const { isProfilePending, profile_data } = useProfile();
 	const { data: wards_data, isPending: isWardPending } = useWardsQuery();
 
 	const form = useForm({
@@ -35,7 +36,10 @@ export function CreateBedForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await createBedAction(value);
+			await createBedAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["beds"] });
@@ -44,8 +48,8 @@ export function CreateBedForm() {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isWardPending}>
-				<Button variant="soft" loading={isWardPending}>
+			<Dialog.Trigger disabled={isWardPending || isProfilePending}>
+				<Button variant="soft" loading={isWardPending || isProfilePending}>
 					New
 				</Button>
 			</Dialog.Trigger>
@@ -176,7 +180,7 @@ export function CreateBedForm() {
 export function UpdateBedForm({ id, ...values }: DB["beds"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 	const { data: wards_data, isPending: isWardPending } = useWardsQuery();
-
+	const { isProfilePending, profile_data } = useProfile();
 	const queryClient = useQueryClient();
 
 	const form = useForm({
@@ -186,7 +190,10 @@ export function UpdateBedForm({ id, ...values }: DB["beds"]["Update"]) {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await updateBedAction(value);
+			await updateBedAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["beds"] });
@@ -194,8 +201,8 @@ export function UpdateBedForm({ id, ...values }: DB["beds"]["Update"]) {
 	});
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isWardPending}>
-				<Button variant="ghost" loading={isWardPending}>
+			<Dialog.Trigger disabled={isWardPending || isProfilePending}>
+				<Button variant="ghost" loading={isWardPending || isProfilePending}>
 					<Edit size={16} />
 				</Button>
 			</Dialog.Trigger>

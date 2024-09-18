@@ -12,6 +12,7 @@ export type Database = {
       admission_consultations: {
         Row: {
           admission_id: string
+          branch_id: string
           created_at: string | null
           id: string
           is_completed: boolean | null
@@ -19,6 +20,7 @@ export type Database = {
         }
         Insert: {
           admission_id: string
+          branch_id: string
           created_at?: string | null
           id?: string
           is_completed?: boolean | null
@@ -26,6 +28,7 @@ export type Database = {
         }
         Update: {
           admission_id?: string
+          branch_id?: string
           created_at?: string | null
           id?: string
           is_completed?: boolean | null
@@ -39,12 +42,20 @@ export type Database = {
             referencedRelation: "admissions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "admission_consultations_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
         ]
       }
       admissions: {
         Row: {
-          admitted_by: string | null
+          admitted_by: string
           beds_id: string | null
+          branch_id: string
           created_at: string | null
           dischard_date: string | null
           id: string
@@ -56,8 +67,9 @@ export type Database = {
           wards_id: string
         }
         Insert: {
-          admitted_by?: string | null
+          admitted_by: string
           beds_id?: string | null
+          branch_id: string
           created_at?: string | null
           dischard_date?: string | null
           id?: string
@@ -69,8 +81,9 @@ export type Database = {
           wards_id: string
         }
         Update: {
-          admitted_by?: string | null
+          admitted_by?: string
           beds_id?: string | null
+          branch_id?: string
           created_at?: string | null
           dischard_date?: string | null
           id?: string
@@ -97,6 +110,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "admissions_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "admissions_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
@@ -115,18 +135,24 @@ export type Database = {
       anaesthesia: {
         Row: {
           anaesthesia_type_id: string | null
+          branch_id: string
+          created_at: string | null
           default_price: string | null
           id: string
           name: string
         }
         Insert: {
           anaesthesia_type_id?: string | null
+          branch_id: string
+          created_at?: string | null
           default_price?: string | null
           id?: string
           name: string
         }
         Update: {
           anaesthesia_type_id?: string | null
+          branch_id?: string
+          created_at?: string | null
           default_price?: string | null
           id?: string
           name?: string
@@ -139,46 +165,82 @@ export type Database = {
             referencedRelation: "anaesthesia_type"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "anaesthesia_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
         ]
       }
       anaesthesia_type: {
         Row: {
+          branch_id: string
+          created_at: string | null
           id: string
           title: string
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           id?: string
           title: string
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           id?: string
           title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "anaesthesia_type_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       antenatal_package: {
         Row: {
+          branch_id: string
+          created_at: string | null
           default_price: number | null
           id: string
           name: string
           with_delivary: boolean | null
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           default_price?: number | null
           id?: string
           name: string
           with_delivary?: boolean | null
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           default_price?: number | null
           id?: string
           name?: string
           with_delivary?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "antenatal_package_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       appointment_types: {
         Row: {
+          branch_id: string
           created_at: string | null
           default_price: string | null
           follow_up_price: string | null
@@ -186,6 +248,7 @@ export type Database = {
           name: string
         }
         Insert: {
+          branch_id: string
           created_at?: string | null
           default_price?: string | null
           follow_up_price?: string | null
@@ -193,17 +256,27 @@ export type Database = {
           name: string
         }
         Update: {
+          branch_id?: string
           created_at?: string | null
           default_price?: string | null
           follow_up_price?: string | null
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "appointment_types_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       appointments: {
         Row: {
           appointment_types_id: string | null
+          branch_id: string
           clinics_id: string
           created_at: string | null
           created_by: string
@@ -220,6 +293,7 @@ export type Database = {
         }
         Insert: {
           appointment_types_id?: string | null
+          branch_id: string
           clinics_id: string
           created_at?: string | null
           created_by: string
@@ -236,6 +310,7 @@ export type Database = {
         }
         Update: {
           appointment_types_id?: string | null
+          branch_id?: string
           clinics_id?: string
           created_at?: string | null
           created_by?: string
@@ -259,6 +334,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "appointments_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "appointments_clinics_id_fkey"
             columns: ["clinics_id"]
             isOneToOne: false
@@ -266,10 +348,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "appointments_created_by_fkey"
+            foreignKeyName: "appointments_created_by_fkey1"
             columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "profile"
             referencedColumns: ["id"]
           },
           {
@@ -283,6 +365,8 @@ export type Database = {
       }
       beds: {
         Row: {
+          branch_id: string
+          created_at: string | null
           default_price: string
           id: string
           is_available: boolean | null
@@ -290,6 +374,8 @@ export type Database = {
           ward_id: string
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           default_price: string
           id?: string
           is_available?: boolean | null
@@ -297,6 +383,8 @@ export type Database = {
           ward_id: string
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           default_price?: string
           id?: string
           is_available?: boolean | null
@@ -304,6 +392,13 @@ export type Database = {
           ward_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "beds_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "beds_ward_id_fkey"
             columns: ["ward_id"]
@@ -411,78 +506,178 @@ export type Database = {
       }
       clinics: {
         Row: {
+          branch_id: string
           created_at: string | null
           id: string
           name: string
         }
         Insert: {
+          branch_id: string
           created_at?: string | null
           id?: string
           name: string
         }
         Update: {
+          branch_id?: string
           created_at?: string | null
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "clinics_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       consultation_templates: {
         Row: {
+          branch_id: string
           content: string
+          created_at: string | null
           id: string
           name: string
         }
         Insert: {
+          branch_id: string
           content: string
+          created_at?: string | null
           id?: string
           name: string
         }
         Update: {
+          branch_id?: string
           content?: string
+          created_at?: string | null
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "consultation_templates_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       departments: {
         Row: {
+          branch_id: string
           created_at: string | null
           id: string
           name: string
         }
         Insert: {
+          branch_id: string
           created_at?: string | null
           id?: string
           name: string
         }
         Update: {
+          branch_id?: string
           created_at?: string | null
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "departments_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_reports: {
+        Row: {
+          branch_id: string
+          created_at: string | null
+          created_by: string
+          document_type_id: string
+          file_url: string
+          id: string
+          title: string
+        }
+        Insert: {
+          branch_id: string
+          created_at?: string | null
+          created_by: string
+          document_type_id: string
+          file_url: string
+          id?: string
+          title: string
+        }
+        Update: {
+          branch_id?: string
+          created_at?: string | null
+          created_by?: string
+          document_type_id?: string
+          file_url?: string
+          id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_reports_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_reports_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_reports_document_type_id_fkey"
+            columns: ["document_type_id"]
+            isOneToOne: false
+            referencedRelation: "document_types"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       document_types: {
         Row: {
+          branch_id: string | null
           created_at: string | null
           id: string
           name: string
         }
         Insert: {
+          branch_id?: string | null
           created_at?: string | null
           id?: string
           name: string
         }
         Update: {
+          branch_id?: string | null
           created_at?: string | null
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "document_types_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       drug_or_generic: {
         Row: {
+          branch_id: string | null
           created_at: string | null
           created_by: string
           default_price: string
@@ -495,6 +690,7 @@ export type Database = {
           total_quantity: number | null
         }
         Insert: {
+          branch_id?: string | null
           created_at?: string | null
           created_by: string
           default_price: string
@@ -507,6 +703,7 @@ export type Database = {
           total_quantity?: number | null
         }
         Update: {
+          branch_id?: string | null
           created_at?: string | null
           created_by?: string
           default_price?: string
@@ -519,6 +716,13 @@ export type Database = {
           total_quantity?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "drug_or_generic_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "drug_or_generic_created_by_fkey1"
             columns: ["created_by"]
@@ -544,42 +748,68 @@ export type Database = {
       }
       drug_or_generic_brand: {
         Row: {
+          branch_id: string | null
           created_at: string | null
           id: string
           name: string
         }
         Insert: {
+          branch_id?: string | null
           created_at?: string | null
           id?: string
           name: string
         }
         Update: {
+          branch_id?: string | null
           created_at?: string | null
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "drug_or_generic_brand_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       fluid_routes: {
         Row: {
+          branch_id: string | null
+          created_at: string | null
           id: string
           name: string
           type: string
         }
         Insert: {
+          branch_id?: string | null
+          created_at?: string | null
           id?: string
           name: string
           type: string
         }
         Update: {
+          branch_id?: string | null
+          created_at?: string | null
           id?: string
           name?: string
           type?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fluid_routes_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       history_taking: {
         Row: {
+          branch_id: string | null
           created_at: string
           id: string
           is_admission: boolean | null
@@ -588,6 +818,7 @@ export type Database = {
           taken_by: string
         }
         Insert: {
+          branch_id?: string | null
           created_at?: string
           id?: string
           is_admission?: boolean | null
@@ -596,6 +827,7 @@ export type Database = {
           taken_by: string
         }
         Update: {
+          branch_id?: string | null
           created_at?: string
           id?: string
           is_admission?: boolean | null
@@ -604,6 +836,13 @@ export type Database = {
           taken_by?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "history_taking_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "history_taking_patients_id_fkey"
             columns: ["patients_id"]
@@ -623,6 +862,8 @@ export type Database = {
       hmo_companies: {
         Row: {
           address: string
+          branch_id: string
+          created_at: string | null
           email: string
           id: string
           name: string
@@ -630,6 +871,8 @@ export type Database = {
         }
         Insert: {
           address: string
+          branch_id: string
+          created_at?: string | null
           email: string
           id?: string
           name: string
@@ -637,31 +880,56 @@ export type Database = {
         }
         Update: {
           address?: string
+          branch_id?: string
+          created_at?: string | null
           email?: string
           id?: string
           name?: string
           phone?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "hmo_companies_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       hmo_group: {
         Row: {
+          branch_id: string
+          created_at: string | null
           id: string
           name: string
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           id?: string
           name: string
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "hmo_group_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       hmo_plans: {
         Row: {
-          branch_id: string | null
+          branch_id: string
+          created_at: string | null
           enrolment_amount: string
           hmo_companies_id: string
           hmo_group_id: string
@@ -671,7 +939,8 @@ export type Database = {
           sign_up_amount: string
         }
         Insert: {
-          branch_id?: string | null
+          branch_id: string
+          created_at?: string | null
           enrolment_amount: string
           hmo_companies_id: string
           hmo_group_id: string
@@ -681,7 +950,8 @@ export type Database = {
           sign_up_amount: string
         }
         Update: {
-          branch_id?: string | null
+          branch_id?: string
+          created_at?: string | null
           enrolment_amount?: string
           hmo_companies_id?: string
           hmo_group_id?: string
@@ -716,24 +986,37 @@ export type Database = {
       }
       imaging: {
         Row: {
+          branch_id: string
+          created_at: string | null
           default_price: string | null
           id: string
           imaging_category_id: string
           name: string
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           default_price?: string | null
           id?: string
           imaging_category_id: string
           name: string
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           default_price?: string | null
           id?: string
           imaging_category_id?: string
           name?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "imaging_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "imaging_imaging_category_id_fkey"
             columns: ["imaging_category_id"]
@@ -745,38 +1028,95 @@ export type Database = {
       }
       imaging_category: {
         Row: {
+          branch_id: string
+          created_at: string | null
           id: string
           name: string
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           id?: string
           name: string
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "imaging_category_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       imaging_templates: {
         Row: {
+          branch_id: string
+          created_at: string | null
           id: string
           note: string
           title: string
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           id?: string
           note: string
           title: string
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           id?: string
           note?: string
           title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "imaging_templates_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       job_positions: {
+        Row: {
+          branch_id: string
+          created_at: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          branch_id: string
+          created_at?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          branch_id?: string
+          created_at?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_positions_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lab_specimen: {
         Row: {
           created_at: string | null
           id: string
@@ -794,71 +1134,97 @@ export type Database = {
         }
         Relationships: []
       }
-      lab_specimen: {
-        Row: {
-          id: string
-          name: string
-        }
-        Insert: {
-          id?: string
-          name: string
-        }
-        Update: {
-          id?: string
-          name?: string
-        }
-        Relationships: []
-      }
       lab_test_category: {
         Row: {
+          branch_id: string
+          created_at: string | null
           id: string
           name: string
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           id?: string
           name: string
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "lab_test_category_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lab_test_parameter: {
         Row: {
+          branch_id: string
+          created_at: string | null
           data_type: string
           id: string
           name: string
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           data_type: string
           id?: string
           name: string
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           data_type?: string
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "lab_test_parameter_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lab_test_template: {
         Row: {
+          branch_id: string
+          created_at: string | null
           id: string
           name: string
           parameter_id: string
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           id?: string
           name: string
           parameter_id: string
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           id?: string
           name?: string
           parameter_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "lab_test_template_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "lab_test_template_parameter_id_fkey"
             columns: ["parameter_id"]
@@ -870,6 +1236,8 @@ export type Database = {
       }
       lab_tests: {
         Row: {
+          branch_id: string
+          created_at: string | null
           default_price: string | null
           id: string
           lab_test_category_id: string
@@ -877,6 +1245,8 @@ export type Database = {
           template_id: string
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           default_price?: string | null
           id?: string
           lab_test_category_id: string
@@ -884,6 +1254,8 @@ export type Database = {
           template_id: string
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           default_price?: string | null
           id?: string
           lab_test_category_id?: string
@@ -891,6 +1263,13 @@ export type Database = {
           template_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "lab_tests_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "lab_tests_lab_test_category_id_fkey"
             columns: ["lab_test_category_id"]
@@ -909,6 +1288,7 @@ export type Database = {
       }
       nursing_report: {
         Row: {
+          branch_id: string
           created_at: string | null
           created_by: string
           id: string
@@ -917,6 +1297,7 @@ export type Database = {
           patient_id: string
         }
         Insert: {
+          branch_id: string
           created_at?: string | null
           created_by: string
           id?: string
@@ -925,6 +1306,7 @@ export type Database = {
           patient_id: string
         }
         Update: {
+          branch_id?: string
           created_at?: string | null
           created_by?: string
           id?: string
@@ -933,6 +1315,13 @@ export type Database = {
           patient_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "nursing_report_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "nursing_report_created_by_fkey"
             columns: ["created_by"]
@@ -951,6 +1340,7 @@ export type Database = {
       }
       patient_diagnosis: {
         Row: {
+          branch_id: string
           created_at: string
           id: string
           is_admission: boolean | null
@@ -959,6 +1349,7 @@ export type Database = {
           taken_by: string
         }
         Insert: {
+          branch_id: string
           created_at?: string
           id?: string
           is_admission?: boolean | null
@@ -967,6 +1358,7 @@ export type Database = {
           taken_by: string
         }
         Update: {
+          branch_id?: string
           created_at?: string
           id?: string
           is_admission?: boolean | null
@@ -975,6 +1367,13 @@ export type Database = {
           taken_by?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "patient_diagnosis_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "patient_diagnosis_patients_id_fkey"
             columns: ["patients_id"]
@@ -993,6 +1392,7 @@ export type Database = {
       }
       patient_examination: {
         Row: {
+          branch_id: string
           created_at: string
           id: string
           is_admission: boolean | null
@@ -1001,6 +1401,7 @@ export type Database = {
           taken_by: string
         }
         Insert: {
+          branch_id: string
           created_at?: string
           id?: string
           is_admission?: boolean | null
@@ -1009,6 +1410,7 @@ export type Database = {
           taken_by: string
         }
         Update: {
+          branch_id?: string
           created_at?: string
           id?: string
           is_admission?: boolean | null
@@ -1017,6 +1419,13 @@ export type Database = {
           taken_by?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "patient_examination_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "patient_examination_patients_id_fkey"
             columns: ["patients_id"]
@@ -1035,30 +1444,43 @@ export type Database = {
       }
       patient_vitals: {
         Row: {
+          branch_id: string
+          created_at: string | null
           date_created: string
           id: string
           is_admission: boolean | null
           patient_id: string | null
-          taken_by: string | null
+          taken_by: string
           vitals: Json | null
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           date_created?: string
           id?: string
           is_admission?: boolean | null
           patient_id?: string | null
-          taken_by?: string | null
+          taken_by: string
           vitals?: Json | null
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           date_created?: string
           id?: string
           is_admission?: boolean | null
           patient_id?: string | null
-          taken_by?: string | null
+          taken_by?: string
           vitals?: Json | null
         }
         Relationships: [
+          {
+            foreignKeyName: "patient_vitals_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "patient_vitals_patient_id_fkey"
             columns: ["patient_id"]
@@ -1077,6 +1499,7 @@ export type Database = {
       }
       patients: {
         Row: {
+          branch_id: string
           created_at: string | null
           created_by: string
           dob: string
@@ -1099,6 +1522,7 @@ export type Database = {
           state_of_origin: string
         }
         Insert: {
+          branch_id: string
           created_at?: string | null
           created_by: string
           dob: string
@@ -1121,6 +1545,7 @@ export type Database = {
           state_of_origin: string
         }
         Update: {
+          branch_id?: string
           created_at?: string | null
           created_by?: string
           dob?: string
@@ -1144,6 +1569,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "patients_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "patients_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
@@ -1162,23 +1594,34 @@ export type Database = {
       payment_methods: {
         Row: {
           allow_only_financial_admin: boolean | null
+          branch_id: string
           created_at: string | null
           id: string
           name: string
         }
         Insert: {
           allow_only_financial_admin?: boolean | null
+          branch_id: string
           created_at?: string | null
           id?: string
           name: string
         }
         Update: {
           allow_only_financial_admin?: boolean | null
+          branch_id?: string
           created_at?: string | null
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "payment_methods_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payments: {
         Row: {
@@ -1186,6 +1629,7 @@ export type Database = {
           amount: string
           appointment_id: string | null
           approved_by: string | null
+          branch_id: string
           cash_points_id: string
           created_at: string | null
           id: string
@@ -1202,6 +1646,7 @@ export type Database = {
           amount: string
           appointment_id?: string | null
           approved_by?: string | null
+          branch_id: string
           cash_points_id: string
           created_at?: string | null
           id?: string
@@ -1218,6 +1663,7 @@ export type Database = {
           amount?: string
           appointment_id?: string | null
           approved_by?: string | null
+          branch_id?: string
           cash_points_id?: string
           created_at?: string | null
           id?: string
@@ -1252,6 +1698,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "payments_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "payments_cash_points_id_fkey"
             columns: ["cash_points_id"]
             isOneToOne: false
@@ -1281,86 +1734,11 @@ export type Database = {
           },
         ]
       }
-      permissions: {
-        Row: {
-          has_access_to_accounting: boolean | null
-          has_access_to_admin_accounting: boolean | null
-          has_access_to_billing: boolean | null
-          has_access_to_config: boolean | null
-          has_access_to_dialysis_management: boolean | null
-          has_access_to_dialysis_records: boolean | null
-          has_access_to_doctor_priviledges: boolean | null
-          has_access_to_documents: boolean | null
-          has_access_to_front_desk: boolean | null
-          has_access_to_lab: boolean | null
-          has_access_to_nursing: boolean | null
-          has_access_to_pharmacy: boolean | null
-          has_access_to_pharmacy_admin: boolean | null
-          has_access_to_radiology: boolean | null
-          has_access_to_radiology_admin: boolean | null
-          has_access_to_reports: boolean | null
-          has_access_to_users: boolean | null
-          id: string
-          is_super_user: boolean | null
-          user_id: string | null
-        }
-        Insert: {
-          has_access_to_accounting?: boolean | null
-          has_access_to_admin_accounting?: boolean | null
-          has_access_to_billing?: boolean | null
-          has_access_to_config?: boolean | null
-          has_access_to_dialysis_management?: boolean | null
-          has_access_to_dialysis_records?: boolean | null
-          has_access_to_doctor_priviledges?: boolean | null
-          has_access_to_documents?: boolean | null
-          has_access_to_front_desk?: boolean | null
-          has_access_to_lab?: boolean | null
-          has_access_to_nursing?: boolean | null
-          has_access_to_pharmacy?: boolean | null
-          has_access_to_pharmacy_admin?: boolean | null
-          has_access_to_radiology?: boolean | null
-          has_access_to_radiology_admin?: boolean | null
-          has_access_to_reports?: boolean | null
-          has_access_to_users?: boolean | null
-          id?: string
-          is_super_user?: boolean | null
-          user_id?: string | null
-        }
-        Update: {
-          has_access_to_accounting?: boolean | null
-          has_access_to_admin_accounting?: boolean | null
-          has_access_to_billing?: boolean | null
-          has_access_to_config?: boolean | null
-          has_access_to_dialysis_management?: boolean | null
-          has_access_to_dialysis_records?: boolean | null
-          has_access_to_doctor_priviledges?: boolean | null
-          has_access_to_documents?: boolean | null
-          has_access_to_front_desk?: boolean | null
-          has_access_to_lab?: boolean | null
-          has_access_to_nursing?: boolean | null
-          has_access_to_pharmacy?: boolean | null
-          has_access_to_pharmacy_admin?: boolean | null
-          has_access_to_radiology?: boolean | null
-          has_access_to_radiology_admin?: boolean | null
-          has_access_to_reports?: boolean | null
-          has_access_to_users?: boolean | null
-          id?: string
-          is_super_user?: boolean | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "permissions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       procedure: {
         Row: {
           anaesthesia_id: string
+          branch_id: string
+          created_at: string | null
           id: string
           is_theatre: boolean | null
           name: string
@@ -1371,6 +1749,8 @@ export type Database = {
         }
         Insert: {
           anaesthesia_id: string
+          branch_id: string
+          created_at?: string | null
           id?: string
           is_theatre?: boolean | null
           name: string
@@ -1381,6 +1761,8 @@ export type Database = {
         }
         Update: {
           anaesthesia_id?: string
+          branch_id?: string
+          created_at?: string | null
           id?: string
           is_theatre?: boolean | null
           name?: string
@@ -1395,6 +1777,13 @@ export type Database = {
             columns: ["anaesthesia_id"]
             isOneToOne: false
             referencedRelation: "anaesthesia"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "procedure_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
             referencedColumns: ["id"]
           },
           {
@@ -1415,54 +1804,128 @@ export type Database = {
       }
       procedure_category: {
         Row: {
+          branch_id: string
+          created_at: string | null
           id: string
           name: string
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           id?: string
           name: string
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "procedure_category_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profile: {
         Row: {
-          branch_id: string | null
+          branch_id: string
+          can_switch_branch: boolean | null
           created_at: string
           department_id: string | null
           email: string
           first_name: string
           gender: string
+          has_access_to_accounting: boolean | null
+          has_access_to_admin_accounting: boolean | null
+          has_access_to_admission: boolean | null
+          has_access_to_billing: boolean | null
+          has_access_to_config: boolean | null
+          has_access_to_dialysis_management: boolean | null
+          has_access_to_dialysis_records: boolean | null
+          has_access_to_doctor_priviledges: boolean | null
+          has_access_to_documents: boolean | null
+          has_access_to_front_desk: boolean | null
+          has_access_to_lab: boolean | null
+          has_access_to_nursing: boolean | null
+          has_access_to_pharmacy: boolean | null
+          has_access_to_pharmacy_admin: boolean | null
+          has_access_to_radiology: boolean | null
+          has_access_to_radiology_admin: boolean | null
+          has_access_to_reports: boolean | null
+          has_access_to_users: boolean | null
           id: string
+          is_super_user: boolean | null
           job_position_id: string | null
           last_name: string
           middle_name: string | null
           user_id: string
         }
         Insert: {
-          branch_id?: string | null
+          branch_id: string
+          can_switch_branch?: boolean | null
           created_at?: string
           department_id?: string | null
           email: string
           first_name: string
           gender: string
+          has_access_to_accounting?: boolean | null
+          has_access_to_admin_accounting?: boolean | null
+          has_access_to_admission?: boolean | null
+          has_access_to_billing?: boolean | null
+          has_access_to_config?: boolean | null
+          has_access_to_dialysis_management?: boolean | null
+          has_access_to_dialysis_records?: boolean | null
+          has_access_to_doctor_priviledges?: boolean | null
+          has_access_to_documents?: boolean | null
+          has_access_to_front_desk?: boolean | null
+          has_access_to_lab?: boolean | null
+          has_access_to_nursing?: boolean | null
+          has_access_to_pharmacy?: boolean | null
+          has_access_to_pharmacy_admin?: boolean | null
+          has_access_to_radiology?: boolean | null
+          has_access_to_radiology_admin?: boolean | null
+          has_access_to_reports?: boolean | null
+          has_access_to_users?: boolean | null
           id?: string
+          is_super_user?: boolean | null
           job_position_id?: string | null
           last_name: string
           middle_name?: string | null
           user_id: string
         }
         Update: {
-          branch_id?: string | null
+          branch_id?: string
+          can_switch_branch?: boolean | null
           created_at?: string
           department_id?: string | null
           email?: string
           first_name?: string
           gender?: string
+          has_access_to_accounting?: boolean | null
+          has_access_to_admin_accounting?: boolean | null
+          has_access_to_admission?: boolean | null
+          has_access_to_billing?: boolean | null
+          has_access_to_config?: boolean | null
+          has_access_to_dialysis_management?: boolean | null
+          has_access_to_dialysis_records?: boolean | null
+          has_access_to_doctor_priviledges?: boolean | null
+          has_access_to_documents?: boolean | null
+          has_access_to_front_desk?: boolean | null
+          has_access_to_lab?: boolean | null
+          has_access_to_nursing?: boolean | null
+          has_access_to_pharmacy?: boolean | null
+          has_access_to_pharmacy_admin?: boolean | null
+          has_access_to_radiology?: boolean | null
+          has_access_to_radiology_admin?: boolean | null
+          has_access_to_reports?: boolean | null
+          has_access_to_users?: boolean | null
           id?: string
+          is_super_user?: boolean | null
           job_position_id?: string | null
           last_name?: string
           middle_name?: string | null
@@ -1501,21 +1964,36 @@ export type Database = {
       }
       quantity_type: {
         Row: {
+          branch_id: string
+          created_at: string | null
           id: string
           name: string | null
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           id?: string
           name?: string | null
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           id?: string
           name?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "quantity_type_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       requests: {
         Row: {
+          branch_id: string
           created_at: string
           id: string
           is_antenatal: boolean | null
@@ -1532,6 +2010,7 @@ export type Database = {
           taken_by: string
         }
         Insert: {
+          branch_id: string
           created_at?: string
           id?: string
           is_antenatal?: boolean | null
@@ -1548,6 +2027,7 @@ export type Database = {
           taken_by: string
         }
         Update: {
+          branch_id?: string
           created_at?: string
           id?: string
           is_antenatal?: boolean | null
@@ -1572,6 +2052,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "requests_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "requests_taken_by_fkey"
             columns: ["taken_by"]
             isOneToOne: false
@@ -1582,39 +2069,68 @@ export type Database = {
       }
       specialties: {
         Row: {
+          branch_id: string
+          created_at: string | null
           id: string
           name: string
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           id?: string
           name: string
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "specialties_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       theatre: {
         Row: {
+          branch_id: string
+          created_at: string | null
           default_price: string
           id: string
           name: string
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           default_price: string
           id?: string
           name: string
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           default_price?: string
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "theatre_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       treatment_plan: {
         Row: {
+          branch_id: string
           created_at: string
           id: string
           is_admission: boolean | null
@@ -1623,6 +2139,7 @@ export type Database = {
           taken_by: string
         }
         Insert: {
+          branch_id: string
           created_at?: string
           id?: string
           is_admission?: boolean | null
@@ -1631,6 +2148,7 @@ export type Database = {
           taken_by: string
         }
         Update: {
+          branch_id?: string
           created_at?: string
           id?: string
           is_admission?: boolean | null
@@ -1639,6 +2157,13 @@ export type Database = {
           taken_by?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "treatment_plan_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "treatment_plan_patients_id_fkey"
             columns: ["patients_id"]
@@ -1657,42 +2182,70 @@ export type Database = {
       }
       vitals: {
         Row: {
+          branch_id: string
+          created_at: string | null
           id: string
           name: string
           unit: string | null
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           id?: string
           name: string
           unit?: string | null
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           id?: string
           name?: string
           unit?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "vitals_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       wards: {
         Row: {
+          branch_id: string
+          created_at: string | null
           default_price: string
           id: string
           is_labor: boolean | null
           name: string
         }
         Insert: {
+          branch_id: string
+          created_at?: string | null
           default_price: string
           id?: string
           is_labor?: boolean | null
           name: string
         }
         Update: {
+          branch_id?: string
+          created_at?: string | null
           default_price?: string
           id?: string
           is_labor?: boolean | null
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "wards_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

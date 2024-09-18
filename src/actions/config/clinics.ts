@@ -2,8 +2,8 @@ import { toast } from "sonner";
 import supabase from "@/supabase/client";
 
 export const createClinicsAction = async (values: DB["clinics"]["Insert"]) => {
-	const { error } = await supabase.from("clinics").insert(values);
-	if (error) {
+	const { error, data } = await supabase.from("clinics").insert(values);
+	if (error && !data) {
 		toast.error(error.message);
 	} else {
 		toast.success("clinic created successfully");
@@ -12,11 +12,11 @@ export const createClinicsAction = async (values: DB["clinics"]["Insert"]) => {
 
 export const updateClinicsAction = async (values: DB["clinics"]["Update"]) => {
 	if (values.id) {
-		const { error } = await supabase
+		const { error, data } = await supabase
 			.from("clinics")
 			.update(values)
 			.eq("id", values.id);
-		if (error) {
+		if (error && !data) {
 			toast.error(error.message);
 		}
 		toast.success("clinic updated successfully");
@@ -25,8 +25,11 @@ export const updateClinicsAction = async (values: DB["clinics"]["Update"]) => {
 
 export const deleteClinicsAction = async ({ id }: { id: string }) => {
 	if (id) {
-		const { error } = await supabase.from("clinics").delete().eq("id", id);
-		if (error) {
+		const { error, data } = await supabase
+			.from("clinics")
+			.delete()
+			.eq("id", id);
+		if (error && !data) {
 			toast.error(error.message);
 		}
 		toast.success("clinics deleted successfully");

@@ -23,16 +23,16 @@ import {
 	useTheatreQuery,
 } from "../../../actions/queries";
 import { FieldInfo } from "../../../components/FieldInfo";
+import { useProfile } from "@/lib/hooks";
 
 export function CreateProceduresForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 	const { data: procedure_cat, isPending: isProcedureCatPending } =
 		useProcedureCatQuery();
-
 	const { data: anaesthesia, isPending: isAnaesthesiaPending } =
 		useAnaesthesiaQuery();
-
 	const { data: theatre, isPending: isTheatrePending } = useTheatreQuery();
 
 	const form = useForm({
@@ -47,7 +47,10 @@ export function CreateProceduresForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await createProcedureAction(value);
+			await createProcedureAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["procedure"] });
@@ -58,13 +61,19 @@ export function CreateProceduresForm() {
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
 			<Dialog.Trigger
 				disabled={
-					isProcedureCatPending || isAnaesthesiaPending || isTheatrePending
+					isProcedureCatPending ||
+					isAnaesthesiaPending ||
+					isTheatrePending ||
+					isProfilePending
 				}
 			>
 				<Button
 					variant="soft"
 					loading={
-						isProcedureCatPending || isAnaesthesiaPending || isTheatrePending
+						isProcedureCatPending ||
+						isAnaesthesiaPending ||
+						isTheatrePending ||
+						isProfilePending
 					}
 				>
 					New
@@ -269,10 +278,7 @@ export function CreateProceduresForm() {
 	);
 }
 
-export function UpdateProceduresForm({
-	id,
-	...values
-}: DB["procedure"]["Update"]) {
+export function UpdateProceduresForm({ ...values }: DB["procedure"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 
 	const { data: procedure_cat, isPending: isProcedureCatPending } =
@@ -284,15 +290,18 @@ export function UpdateProceduresForm({
 	const { data: theatre, isPending: isTheatrePending } = useTheatreQuery();
 
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
-			id: id,
 			...values,
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await updateProcedureAction(value);
+			await updateProcedureAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["procedure"] });
@@ -303,13 +312,19 @@ export function UpdateProceduresForm({
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
 			<Dialog.Trigger
 				disabled={
-					isProcedureCatPending || isAnaesthesiaPending || isTheatrePending
+					isProcedureCatPending ||
+					isAnaesthesiaPending ||
+					isTheatrePending ||
+					isProfilePending
 				}
 			>
 				<Button
 					variant="ghost"
 					loading={
-						isProcedureCatPending || isAnaesthesiaPending || isTheatrePending
+						isProcedureCatPending ||
+						isAnaesthesiaPending ||
+						isTheatrePending ||
+						isProfilePending
 					}
 				>
 					<Edit size={16} />

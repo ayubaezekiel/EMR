@@ -1,5 +1,5 @@
 import { useConsultationTemplatesQuery } from "@/actions/queries";
-import { getProfile } from "@/lib/utils";
+import { useProfile } from "@/lib/hooks";
 import { Button, Modal, Select } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Flex, Spinner, Text } from "@radix-ui/themes";
@@ -71,6 +71,7 @@ export function CreateDiagnosisForm({
 	const { data, isPending } = useConsultationTemplatesQuery();
 
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -78,11 +79,11 @@ export function CreateDiagnosisForm({
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			const prof = await getProfile();
 			await createPatientDiagnosisAction({
 				note: value.note,
 				patients_id: patientId,
-				taken_by: `${prof?.id}`,
+				taken_by: `${profile_data?.id}`,
+				branch_id: `${profile_data?.branch_id}`,
 				is_admission: isAdmission,
 			});
 			form.reset();
@@ -93,7 +94,7 @@ export function CreateDiagnosisForm({
 
 	return (
 		<>
-			<Button size="md" onClick={open}>
+			<Button size="md" onClick={open} loading={isProfilePending}>
 				Add New
 			</Button>
 
@@ -180,6 +181,7 @@ export function UpdateDiagnosisForm({
 	const [opened, { close, open }] = useDisclosure(false);
 	const { data, isPending } = useConsultationTemplatesQuery();
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -189,12 +191,12 @@ export function UpdateDiagnosisForm({
 		validatorAdapter: zodValidator(),
 
 		onSubmit: async ({ value }) => {
-			const prof = await getProfile();
 			await updatePatientDiagnosisAction({
 				id,
 				note: value.note,
 				patients_id: values.patients_id,
-				taken_by: `${prof?.id}`,
+				taken_by: `${profile_data?.id}`,
+				branch_id: `${profile_data?.branch_id}`,
 			});
 			form.reset();
 			close();
@@ -204,7 +206,12 @@ export function UpdateDiagnosisForm({
 
 	return (
 		<>
-			<Button variant="subtle" size="compact-xs" onClick={open}>
+			<Button
+				variant="subtle"
+				size="compact-xs"
+				onClick={open}
+				loading={isProfilePending}
+			>
 				<Edit size={16} />
 			</Button>
 

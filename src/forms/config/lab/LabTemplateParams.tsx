@@ -17,6 +17,7 @@ import {
 	updateLabTestParamsAction,
 } from "../../../actions/config/lab-test";
 import { FieldInfo } from "../../../components/FieldInfo";
+import { useProfile } from "@/lib/hooks";
 
 const data_types = [
 	"Text",
@@ -29,6 +30,7 @@ const data_types = [
 export function CreateLabParamsForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -37,7 +39,10 @@ export function CreateLabParamsForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await createLabTestParamsAction(value);
+			await createLabTestParamsAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["labTestParams"] });
@@ -46,8 +51,10 @@ export function CreateLabParamsForm() {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button variant="soft">New</Button>
+			<Dialog.Trigger disabled={isProfilePending}>
+				<Button variant="soft" loading={isProfilePending}>
+					New
+				</Button>
 			</Dialog.Trigger>
 
 			<Dialog.Content>
@@ -137,31 +144,32 @@ export function CreateLabParamsForm() {
 }
 
 export function UpdateLabParamsForm({
-	id,
 	...values
 }: DB["lab_test_parameter"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
-			id: id,
 			...values,
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			updateLabTestParamsAction(value);
+			updateLabTestParamsAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
-
 			queryClient.invalidateQueries({ queryKey: ["labTestParams"] });
 		},
 	});
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button variant="ghost">
+			<Dialog.Trigger disabled={isProfilePending}>
+				<Button variant="ghost" loading={isProfilePending}>
 					<Edit size={16} />
 				</Button>
 			</Dialog.Trigger>

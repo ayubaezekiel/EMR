@@ -10,10 +10,12 @@ import {
 	updateSpecialtyAction,
 } from "../../actions/config/specialty";
 import { FieldInfo } from "../../components/FieldInfo";
+import { useProfile } from "@/lib/hooks";
 
 export function CreateSpecialtiesForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -21,7 +23,10 @@ export function CreateSpecialtiesForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await createSpecialtyAction(value);
+			await createSpecialtyAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["specialties"] });
@@ -30,7 +35,7 @@ export function CreateSpecialtiesForm() {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
+			<Dialog.Trigger disabled={isProfilePending}>
 				<Button variant="soft">New</Button>
 			</Dialog.Trigger>
 
@@ -90,31 +95,32 @@ export function CreateSpecialtiesForm() {
 }
 
 export function UpdateSpecialtiesForm({
-	id,
 	...values
 }: DB["specialties"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
-			id: id,
 			...values,
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await updateSpecialtyAction(value);
+			await updateSpecialtyAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
-
 			queryClient.invalidateQueries({ queryKey: ["specialties"] });
 		},
 	});
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button variant="ghost">
+			<Dialog.Trigger disabled={isProfilePending}>
+				<Button variant="ghost" loading={isProfilePending}>
 					<Edit size={16} />
 				</Button>
 			</Dialog.Trigger>

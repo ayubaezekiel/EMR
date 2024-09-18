@@ -5,15 +5,17 @@ import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
+import { FieldInfo } from "../../components/FieldInfo";
+import { useProfile } from "@/lib/hooks";
 import {
 	createQuantityTypeAction,
 	updateQuantityTypeAction,
-} from "../../actions/config/quantity-type";
-import { FieldInfo } from "../../components/FieldInfo";
+} from "@/actions/config/quantity-type";
 
 export function CreateQuantityTypeForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -21,7 +23,10 @@ export function CreateQuantityTypeForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await createQuantityTypeAction(value);
+			await createQuantityTypeAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["quantityType"] });
@@ -30,8 +35,10 @@ export function CreateQuantityTypeForm() {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button variant="soft">New</Button>
+			<Dialog.Trigger disabled={isProfilePending}>
+				<Button variant="soft" loading={isProfilePending}>
+					New
+				</Button>
 			</Dialog.Trigger>
 
 			<Dialog.Content>
@@ -95,6 +102,7 @@ export function UpdateQuantityTypeForm({
 }: DB["quantity_type"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -102,7 +110,10 @@ export function UpdateQuantityTypeForm({
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await updateQuantityTypeAction(value);
+			await updateQuantityTypeAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["quantityType"] });
@@ -111,8 +122,8 @@ export function UpdateQuantityTypeForm({
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button variant="ghost">
+			<Dialog.Trigger disabled={isProfilePending}>
+				<Button variant="ghost" loading={isProfilePending}>
 					<Edit size={16} />
 				</Button>
 			</Dialog.Trigger>

@@ -1,5 +1,5 @@
 import { useLabTestQuery, usePatientsQuery } from "@/actions/queries";
-import { getProfile } from "@/lib/utils";
+import { useProfile } from "@/lib/hooks";
 import supabase from "@/supabase/client";
 import { useForm } from "@mantine/form";
 import { randomId } from "@mantine/hooks";
@@ -23,11 +23,11 @@ import { toast } from "sonner";
 export function CreateLabRequestForm({ patientId }: { patientId?: string }) {
 	const [isLoading, setIsLoading] = useState(false);
 	const { data: lab_test_data, isPending: isLabPending } = useLabTestQuery();
-
 	const { data: patient_data, isPending: isPatientsPending } =
 		usePatientsQuery();
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		mode: "uncontrolled",
@@ -39,36 +39,32 @@ export function CreateLabRequestForm({ patientId }: { patientId?: string }) {
 
 	const fields = form.getValues().services.map((item, index) => (
 		<Flex key={item.key} gap={"2"} mt={"4"}>
-			{isLabPending ? (
-				<Spinner />
-			) : (
-				<div className="flex flex-col gap-1 w-full">
-					<Text size={"3"}>Test*</Text>
-					<Select.Root
-						required
-						size={"3"}
-						key={form.key(`services.${index}.service`)}
-						onValueChange={(e) =>
-							form.getInputProps(`services.${index}.service`).onChange(e)
-						}
-					>
-						<Select.Trigger placeholder="select a test..." />
-						<Select.Content position="popper">
-							{lab_test_data?.lab_test_data?.map((v) => (
-								<Select.Item
-									key={v.id}
-									value={JSON.stringify({
-										name: v.name,
-										amount: v.default_price,
-									})}
-								>
-									{v.name}
-								</Select.Item>
-							))}
-						</Select.Content>
-					</Select.Root>
-				</div>
-			)}
+			<div className="flex flex-col gap-1 w-full">
+				<Text size={"3"}>Test*</Text>
+				<Select.Root
+					required
+					size={"3"}
+					key={form.key(`services.${index}.service`)}
+					onValueChange={(e) =>
+						form.getInputProps(`services.${index}.service`).onChange(e)
+					}
+				>
+					<Select.Trigger placeholder="select a test..." />
+					<Select.Content position="popper">
+						{lab_test_data?.lab_test_data?.map((v) => (
+							<Select.Item
+								key={v.id}
+								value={JSON.stringify({
+									name: v.name,
+									amount: v.default_price,
+								})}
+							>
+								{v.name}
+							</Select.Item>
+						))}
+					</Select.Content>
+				</Select.Root>
+			</div>
 
 			<div className="flex flex-col gap-1">
 				<Text size={"3"}>Note*</Text>
@@ -105,8 +101,15 @@ export function CreateLabRequestForm({ patientId }: { patientId?: string }) {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button size={"4"}>New Request</Button>
+			<Dialog.Trigger
+				disabled={isLabPending || isPatientsPending || isProfilePending}
+			>
+				<Button
+					size={"4"}
+					loading={isLabPending || isPatientsPending || isProfilePending}
+				>
+					New Request
+				</Button>
 			</Dialog.Trigger>
 
 			<Dialog.Content>
@@ -118,11 +121,10 @@ export function CreateLabRequestForm({ patientId }: { patientId?: string }) {
 				<form
 					onSubmit={form.onSubmit(async (values) => {
 						setIsLoading(true);
-
-						const prof = await getProfile();
-						const { error } = await supabase.from("requests").insert({
+						const { error, data } = await supabase.from("requests").insert({
 							patients_id: patientId ?? `${values.patients_id}`,
-							taken_by: `${prof?.id}`,
+							taken_by: `${profile_data?.id}`,
+							branch_id: `${profile_data?.branch_id}`,
 							is_lab: true,
 							services: values.services.map((v) => ({
 								service: JSON.parse(v.service),
@@ -213,6 +215,7 @@ export function UpdateLabRequestForm(labData: DB["requests"]["Update"]) {
 	const { data: lab_test_data, isPending: isLabPending } = useLabTestQuery();
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		mode: "uncontrolled",
@@ -288,8 +291,13 @@ export function UpdateLabRequestForm(labData: DB["requests"]["Update"]) {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button size={"1"} color="red" variant="ghost">
+			<Dialog.Trigger disabled={isProfilePending || isLabPending}>
+				<Button
+					size={"1"}
+					color="red"
+					variant="ghost"
+					loading={isLabPending || isProfilePending}
+				>
 					<Edit />
 				</Button>
 			</Dialog.Trigger>
@@ -303,12 +311,12 @@ export function UpdateLabRequestForm(labData: DB["requests"]["Update"]) {
 				<form
 					onSubmit={form.onSubmit(async (values) => {
 						setIsLoading(true);
-						const prof = await getProfile();
-						const { error } = await supabase
+						const { error, data } = await supabase
 							.from("requests")
 							.update({
 								patients_id: `${labData.patients_id}`,
-								taken_by: `${prof?.id}`,
+								taken_by: `${profile_data?.id}`,
+								branch_id: `${profile_data?.branch_id}`,
 								is_lab: true,
 								services: values.services.map((v) => ({
 									service: JSON.parse(v.service),

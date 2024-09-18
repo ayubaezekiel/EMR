@@ -10,10 +10,12 @@ import {
 } from "../../actions/config/clinics";
 import { FieldInfo } from "../../components/FieldInfo";
 import { useQueryClient } from "@tanstack/react-query";
+import { useProfile } from "@/lib/hooks";
 
 export function CreateClinicsForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -21,7 +23,10 @@ export function CreateClinicsForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await createClinicsAction(value);
+			await createClinicsAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["clinics"] });
@@ -30,8 +35,10 @@ export function CreateClinicsForm() {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button variant="soft">New</Button>
+			<Dialog.Trigger disabled={isProfilePending}>
+				<Button variant="soft" loading={isProfilePending}>
+					New
+				</Button>
 			</Dialog.Trigger>
 
 			<Dialog.Content>
@@ -89,29 +96,31 @@ export function CreateClinicsForm() {
 	);
 }
 
-export function UpdateClinicsForm({ id, ...values }: DB["clinics"]["Update"]) {
+export function UpdateClinicsForm({ ...values }: DB["clinics"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
-			id: id,
 			...values,
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await updateClinicsAction(value);
+			await updateClinicsAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
-
 			queryClient.invalidateQueries({ queryKey: ["clinics"] });
 		},
 	});
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button variant="ghost">
+			<Dialog.Trigger disabled={isProfilePending}>
+				<Button variant="ghost" loading={isProfilePending}>
 					<Edit size={16} />
 				</Button>
 			</Dialog.Trigger>

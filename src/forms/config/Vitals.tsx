@@ -1,5 +1,5 @@
 import { useVitalsQuery } from "@/actions/queries";
-import { getProfile } from "@/lib/utils";
+import { useProfile } from "@/lib/hooks";
 import supabase from "@/supabase/client";
 import { useForm as useMantineForm } from "@mantine/form";
 import { randomId } from "@mantine/hooks";
@@ -31,6 +31,7 @@ import { Label } from "../../components/ui/label";
 export function CreateVitalsForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -39,7 +40,10 @@ export function CreateVitalsForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await createVitalsAction(value);
+			await createVitalsAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["vitals"] });
@@ -48,8 +52,10 @@ export function CreateVitalsForm() {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button variant="soft">New</Button>
+			<Dialog.Trigger disabled={isProfilePending}>
+				<Button variant="soft" loading={isProfilePending}>
+					New
+				</Button>
 			</Dialog.Trigger>
 
 			<Dialog.Content>
@@ -131,6 +137,7 @@ export function CreateVitalsForm() {
 export function UpdateVitalsForm({ id, ...values }: DB["vitals"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -139,18 +146,20 @@ export function UpdateVitalsForm({ id, ...values }: DB["vitals"]["Update"]) {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await updateVitalsAction(value);
+			await updateVitalsAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
-
 			queryClient.invalidateQueries({ queryKey: ["vitals"] });
 		},
 	});
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger>
-				<Button variant="ghost">
+			<Dialog.Trigger disabled={isProfilePending}>
+				<Button variant="ghost" loading={isProfilePending}>
 					<Edit size={16} />
 				</Button>
 			</Dialog.Trigger>
@@ -235,6 +244,7 @@ export function CreatePatientVitalsForm({ patientId }: { patientId: string }) {
 	const { data, isPending } = useVitalsQuery();
 
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const [open, onOpenChange] = useState(false);
 
@@ -242,6 +252,7 @@ export function CreatePatientVitalsForm({ patientId }: { patientId: string }) {
 		mode: "uncontrolled",
 		initialValues: {
 			patient_id: patientId,
+			branch_id: `${profile_data?.branch_id}`,
 			vitals: [{ name: "", value: "", unit: "", key: randomId() }],
 		},
 	});
@@ -320,11 +331,11 @@ export function CreatePatientVitalsForm({ patientId }: { patientId: string }) {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isPending}>
+			<Dialog.Trigger disabled={isPending || isProfilePending}>
 				<Button
 					variant="soft"
 					radius="full"
-					loading={isPending || isSubmitting}
+					loading={isPending || isProfilePending}
 				>
 					Record Vitals
 				</Button>
@@ -339,12 +350,13 @@ export function CreatePatientVitalsForm({ patientId }: { patientId: string }) {
 							unit: n.unit,
 							value: n.value,
 						}));
-						const prof = await getProfile();
-						const { error } = await supabase
+
+						const { error, data } = await supabase
 							.from("patient_vitals")
 							.insert({
 								patient_id: patientId,
-								taken_by: `${prof?.id}`,
+								branch_id: `${profile_data?.branch_id}`,
+								taken_by: `${profile_data?.id}`,
 								vitals: p_vitals,
 							})
 							.select();
@@ -409,6 +421,7 @@ export function UpdatePatientVitalsForm({
 }: DB["patient_vitals"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const { data, isPending } = useVitalsQuery();
@@ -497,88 +510,87 @@ export function UpdatePatientVitalsForm({
 	));
 
 	return (
-		<div>
-			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button variant="ghost">
-						<Edit size={16} />
-					</Button>
-				</Dialog.Trigger>
+		<Dialog.Root open={open} onOpenChange={onOpenChange}>
+			<Dialog.Trigger disabled={isProfilePending || isPending}>
+				<Button variant="ghost" loading={isProfilePending || isPending}>
+					<Edit size={16} />
+				</Button>
+			</Dialog.Trigger>
 
-				<Dialog.Content>
-					<Dialog.Title>Update Patient Vitals</Dialog.Title>
-					<Dialog.Description size="2" mb="4">
-						Fill out the form information
-					</Dialog.Description>
-					<form
-						onSubmit={form.onSubmit(async (values) => {
-							setIsSubmitting(true);
-							const p_vitals = values.vitals.map((n) => ({
-								name: n.name,
-								unit: n.unit,
-								value: n.value,
-							}));
-							const prof = await getProfile();
-							const { error } = await supabase
-								.from("patient_vitals")
-								.update({
-									patient: values.patient,
-									taken_by: `${prof?.id}`,
-									vitals: p_vitals,
-								})
-								.eq("id", `${id}`);
+			<Dialog.Content>
+				<Dialog.Title>Update Patient Vitals</Dialog.Title>
+				<Dialog.Description size="2" mb="4">
+					Fill out the form information
+				</Dialog.Description>
+				<form
+					onSubmit={form.onSubmit(async (values) => {
+						setIsSubmitting(true);
+						const p_vitals = values.vitals.map((n) => ({
+							name: n.name,
+							unit: n.unit,
+							value: n.value,
+						}));
 
-							if (error) {
-								toast.error(error.message);
-								setIsSubmitting(false);
-							} else {
-								setIsSubmitting(false);
-								onOpenChange(false);
-								toast.success("patient vitals updated successfully");
-								queryClient.invalidateQueries({
-									queryKey: ["patientVitalsById"],
-								});
-							}
-						})}
-					>
-						{fields.length < 0 && (
-							<Callout.Root color="red">
-								<Callout.Icon>
-									<AlertCircle />
-									<Callout.Text ml={"2"}>Empty</Callout.Text>
-								</Callout.Icon>
-							</Callout.Root>
-						)}
+						const { error, data } = await supabase
+							.from("patient_vitals")
+							.update({
+								branch_id: `${profile_data?.branch_id}`,
+								patient: values.patient,
+								taken_by: `${profile_data?.id}`,
+								vitals: p_vitals,
+							})
+							.eq("id", `${id}`);
 
-						{fields}
+						if (error) {
+							toast.error(error.message);
+							setIsSubmitting(false);
+						} else {
+							setIsSubmitting(false);
+							onOpenChange(false);
+							toast.success("patient vitals updated successfully");
+							queryClient.invalidateQueries({
+								queryKey: ["patientVitalsById"],
+							});
+						}
+					})}
+				>
+					{fields.length < 0 && (
+						<Callout.Root color="red">
+							<Callout.Icon>
+								<AlertCircle />
+								<Callout.Text ml={"2"}>Empty</Callout.Text>
+							</Callout.Icon>
+						</Callout.Root>
+					)}
 
-						<Flex justify="end" mt="4">
-							<Button
-								type="button"
-								variant="soft"
-								onClick={() =>
-									form.insertListItem("vitals", {
-										name: "",
-										value: "",
-										unit: "",
-										key: randomId(),
-									})
-								}
-							>
-								Add more
-							</Button>
-						</Flex>
+					{fields}
+
+					<Flex justify="end" mt="4">
 						<Button
-							disabled={!form.isValid() || isSubmitting}
-							loading={isSubmitting}
-							size={"4"}
-							type="submit"
+							type="button"
+							variant="soft"
+							onClick={() =>
+								form.insertListItem("vitals", {
+									name: "",
+									value: "",
+									unit: "",
+									key: randomId(),
+								})
+							}
 						>
-							Update
+							Add more
 						</Button>
-					</form>
-				</Dialog.Content>
-			</Dialog.Root>
-		</div>
+					</Flex>
+					<Button
+						disabled={!form.isValid() || isSubmitting}
+						loading={isSubmitting}
+						size={"4"}
+						type="submit"
+					>
+						Update
+					</Button>
+				</form>
+			</Dialog.Content>
+		</Dialog.Root>
 	);
 }

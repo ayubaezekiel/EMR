@@ -1,5 +1,5 @@
 import { useConsultationTemplatesQuery } from "@/actions/queries";
-import { getProfile } from "@/lib/utils";
+import { useProfile } from "@/lib/hooks";
 import { Button, Modal, Select } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Flex, Spinner, Text } from "@radix-ui/themes";
@@ -74,6 +74,7 @@ export function CreateExaminationForm({
 
 	const { data, isPending } = useConsultationTemplatesQuery();
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -81,11 +82,11 @@ export function CreateExaminationForm({
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			const prof = await getProfile();
 			await createExaminationAction({
 				note: value.note,
 				patients_id: patientId,
-				taken_by: `${prof?.id}`,
+				taken_by: `${profile_data?.id}`,
+				branch_id: `${profile_data?.branch_id}`,
 				is_admission: isAdmission,
 			});
 			form.reset();
@@ -96,7 +97,7 @@ export function CreateExaminationForm({
 
 	return (
 		<>
-			<Button size="md" onClick={open}>
+			<Button size="md" onClick={open} loading={isProfilePending}>
 				Add New
 			</Button>
 
@@ -184,6 +185,7 @@ export function UpdateExaminationForm({
 	const [opened, { open, close }] = useDisclosure(false);
 
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -191,12 +193,12 @@ export function UpdateExaminationForm({
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			const prof = await getProfile();
 			await updateExaminationAction({
 				id: id,
 				note: value.note,
 				patients_id: values.patients_id,
-				taken_by: `${prof?.id}`,
+				taken_by: `${profile_data?.id}`,
+				branch_id: `${profile_data?.branch_id}`,
 			});
 			form.reset();
 			close();
@@ -206,7 +208,12 @@ export function UpdateExaminationForm({
 
 	return (
 		<>
-			<Button variant="subtle" size="compact-xs" onClick={open}>
+			<Button
+				variant="subtle"
+				size="compact-xs"
+				onClick={open}
+				loading={isProfilePending}
+			>
 				<Edit size={16} />
 			</Button>
 

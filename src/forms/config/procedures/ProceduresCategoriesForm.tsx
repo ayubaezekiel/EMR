@@ -10,10 +10,12 @@ import {
 	updateProcedureCategoryAction,
 } from "../../../actions/config/procedure";
 import { FieldInfo } from "../../../components/FieldInfo";
+import { useProfile } from "@/lib/hooks";
 
 export function CreateProcedureCategoriesForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -21,7 +23,10 @@ export function CreateProcedureCategoriesForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await createProcedureCategoryAction(value);
+			await createProcedureCategoryAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["procedureCat"] });
@@ -29,66 +34,66 @@ export function CreateProcedureCategoriesForm() {
 	});
 
 	return (
-		<div>
-			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button variant="soft">New</Button>
-				</Dialog.Trigger>
+		<Dialog.Root open={open} onOpenChange={onOpenChange}>
+			<Dialog.Trigger disabled={isProfilePending}>
+				<Button variant="soft" loading={isProfilePending}>
+					New
+				</Button>
+			</Dialog.Trigger>
 
-				<Dialog.Content>
-					<Dialog.Title>New Category</Dialog.Title>
-					<Dialog.Description size="2" mb="4">
-						Fill out the form information
-					</Dialog.Description>
+			<Dialog.Content>
+				<Dialog.Title>New Category</Dialog.Title>
+				<Dialog.Description size="2" mb="4">
+					Fill out the form information
+				</Dialog.Description>
 
-					<form
-						onSubmit={(e) => {
-							e.stopPropagation();
-							e.preventDefault();
-							form.handleSubmit();
+				<form
+					onSubmit={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+						form.handleSubmit();
+					}}
+				>
+					<form.Field
+						name="name"
+						validators={{
+							onChange: z
+								.string()
+								.min(3, { message: "field must be atleast 3 characters" }),
 						}}
-					>
-						<form.Field
-							name="name"
-							validators={{
-								onChange: z
-									.string()
-									.min(3, { message: "field must be atleast 3 characters" }),
-							}}
-							children={(field) => (
-								<label htmlFor={field.name} className="flex flex-col">
-									<Text size={"3"}>Name*</Text>
-									<TextField.Root
-										name={field.name}
-										id={field.name}
-										value={field.state.value}
-										onChange={(e) => field.handleChange(e.target.value)}
-										onBlur={field.handleBlur}
-									/>
-									<FieldInfo field={field} />
-								</label>
+						children={(field) => (
+							<label htmlFor={field.name} className="flex flex-col">
+								<Text size={"3"}>Name*</Text>
+								<TextField.Root
+									name={field.name}
+									id={field.name}
+									value={field.state.value}
+									onChange={(e) => field.handleChange(e.target.value)}
+									onBlur={field.handleBlur}
+								/>
+								<FieldInfo field={field} />
+							</label>
+						)}
+					/>
+
+					<Flex gap="3" mt="4" justify="end">
+						<form.Subscribe
+							selector={(state) => [state.canSubmit, state.isSubmitting]}
+							children={([canSubmit, isSubmitting]) => (
+								<Button
+									loading={isSubmitting}
+									type="submit"
+									disabled={!canSubmit || isSubmitting}
+									size={"4"}
+								>
+									Save
+								</Button>
 							)}
 						/>
-
-						<Flex gap="3" mt="4" justify="end">
-							<form.Subscribe
-								selector={(state) => [state.canSubmit, state.isSubmitting]}
-								children={([canSubmit, isSubmitting]) => (
-									<Button
-										loading={isSubmitting}
-										type="submit"
-										disabled={!canSubmit || isSubmitting}
-										size={"4"}
-									>
-										Save
-									</Button>
-								)}
-							/>
-						</Flex>
-					</form>
-				</Dialog.Content>
-			</Dialog.Root>
-		</div>
+					</Flex>
+				</form>
+			</Dialog.Content>
+		</Dialog.Root>
 	);
 }
 
@@ -98,6 +103,7 @@ export function UpdateProcedureCategoriesForm({
 }: DB["procedure_category"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -106,7 +112,10 @@ export function UpdateProcedureCategoriesForm({
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await updateProcedureCategoryAction(value);
+			await updateProcedureCategoryAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 
@@ -115,66 +124,64 @@ export function UpdateProcedureCategoriesForm({
 	});
 
 	return (
-		<div>
-			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button variant="ghost">
-						<Edit size={16} />
-					</Button>
-				</Dialog.Trigger>
+		<Dialog.Root open={open} onOpenChange={onOpenChange}>
+			<Dialog.Trigger disabled={isProfilePending}>
+				<Button variant="ghost" loading={isProfilePending}>
+					<Edit size={16} />
+				</Button>
+			</Dialog.Trigger>
 
-				<Dialog.Content>
-					<Dialog.Title>Update Category</Dialog.Title>
-					<Dialog.Description size="2" mb="4">
-						Fill out the form information
-					</Dialog.Description>
-					<form
-						onSubmit={(e) => {
-							e.stopPropagation();
-							e.preventDefault();
-							form.handleSubmit();
+			<Dialog.Content>
+				<Dialog.Title>Update Category</Dialog.Title>
+				<Dialog.Description size="2" mb="4">
+					Fill out the form information
+				</Dialog.Description>
+				<form
+					onSubmit={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+						form.handleSubmit();
+					}}
+				>
+					<form.Field
+						name="name"
+						validators={{
+							onChange: z
+								.string()
+								.min(3, { message: "field must be atleast 3 characters" }),
 						}}
-					>
-						<form.Field
-							name="name"
-							validators={{
-								onChange: z
-									.string()
-									.min(3, { message: "field must be atleast 3 characters" }),
-							}}
-							children={(field) => (
-								<label htmlFor={field.name} className="flex flex-col">
-									<Text size={"3"}>Name*</Text>
-									<TextField.Root
-										name={field.name}
-										id={field.name}
-										value={field.state.value}
-										onChange={(e) => field.handleChange(e.target.value)}
-										onBlur={field.handleBlur}
-									/>
-									<FieldInfo field={field} />
-								</label>
+						children={(field) => (
+							<label htmlFor={field.name} className="flex flex-col">
+								<Text size={"3"}>Name*</Text>
+								<TextField.Root
+									name={field.name}
+									id={field.name}
+									value={field.state.value}
+									onChange={(e) => field.handleChange(e.target.value)}
+									onBlur={field.handleBlur}
+								/>
+								<FieldInfo field={field} />
+							</label>
+						)}
+					/>
+
+					<Flex gap="3" mt="4" justify="end">
+						<form.Subscribe
+							selector={(state) => [state.canSubmit, state.isSubmitting]}
+							children={([canSubmit, isSubmitting]) => (
+								<Button
+									loading={isSubmitting}
+									type="submit"
+									disabled={!canSubmit || isSubmitting}
+									size={"4"}
+								>
+									Save
+								</Button>
 							)}
 						/>
-
-						<Flex gap="3" mt="4" justify="end">
-							<form.Subscribe
-								selector={(state) => [state.canSubmit, state.isSubmitting]}
-								children={([canSubmit, isSubmitting]) => (
-									<Button
-										loading={isSubmitting}
-										type="submit"
-										disabled={!canSubmit || isSubmitting}
-										size={"4"}
-									>
-										Save
-									</Button>
-								)}
-							/>
-						</Flex>
-					</form>
-				</Dialog.Content>
-			</Dialog.Root>
-		</div>
+					</Flex>
+				</form>
+			</Dialog.Content>
+		</Dialog.Root>
 	);
 }

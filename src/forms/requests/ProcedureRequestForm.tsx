@@ -1,5 +1,5 @@
 import { usePatientsQuery, useProceduresQuery } from "@/actions/queries";
-import { getProfile } from "@/lib/utils";
+import { useProfile } from "@/lib/hooks";
 import supabase from "@/supabase/client";
 import { useForm } from "@mantine/form";
 import { randomId } from "@mantine/hooks";
@@ -29,6 +29,7 @@ export function CreateProcedureRequestForm({
 		usePatientsQuery();
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		mode: "uncontrolled",
@@ -99,9 +100,14 @@ export function CreateProcedureRequestForm({
 		<div>
 			<Dialog.Root open={open} onOpenChange={onOpenChange}>
 				<Dialog.Trigger
-					disabled={isLoading || isProceduresPending || isPatientsPending}
+					disabled={
+						isLoading ||
+						isProceduresPending ||
+						isPatientsPending ||
+						isProfilePending
+					}
 				>
-					<Button size={"4"} loading={isLoading || isProceduresPending}>
+					<Button size={"4"} loading={isProfilePending || isProceduresPending}>
 						New Request
 					</Button>
 				</Dialog.Trigger>
@@ -116,10 +122,10 @@ export function CreateProcedureRequestForm({
 						onSubmit={form.onSubmit(async (values) => {
 							setIsLoading(true);
 
-							const prof = await getProfile();
-							const { error } = await supabase.from("requests").insert({
+							const { error, data } = await supabase.from("requests").insert({
 								patients_id: patientId ?? `${values.patients_id}`,
-								taken_by: `${prof?.id}`,
+								taken_by: `${profile_data?.id}`,
+								branch_id: `${profile_data?.branch_id}`,
 								is_procedure: true,
 								services: values.services.map((v) => ({
 									service: JSON.parse(v.service),
@@ -205,6 +211,7 @@ export function UpdateProcedureRequestForm(prodData: DB["requests"]["Update"]) {
 		useProceduresQuery();
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		mode: "uncontrolled",
@@ -272,12 +279,12 @@ export function UpdateProcedureRequestForm(prodData: DB["requests"]["Update"]) {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isProceduresPending}>
+			<Dialog.Trigger disabled={isProceduresPending || isProfilePending}>
 				<Button
 					size={"1"}
 					color="red"
 					variant="ghost"
-					loading={isLoading || isProceduresPending}
+					loading={isProfilePending || isProceduresPending}
 				>
 					<Edit />
 				</Button>
@@ -293,12 +300,12 @@ export function UpdateProcedureRequestForm(prodData: DB["requests"]["Update"]) {
 					onSubmit={form.onSubmit(async (values) => {
 						setIsLoading(true);
 
-						const prof = await getProfile();
-						const { error } = await supabase
+						const { error, data } = await supabase
 							.from("requests")
 							.update({
 								patients_id: `${prodData.patients_id}`,
-								taken_by: `${prof?.id}`,
+								taken_by: `${profile_data?.id}`,
+								branch_id: `${profile_data?.branch_id}`,
 								is_procedure: true,
 								services: values.services.map((v) => ({
 									service: JSON.parse(v.service),

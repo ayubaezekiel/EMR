@@ -11,12 +11,12 @@ import { useForm } from "@tanstack/react-form";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { usePerms } from "../lib/hooks";
 import supabase_admin from "../supabase/supabase-admin";
 import { FieldInfo } from "./FieldInfo";
+import { useProfile } from "@/lib/hooks";
 
 export function InviteUser() {
-	const { isPermPending, perm_data } = usePerms();
+	const { isProfilePending, profile_data } = useProfile();
 	const [revealPassword, setRevealPassword] = useState(false);
 	const [open, onOpenChange] = useState(false);
 
@@ -56,11 +56,11 @@ export function InviteUser() {
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
 			<Dialog.Trigger
-				disabled={isPermPending || Boolean(!perm_data?.is_super_user)}
+				disabled={isProfilePending || Boolean(!profile_data?.is_super_user)}
 			>
 				<Button
-					disabled={Boolean(!perm_data?.is_super_user)}
-					loading={isPermPending}
+					disabled={Boolean(!profile_data?.is_super_user)}
+					loading={isProfilePending}
 				>
 					New user
 				</Button>

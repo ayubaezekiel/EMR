@@ -3,14 +3,12 @@ import {
 	useDepartmentsQuery,
 	useJobPositionsQuery,
 } from "@/actions/queries";
-import { usePerms } from "@/lib/hooks";
-import supabase from "@/supabase/client";
+import { useProfile } from "@/lib/hooks";
 import { Button, Flex, Select, Text, TextField } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { toast } from "sonner";
 import { z } from "zod";
 import { updateProfileAction } from "../../actions/config/user-profile";
 import { FieldInfo } from "../../components/FieldInfo";
@@ -18,51 +16,37 @@ import { FieldInfo } from "../../components/FieldInfo";
 export function UpdateProfileForm() {
 	const queryClient = useQueryClient();
 	const { userId } = useParams({ from: "/_layout/dashboard/users/$userId" });
-
-	const { isPermPending, perm_data } = usePerms();
-
-	const { data: branch_data, isPending: isBranchPending } = useBranchQuery();
-
 	const { data: dept_data, isPending: isDeptPending } = useDepartmentsQuery();
+	const { data, isPending } = useBranchQuery();
 
 	const { data: job_pos_data, isPending: isJobPosPending } =
 		useJobPositionsQuery();
 
-	const { data: profile_data, isPending: isProfilePending } = useQuery({
-		queryKey: ["profile"],
-		queryFn: async () => {
-			const { data, error } = await supabase
-				.from("profile")
-				.select("*")
-				.eq("user_id", userId)
-				.single();
-			if (error) {
-				toast.error(error.message);
-			}
-			return data;
-		},
-	});
+	const { isProfilePending, profile_data } = useProfile();
+
+	const { branch, ...rest } = { ...profile_data };
+	branch;
 
 	const form = useForm({
 		defaultValues: {
-			...profile_data,
+			...rest,
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await updateProfileAction(value);
+			await updateProfileAction({
+				...value,
+			});
 			form.reset();
-			queryClient.invalidateQueries({ queryKey: ["profile"] });
+			queryClient.resetQueries();
 		},
 	});
 
 	const pending =
-		isProfilePending ||
-		isBranchPending ||
-		isJobPosPending ||
-		isDeptPending ||
-		isPermPending;
+		isProfilePending || isJobPosPending || isDeptPending || isPending;
 
-	const allowed = perm_data?.user_id === userId || perm_data?.is_super_user;
+	const allowed =
+		profile_data?.user_id === userId || profile_data?.is_super_user;
+	const super_user_allowed = profile_data?.is_super_user;
 
 	return (
 		<form
@@ -160,42 +144,14 @@ export function UpdateProfileForm() {
 
 			<div>
 				<form.Field
-					name="branch_id"
-					validators={{
-						onChange: z.string().min(3, { message: "required" }),
-					}}
-					children={(field) => (
-						<div className="flex flex-col">
-							<Text size={"3"}>Branch*</Text>
-							<Select.Root
-								disabled={!allowed}
-								onValueChange={(e) => field.handleChange(e)}
-								value={field.state.value!}
-								name={field.name}
-								size={"3"}
-							>
-								<Select.Trigger placeholder="select branch..." />
-								<Select.Content position="popper">
-									{branch_data?.branch_data?.map((b) => (
-										<Select.Item value={b.id}>{b.name}</Select.Item>
-									))}
-								</Select.Content>
-							</Select.Root>
-							<FieldInfo field={field} />
-						</div>
-					)}
-				/>
-
-				<form.Field
+					defaultValue={profile_data?.department_id}
 					name="department_id"
-					validators={{
-						onChange: z.string().min(3, { message: "required" }),
-					}}
 					children={(field) => (
 						<div className="flex flex-col">
 							<Text size={"3"}>Department*</Text>
 							<Select.Root
-								disabled={!allowed}
+								required
+								disabled={!super_user_allowed}
 								onValueChange={(e) => field.handleChange(e)}
 								value={field.state.value!}
 								name={field.name}
@@ -214,14 +170,13 @@ export function UpdateProfileForm() {
 				/>
 				<form.Field
 					name="job_position_id"
-					validators={{
-						onChange: z.string().min(3, { message: "required" }),
-					}}
+					defaultValue={profile_data?.job_position_id}
 					children={(field) => (
 						<div className="flex flex-col">
 							<Text size={"3"}>Job Position*</Text>
 							<Select.Root
-								disabled={!allowed}
+								required
+								disabled={!super_user_allowed}
 								onValueChange={(e) => field.handleChange(e)}
 								value={field.state.value!}
 								name={field.name}
@@ -230,6 +185,31 @@ export function UpdateProfileForm() {
 								<Select.Trigger placeholder="select job position..." />
 								<Select.Content position="popper">
 									{job_pos_data?.job_positions_data?.map((b) => (
+										<Select.Item value={b.id}>{b.name}</Select.Item>
+									))}
+								</Select.Content>
+							</Select.Root>
+							<FieldInfo field={field} />
+						</div>
+					)}
+				/>
+				<form.Field
+					name="branch_id"
+					defaultValue={profile_data?.branch_id}
+					children={(field) => (
+						<div className="flex flex-col">
+							<Text size={"3"}>Branch</Text>
+							<Select.Root
+								required
+								disabled={!super_user_allowed}
+								onValueChange={(e) => field.handleChange(e)}
+								value={field.state.value!}
+								name={field.name}
+								size={"3"}
+							>
+								<Select.Trigger placeholder="select job position..." />
+								<Select.Content position="popper">
+									{data?.branch_data?.map((b) => (
 										<Select.Item value={b.id}>{b.name}</Select.Item>
 									))}
 								</Select.Content>

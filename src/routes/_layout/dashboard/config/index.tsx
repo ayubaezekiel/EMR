@@ -3,6 +3,7 @@ import {
 	Badge,
 	Box,
 	Button,
+	Callout,
 	Card,
 	DataList,
 	Flex,
@@ -24,7 +25,9 @@ import { HMOGroups } from "../../../../components/config/insurance/HMOGroups";
 import { HMOPlans } from "../../../../components/config/insurance/HMOPlans";
 import { UpdateCenterForm } from "../../../../forms/config/CenterForm";
 import { config_services_routes } from "../../../../lib/constants";
-import { useCenter } from "../../../../lib/hooks";
+import { useCenter, useProfile } from "../../../../lib/hooks";
+import { DocumentTypes } from "@/components/config/DocumentTypes";
+import { AlertTriangle } from "lucide-react";
 
 export const Route = createFileRoute("/_layout/dashboard/config/")({
 	component: () => {
@@ -39,18 +42,22 @@ export const Route = createFileRoute("/_layout/dashboard/config/")({
 
 const Center = () => {
 	const activeTab = Route.useSearch<{ active: string }>();
-
+	const navigate = Route.useNavigate();
 	const { center_data, isCenterPending } = useCenter();
 
-	const url = new URL(location.href);
-	const params = new URLSearchParams(url.search);
+	const { profile_data } = useProfile();
 
-	return (
+	return profile_data?.is_super_user ||
+		Boolean(profile_data?.has_access_to_config) ? (
 		<Tabs.Root
 			defaultValue={activeTab.active}
 			mt={"4"}
 			onValueChange={(e) => {
-				params.set("active", e);
+				navigate({
+					search: {
+						active: e,
+					},
+				});
 			}}
 		>
 			<Tabs.List>
@@ -114,7 +121,7 @@ const Center = () => {
 			<Tabs.Content mt={"4"} value="services">
 				<div className="grid gap-4 md:grid-cols-3 mt-4">
 					{config_services_routes.map((p) => (
-						<Card key={p.link_title}>
+						<Card key={p.route}>
 							<Box height={"50px"}>
 								<Link to={p.route} className="w-full h-full ">
 									<Button
@@ -147,18 +154,27 @@ const Center = () => {
 			</Tabs.Content>
 
 			<Tabs.Content mt={"4"} value="data">
-				<AppointmentType />
-
 				<div className="grid gap-4 md:grid-cols-2 mt-4">
+					<AppointmentType />
 					<JobPostion />
 					<Clinics />
 					<Specialties />
 					<Departments />
+					<DocumentTypes />
 				</div>
 			</Tabs.Content>
 			<Tabs.Content mt={"4"} value="finance">
 				<FinancialAnalytics />
 			</Tabs.Content>
 		</Tabs.Root>
+	) : (
+		<Flex>
+			<Callout.Root color="red">
+				<Callout.Icon>
+					<AlertTriangle />
+				</Callout.Icon>
+				<Callout.Text>Access denied, insufficient permissions</Callout.Text>
+			</Callout.Root>
+		</Flex>
 	);
 };

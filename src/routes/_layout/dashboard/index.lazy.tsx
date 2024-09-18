@@ -7,10 +7,9 @@ import {
 	Heading,
 	Spinner,
 } from "@radix-ui/themes";
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute, Link } from "@tanstack/react-router";
+import { TriangleAlert } from "lucide-react";
 import { services_routes } from "../../../lib/constants";
-import { Link } from "@tanstack/react-router";
-import { Home, TriangleAlert } from "lucide-react";
 import { useCenter } from "../../../lib/hooks";
 
 export const Route = createLazyFileRoute("/_layout/dashboard/")({
@@ -21,16 +20,6 @@ export const Route = createLazyFileRoute("/_layout/dashboard/")({
 			</div>
 			<Warning />
 			<div className="grid md:grid-cols-2 gap-4 lg:grid-cols-4 mt-10">
-				<Card>
-					<Box height={"100px"}>
-						<Link to={"/dashboard"} className="w-full h-full ">
-							<Button variant="ghost" style={{ width: "100%", height: "100%" }}>
-								<Home /> Dashboard
-							</Button>
-						</Link>
-					</Box>
-				</Card>
-
 				{services_routes.map((p) => (
 					<Card>
 						<Box height={"100px"} key={p.route}>

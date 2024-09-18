@@ -30,8 +30,8 @@ export function CreateAdmissionForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
 
-	const { data: wards_data, isPending: isWardPending } = useWardsQuery();
 	const { isProfilePending, profile_data } = useProfile();
+	const { data: wards_data, isPending: isWardPending } = useWardsQuery();
 	const { data: bed_data, isPending: isBedPending } = useBedsQuery();
 	const { data: patient_data, isPending: isPatientPending } =
 		usePatientsQuery();
@@ -47,8 +47,9 @@ export function CreateAdmissionForm() {
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
 			await createAdmissionAction({
-				admitted_by: `${profile_data?.id}`,
 				...value,
+				admitted_by: `${profile_data?.id}`,
+				branch_id: `${profile_data?.branch_id}`,
 			});
 			form.reset();
 			onOpenChange(false);
@@ -63,7 +64,9 @@ export function CreateAdmissionForm() {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isProfilePending}>
+			<Dialog.Trigger
+				disabled={isProfilePending || !profile_data?.has_access_to_admission}
+			>
 				<Button size={"4"} loading={isProfilePending}>
 					Admit Patient
 				</Button>
@@ -259,10 +262,10 @@ export function UpdateAdmissionForm({
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			const { ...values } = value;
 			await updateAdmissionAction({
+				...value,
 				admitted_by: `${profile_data?.id}`,
-				...values,
+				branch_id: `${profile_data?.branch_id}`,
 			});
 			form.reset();
 			onOpenChange(false);

@@ -4,8 +4,7 @@ import {
 } from "@/actions/queries";
 import { FieldInfo } from "@/components/FieldInfo";
 import { editor_plugins } from "@/components/textEditor/RichTextEditor";
-import { useAntenatalPackage } from "@/lib/hooks";
-import { getProfile } from "@/lib/utils";
+import { useAntenatalPackage, useProfile } from "@/lib/hooks";
 import supabase from "@/supabase/client";
 import { Button, Group, Modal, Select } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
@@ -28,6 +27,7 @@ export function CreateAntenatalRequestForm() {
 		usePatientsQuery();
 
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -41,10 +41,10 @@ export function CreateAntenatalRequestForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			const prof = await getProfile();
-			const { error } = await supabase.from("requests").insert({
+			const { error, data } = await supabase.from("requests").insert({
 				patients_id: `${value.patients_id}`,
-				taken_by: `${prof?.id}`,
+				taken_by: `${profile_data?.id}`,
+				branch_id: `${profile_data?.branch_id}`,
 				is_antenatal: true,
 				services: {
 					package: value.services.package,
@@ -55,7 +55,6 @@ export function CreateAntenatalRequestForm() {
 			});
 			if (error) {
 				toast.error(error.message);
-				console.log(value.services);
 			} else {
 				toast.success("patient enrolled successfully");
 				form.reset();
@@ -70,7 +69,12 @@ export function CreateAntenatalRequestForm() {
 			<Button
 				size={"md"}
 				onClick={open}
-				loading={isPatientsPending || isPending || isAntenatalPackagePending}
+				loading={
+					isPatientsPending ||
+					isPending ||
+					isAntenatalPackagePending ||
+					isProfilePending
+				}
 			>
 				New Request
 			</Button>

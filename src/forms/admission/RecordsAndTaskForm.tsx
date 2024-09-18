@@ -43,6 +43,7 @@ export function RecordsAndTaskForm({
 				patient_id: patientId,
 				created_by: `${profile_data?.id}`,
 				is_progress_note: isProgressNote,
+				branch_id: `${profile_data?.branch_id}`,
 			});
 			form.reset();
 			close();
@@ -144,6 +145,7 @@ export function UpdateRecordsAndTaskForm(
 			await updateAdmissionReportsAction({
 				...value,
 				created_by: `${profile_data?.id}`,
+				branch_id: `${profile_data?.branch_id}`,
 			});
 			form.reset();
 			close();

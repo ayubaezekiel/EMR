@@ -1,33 +1,36 @@
+import { useProfile } from "@/lib/hooks";
 import { Button, Flex, Switch, Text } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { z } from "zod";
-import { updateUserPermsAction } from "../../actions/config/user-profile";
+import { updateProfileAction } from "../../actions/config/user-profile";
 import { FieldInfo } from "../../components/FieldInfo";
-import { usePerms } from "@/lib/hooks";
 
 export function UserPermission() {
 	const queryClient = useQueryClient();
-	const { userId } = useParams({ from: "/_layout/dashboard/users/$userId" });
 
-	const { perm_data, isPermPending } = usePerms();
+	const { isProfilePending, profile_data } = useProfile();
+
+	const { branch, ...rest } = { ...profile_data };
+	branch;
 
 	const form = useForm({
 		defaultValues: {
-			user_id: userId,
-			...perm_data,
+			...rest,
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await updateUserPermsAction(value);
+			await updateProfileAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
-			queryClient.invalidateQueries({ queryKey: ["profile"] });
+			queryClient.resetQueries();
 		},
 	});
 
-	const allowed = perm_data?.is_super_user || perm_data?.user_id === userId;
+	const allowed = profile_data?.is_super_user;
 
 	return (
 		<form
@@ -40,6 +43,48 @@ export function UserPermission() {
 			<div className="flex flex-col gap-2">
 				<form.Field
 					name="is_super_user"
+					validators={{
+						onChange: z.boolean().optional(),
+					}}
+					children={(field) => (
+						<div className="flex gap-2 items-center">
+							<Switch
+								size={"3"}
+								disabled={!allowed}
+								name={field.name}
+								id={field.name}
+								checked={Boolean(field.state.value)}
+								onCheckedChange={(e) => field.handleChange(e)}
+								onBlur={field.handleBlur}
+							/>
+							<Text size={"3"}>{field.name}</Text>
+							<FieldInfo field={field} />
+						</div>
+					)}
+				/>
+				<form.Field
+					name="can_switch_branch"
+					validators={{
+						onChange: z.boolean().optional(),
+					}}
+					children={(field) => (
+						<div className="flex gap-2 items-center">
+							<Switch
+								size={"3"}
+								disabled={!allowed}
+								name={field.name}
+								id={field.name}
+								checked={Boolean(field.state.value)}
+								onCheckedChange={(e) => field.handleChange(e)}
+								onBlur={field.handleBlur}
+							/>
+							<Text size={"3"}>{field.name}</Text>
+							<FieldInfo field={field} />
+						</div>
+					)}
+				/>
+				<form.Field
+					name="has_access_to_admission"
 					validators={{
 						onChange: z.boolean().optional(),
 					}}
@@ -405,8 +450,8 @@ export function UserPermission() {
 					children={([canSubmit, isSubmitting]) => (
 						<Button
 							type="submit"
-							disabled={!canSubmit || !allowed}
-							loading={isSubmitting || isPermPending}
+							disabled={!canSubmit || !allowed || isProfilePending}
+							loading={isSubmitting || isProfilePending}
 							size={"4"}
 						>
 							Update

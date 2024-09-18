@@ -1,4 +1,5 @@
-import { Box, Heading, Section } from "@radix-ui/themes";
+import { useProfile } from "@/lib/hooks";
+import { Badge, Box, Heading, Section, Spinner } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import {
 	Outlet,
@@ -8,7 +9,6 @@ import {
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Header } from "../components/Header";
-import { Sidebar } from "../components/SideBar";
 import { checkAuth } from "../lib/utils";
 
 const Layout = () => {
@@ -17,6 +17,8 @@ const Layout = () => {
 		queryFn: checkAuth,
 		queryKey: ["user"],
 	});
+
+	const { isProfilePending, profile_data } = useProfile();
 
 	useEffect(() => {
 		const block = async () => {
@@ -30,18 +32,27 @@ const Layout = () => {
 
 	return (
 		<Box>
-			<Header
-				isPending={isPending}
-				user={`${data?.email}`}
-				userId={`${data?.id}`}
-			/>
-			<aside className="lg:flex w-72 hidden justify-start  fixed inset-y-0">
-				<Sidebar />
-			</aside>
-			<main className="lg:w-[80%] lg:ml-auto lg:px-20 p-2 mt-20">
+			<Header />
+			<main className="lg:px-20 p-2 mt-20">
 				<Section>
 					<Heading size={"1"} mb={"2"}>
-						<div className="flex items-center gap-2">staff - {data?.email}</div>
+						<div className="flex items-center gap-2">
+							Staff -{" "}
+							{isProfilePending ? (
+								<Spinner />
+							) : (
+								<Badge variant="solid">
+									{profile_data?.first_name} {profile_data?.middle_name ?? ""}{" "}
+									{profile_data?.last_name}
+								</Badge>
+							)}
+							{isPending ? (
+								<Spinner />
+							) : (
+								<Badge variant="solid">{data?.email}</Badge>
+							)}
+							<Badge variant="solid">{profile_data?.branch?.name}</Badge>
+						</div>
 					</Heading>
 					<Outlet />
 				</Section>

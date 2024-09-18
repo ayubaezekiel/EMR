@@ -1,14 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import supabase from "../supabase/client";
-import { getPerms } from "../actions/actions";
 import { getProfile } from "./utils";
 import { toast } from "sonner";
 
 export const useAntenatalPackage = () => {
+	const { profile_data } = useProfile();
+
 	const { data: antenatal_package_data, isPending: isAntenatalPackagePending } =
 		useQuery({
 			queryFn: async () => {
-				const { data } = await supabase.from("antenatal_package").select("*");
+				const { data } = await supabase
+					.from("antenatal_package")
+					.select("*")
+					.eq("branch_id", profile_data?.branch_id as string);
 				return data;
 			},
 			queryKey: ["antenatalPackage"],
@@ -32,10 +36,14 @@ export const useRequestById = ({ patientId }: { patientId: string }) => {
 };
 
 export const useQuantityType = () => {
+	const { profile_data } = useProfile();
 	const { data: quantity_type_data, isPending: isQuantityTypePending } =
 		useQuery({
 			queryFn: async () => {
-				const { data } = await supabase.from("quantity_type").select("*");
+				const { data } = await supabase
+					.from("quantity_type")
+					.select("*")
+					.eq("branch_id", profile_data?.branch_id as string);
 				return data;
 			},
 			queryKey: ["quantityType"],
@@ -43,12 +51,45 @@ export const useQuantityType = () => {
 	return { quantity_type_data, isQuantityTypePending };
 };
 
+export const useUserReport = () => {
+	const { profile_data } = useProfile();
+	const { data: user_report_data, isPending: isUserReportPending } = useQuery({
+		queryFn: async () => {
+			const { data } = await supabase
+				.from("document_reports")
+				.select("*,profile(*),document_types(*)")
+				.eq("branch_id", profile_data?.branch_id as string);
+			return data;
+		},
+		queryKey: ["userReports"],
+	});
+	return { user_report_data, isUserReportPending };
+};
+
+export const useDocumentType = () => {
+	const { profile_data } = useProfile();
+	const { data: document_type_data, isPending: isDocumentTypePending } =
+		useQuery({
+			queryFn: async () => {
+				const { data } = await supabase
+					.from("document_types")
+					.select("*")
+					.eq("branch_id", profile_data?.branch_id as string);
+				return data;
+			},
+			queryKey: ["documentType"],
+		});
+	return { document_type_data, isDocumentTypePending };
+};
+
 export const useBilling = () => {
+	const { profile_data } = useProfile();
 	const { data: billing_data, isPending: isBillingPending } = useQuery({
 		queryFn: async () => {
 			const { data } = await supabase
 				.from("payments")
-				.select("*,patients(*),cash_points(*),payment_methods(*),profile(*)");
+				.select("*,patients(*),cash_points(*),payment_methods(*),profile(*)")
+				.eq("branch_id", profile_data?.branch_id as string);
 			return data;
 		},
 		queryKey: ["payments"],
@@ -56,19 +97,16 @@ export const useBilling = () => {
 	return { billing_data, isBillingPending };
 };
 
-export const useUser = async () => {
-	const { data } = await supabase.auth.getSession();
-	const user = data.session?.user;
-	return { user };
-};
-
-export const usePerms = () => {
-	const { data: perm_data, isPending: isPermPending } = useQuery({
-		queryKey: ["permissions"],
-		queryFn: () => getPerms(),
+export const useUser = () => {
+	const { data, isPending } = useQuery({
+		queryKey: ["loggedUser"],
+		queryFn: async () => {
+			const { data, error } = await supabase.auth.getSession();
+			const user = data.session?.user;
+			return { user, error };
+		},
 	});
-
-	return { perm_data, isPermPending };
+	return { data, isPending };
 };
 
 export const useProfile = () => {

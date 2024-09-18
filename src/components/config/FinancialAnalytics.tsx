@@ -152,7 +152,7 @@ export function FinancialAnalytics() {
 	return isBillingPending ? (
 		<Spinner />
 	) : (
-		<div className="container flex flex-col gap-4 mx-auto p-4 space-y-4">
+		<div className="flex flex-col gap-4 space-y-4">
 			<div className="flex items-center justify-between font-bold">
 				<h1 className="text-2xl font-bold">Financial Analytics</h1>
 				<div className="flex flex-col text-xl">

@@ -1,5 +1,5 @@
 import { useImagingQuery, usePatientsQuery } from "@/actions/queries";
-import { getProfile } from "@/lib/utils";
+import { useProfile } from "@/lib/hooks";
 import supabase from "@/supabase/client";
 import { useForm } from "@mantine/form";
 import { randomId } from "@mantine/hooks";
@@ -29,6 +29,7 @@ export function CreateRadiologyRequestForm({
 		usePatientsQuery();
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		mode: "uncontrolled",
@@ -93,8 +94,10 @@ export function CreateRadiologyRequestForm({
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isRadiologyPending || isPatientsPending}>
-				<Button loading={isLoading || isRadiologyPending} size={"4"}>
+			<Dialog.Trigger
+				disabled={isRadiologyPending || isPatientsPending || isProfilePending}
+			>
+				<Button loading={isProfilePending || isRadiologyPending} size={"4"}>
 					New Request
 				</Button>
 			</Dialog.Trigger>
@@ -108,11 +111,10 @@ export function CreateRadiologyRequestForm({
 				<form
 					onSubmit={form.onSubmit(async (values) => {
 						setIsLoading(true);
-
-						const prof = await getProfile();
-						const { error } = await supabase.from("requests").insert({
+						const { error, data } = await supabase.from("requests").insert({
 							patients_id: patientId ?? `${values.patients_id}`,
-							taken_by: `${prof?.id}`,
+							taken_by: `${profile_data?.id}`,
+							branch_id: `${profile_data?.branch_id}`,
 							is_radiology: true,
 							services: values.services.map((v) => ({
 								service: JSON.parse(v.service),
@@ -199,6 +201,7 @@ export function UpdateRadiologyRequestForm(radData: DB["requests"]["Update"]) {
 
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		mode: "uncontrolled",
@@ -261,90 +264,88 @@ export function UpdateRadiologyRequestForm(radData: DB["requests"]["Update"]) {
 	));
 
 	return (
-		<div>
-			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger disabled={isRadiologyPending}>
-					<Button
-						loading={isLoading || isRadiologyPending}
-						size={"1"}
-						color="red"
-						variant="ghost"
-					>
-						<Edit />
-					</Button>
-				</Dialog.Trigger>
+		<Dialog.Root open={open} onOpenChange={onOpenChange}>
+			<Dialog.Trigger disabled={isRadiologyPending || isProfilePending}>
+				<Button
+					loading={isProfilePending || isRadiologyPending}
+					size={"1"}
+					color="red"
+					variant="ghost"
+				>
+					<Edit />
+				</Button>
+			</Dialog.Trigger>
 
-				<Dialog.Content>
-					<Dialog.Title>Radiology Request</Dialog.Title>
-					<Dialog.Description size="2" mb="4">
-						Fill out the form information
-					</Dialog.Description>
+			<Dialog.Content>
+				<Dialog.Title>Radiology Request</Dialog.Title>
+				<Dialog.Description size="2" mb="4">
+					Fill out the form information
+				</Dialog.Description>
 
-					<form
-						onSubmit={form.onSubmit(async (values) => {
-							setIsLoading(true);
+				<form
+					onSubmit={form.onSubmit(async (values) => {
+						setIsLoading(true);
 
-							const prof = await getProfile();
-							const { error } = await supabase
-								.from("requests")
-								.update({
-									patients_id: `${radData.patients_id}`,
-									taken_by: `${prof?.id}`,
-									is_radiology: true,
-									services: values.services.map((v) => ({
-										service: JSON.parse(v.service),
-										note: v.note,
-									})),
-								})
-								.eq("id", `${radData.id}`);
-							if (error) {
-								toast.error(error.message);
-								setIsLoading(false);
-							} else {
-								toast.success("request issued successfully");
-								form.reset();
-								queryClient.invalidateQueries({ queryKey: ["requests"] });
-								setIsLoading(false);
-								onOpenChange(false);
-							}
-						})}
-					>
-						{fields.length < 0 && (
-							<Callout.Root color="red">
-								<Callout.Icon>
-									<AlertCircle />
-									<Callout.Text ml={"2"}>Empty</Callout.Text>
-								</Callout.Icon>
-							</Callout.Root>
-						)}
+						const { error, data } = await supabase
+							.from("requests")
+							.update({
+								patients_id: `${radData.patients_id}`,
+								taken_by: `${profile_data?.id}`,
+								branch_id: `${profile_data?.branch_id}`,
+								is_radiology: true,
+								services: values.services.map((v) => ({
+									service: JSON.parse(v.service),
+									note: v.note,
+								})),
+							})
+							.eq("id", `${radData.id}`);
+						if (error) {
+							toast.error(error.message);
+							setIsLoading(false);
+						} else {
+							toast.success("request issued successfully");
+							form.reset();
+							queryClient.invalidateQueries({ queryKey: ["requests"] });
+							setIsLoading(false);
+							onOpenChange(false);
+						}
+					})}
+				>
+					{fields.length < 0 && (
+						<Callout.Root color="red">
+							<Callout.Icon>
+								<AlertCircle />
+								<Callout.Text ml={"2"}>Empty</Callout.Text>
+							</Callout.Icon>
+						</Callout.Root>
+					)}
 
-						{fields}
-						<Flex justify="end" mt="4">
-							<Button
-								type="button"
-								variant="soft"
-								onClick={() =>
-									form.insertListItem("services", {
-										service: "",
-										note: "",
-										key: randomId(),
-									})
-								}
-							>
-								Add more
-							</Button>
-						</Flex>
+					{fields}
+					<Flex justify="end" mt="4">
 						<Button
-							loading={isLoading}
-							disabled={!form.isValid() || isLoading}
-							size={"4"}
-							type="submit"
+							type="button"
+							variant="soft"
+							onClick={() =>
+								form.insertListItem("services", {
+									service: "",
+									note: "",
+									key: randomId(),
+								})
+							}
 						>
-							Request
+							Add more
 						</Button>
-					</form>
-				</Dialog.Content>
-			</Dialog.Root>
-		</div>
+					</Flex>
+					<Button
+						loading={isLoading}
+						disabled={!form.isValid() || isLoading}
+						size={"4"}
+						type="submit"
+					>
+						Request
+					</Button>
+				</form>
+			</Dialog.Content>
+		</Dialog.Root>
 	);
 }

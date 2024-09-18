@@ -3,6 +3,7 @@ import {
 	updateAntenatalPackageAction,
 } from "@/actions/config/antenatal";
 import { FieldInfo } from "@/components/FieldInfo";
+import { useProfile } from "@/lib/hooks";
 import {
 	Button,
 	Checkbox,
@@ -21,6 +22,7 @@ import { z } from "zod";
 export function CreateAntenatalPackageForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -30,7 +32,10 @@ export function CreateAntenatalPackageForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await createAntenatalPackageAction(value);
+			await createAntenatalPackageAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["antenatalPackage"] });
@@ -38,106 +43,106 @@ export function CreateAntenatalPackageForm() {
 	});
 
 	return (
-		<div>
-			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button variant="soft">New</Button>
-				</Dialog.Trigger>
+		<Dialog.Root open={open} onOpenChange={onOpenChange}>
+			<Dialog.Trigger disabled={isProfilePending}>
+				<Button variant="soft" loading={isProfilePending}>
+					New
+				</Button>
+			</Dialog.Trigger>
 
-				<Dialog.Content>
-					<Dialog.Title>New Antenatal Package</Dialog.Title>
-					<Dialog.Description size="2" mb="4">
-						Fill out the form information
-					</Dialog.Description>
+			<Dialog.Content>
+				<Dialog.Title>New Antenatal Package</Dialog.Title>
+				<Dialog.Description size="2" mb="4">
+					Fill out the form information
+				</Dialog.Description>
 
-					<form
-						onSubmit={(e) => {
-							e.stopPropagation();
-							e.preventDefault();
-							form.handleSubmit();
+				<form
+					onSubmit={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+						form.handleSubmit();
+					}}
+				>
+					<form.Field
+						name="name"
+						validators={{
+							onChange: z
+								.string()
+								.min(3, { message: "field must be atleast 3 characters" }),
 						}}
-					>
-						<form.Field
-							name="name"
-							validators={{
-								onChange: z
-									.string()
-									.min(3, { message: "field must be atleast 3 characters" }),
-							}}
-							children={(field) => (
-								<label htmlFor={field.name}>
-									<Text size={"3"}>Name*</Text>
-									<TextField.Root
-										name={field.name}
-										id={field.name}
-										value={field.state.value}
-										onChange={(e) => field.handleChange(e.target.value)}
-										onBlur={field.handleBlur}
-									/>
-									<FieldInfo field={field} />
-								</label>
-							)}
-						/>
-						<form.Field
-							name="default_price"
-							validators={{
-								onChange: z.number().min(0, { message: "required" }),
-							}}
-							children={(field) => (
-								<label htmlFor={field.name}>
-									<Text size={"3"}>Default Price*</Text>
-									<TextField.Root
-										type="number"
-										name={field.name}
-										id={field.name}
-										value={field.state.value}
-										onChange={(e) =>
-											field.handleChange(parseFloat(e.target.value))
-										}
-										onBlur={field.handleBlur}
-									/>
-									<FieldInfo field={field} />
-								</label>
-							)}
-						/>
-						<form.Field
-							name="with_delivary"
-							children={(field) => (
-								<label
-									htmlFor={field.name}
-									className="flex gap-2 items-center mt-4"
+						children={(field) => (
+							<label htmlFor={field.name}>
+								<Text size={"3"}>Name*</Text>
+								<TextField.Root
+									name={field.name}
+									id={field.name}
+									value={field.state.value}
+									onChange={(e) => field.handleChange(e.target.value)}
+									onBlur={field.handleBlur}
+								/>
+								<FieldInfo field={field} />
+							</label>
+						)}
+					/>
+					<form.Field
+						name="default_price"
+						validators={{
+							onChange: z.number().min(0, { message: "required" }),
+						}}
+						children={(field) => (
+							<label htmlFor={field.name}>
+								<Text size={"3"}>Default Price*</Text>
+								<TextField.Root
+									type="number"
+									name={field.name}
+									id={field.name}
+									value={field.state.value}
+									onChange={(e) =>
+										field.handleChange(parseFloat(e.target.value))
+									}
+									onBlur={field.handleBlur}
+								/>
+								<FieldInfo field={field} />
+							</label>
+						)}
+					/>
+					<form.Field
+						name="with_delivary"
+						children={(field) => (
+							<label
+								htmlFor={field.name}
+								className="flex gap-2 items-center mt-4"
+							>
+								<Text size={"3"}>With Delivary?</Text>
+								<Checkbox
+									name={field.name}
+									id={field.name}
+									checked={field.state.value}
+									onCheckedChange={(e) => field.handleChange(Boolean(e))}
+									onBlur={field.handleBlur}
+								/>
+								<FieldInfo field={field} />
+							</label>
+						)}
+					/>
+					<Flex gap="3" mt="4" justify="end">
+						<form.Subscribe
+							selector={(state) => [state.canSubmit, state.isSubmitting]}
+							children={([canSubmit, isSubmitting]) => (
+								<Button
+									loading={isSubmitting}
+									type="submit"
+									disabled={!canSubmit || isSubmitting}
+									size={"4"}
 								>
-									<Text size={"3"}>With Delivary?</Text>
-									<Checkbox
-										name={field.name}
-										id={field.name}
-										checked={field.state.value}
-										onCheckedChange={(e) => field.handleChange(Boolean(e))}
-										onBlur={field.handleBlur}
-									/>
-									<FieldInfo field={field} />
-								</label>
+									Save
+								</Button>
 							)}
 						/>
-						<Flex gap="3" mt="4" justify="end">
-							<form.Subscribe
-								selector={(state) => [state.canSubmit, state.isSubmitting]}
-								children={([canSubmit, isSubmitting]) => (
-									<Button
-										loading={isSubmitting}
-										type="submit"
-										disabled={!canSubmit || isSubmitting}
-										size={"4"}
-									>
-										Save
-									</Button>
-								)}
-							/>
-						</Flex>
-					</form>
-				</Dialog.Content>
-			</Dialog.Root>
-		</div>
+					</Flex>
+				</form>
+			</Dialog.Content>
+		</Dialog.Root>
 	);
 }
 
@@ -146,6 +151,7 @@ export function UpdateAntenatalPackageForm({
 }: DB["antenatal_package"]["Update"]) {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -153,7 +159,10 @@ export function UpdateAntenatalPackageForm({
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await updateAntenatalPackageAction(value);
+			await updateAntenatalPackageAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["antenatalPackage"] });
@@ -161,106 +170,104 @@ export function UpdateAntenatalPackageForm({
 	});
 
 	return (
-		<div>
-			<Dialog.Root open={open} onOpenChange={onOpenChange}>
-				<Dialog.Trigger>
-					<Button variant="ghost">
-						<Edit size={16} />
-					</Button>
-				</Dialog.Trigger>
+		<Dialog.Root open={open} onOpenChange={onOpenChange}>
+			<Dialog.Trigger disabled={isProfilePending}>
+				<Button variant="ghost" loading={isProfilePending}>
+					<Edit size={16} />
+				</Button>
+			</Dialog.Trigger>
 
-				<Dialog.Content>
-					<Dialog.Title>Update Antenatal Package</Dialog.Title>
-					<Dialog.Description size="2" mb="4">
-						Fill out the form information
-					</Dialog.Description>
-					<form
-						onSubmit={(e) => {
-							e.stopPropagation();
-							e.preventDefault();
-							form.handleSubmit();
+			<Dialog.Content>
+				<Dialog.Title>Update Antenatal Package</Dialog.Title>
+				<Dialog.Description size="2" mb="4">
+					Fill out the form information
+				</Dialog.Description>
+				<form
+					onSubmit={(e) => {
+						e.stopPropagation();
+						e.preventDefault();
+						form.handleSubmit();
+					}}
+				>
+					<form.Field
+						name="name"
+						validators={{
+							onChange: z
+								.string()
+								.min(3, { message: "field must be atleast 3 characters" }),
 						}}
-					>
-						<form.Field
-							name="name"
-							validators={{
-								onChange: z
-									.string()
-									.min(3, { message: "field must be atleast 3 characters" }),
-							}}
-							children={(field) => (
-								<label htmlFor={field.name}>
-									<Text size={"3"}>Name*</Text>
-									<TextField.Root
-										name={field.name}
-										id={field.name}
-										value={field.state.value}
-										onChange={(e) => field.handleChange(e.target.value)}
-										onBlur={field.handleBlur}
-									/>
-									<FieldInfo field={field} />
-								</label>
-							)}
-						/>
-						<form.Field
-							name="default_price"
-							validators={{
-								onChange: z.number().min(0, { message: "required" }),
-							}}
-							children={(field) => (
-								<label htmlFor={field.name}>
-									<Text size={"3"}>Default Price*</Text>
-									<TextField.Root
-										type="number"
-										name={field.name}
-										id={field.name}
-										value={field.state.value!}
-										onChange={(e) =>
-											field.handleChange(parseFloat(e.target.value))
-										}
-										onBlur={field.handleBlur}
-									/>
-									<FieldInfo field={field} />
-								</label>
-							)}
-						/>
-						<form.Field
-							name="with_delivary"
-							children={(field) => (
-								<label
-									htmlFor={field.name}
-									className="flex gap-2 items-center mt-4"
+						children={(field) => (
+							<label htmlFor={field.name}>
+								<Text size={"3"}>Name*</Text>
+								<TextField.Root
+									name={field.name}
+									id={field.name}
+									value={field.state.value}
+									onChange={(e) => field.handleChange(e.target.value)}
+									onBlur={field.handleBlur}
+								/>
+								<FieldInfo field={field} />
+							</label>
+						)}
+					/>
+					<form.Field
+						name="default_price"
+						validators={{
+							onChange: z.number().min(0, { message: "required" }),
+						}}
+						children={(field) => (
+							<label htmlFor={field.name}>
+								<Text size={"3"}>Default Price*</Text>
+								<TextField.Root
+									type="number"
+									name={field.name}
+									id={field.name}
+									value={field.state.value!}
+									onChange={(e) =>
+										field.handleChange(parseFloat(e.target.value))
+									}
+									onBlur={field.handleBlur}
+								/>
+								<FieldInfo field={field} />
+							</label>
+						)}
+					/>
+					<form.Field
+						name="with_delivary"
+						children={(field) => (
+							<label
+								htmlFor={field.name}
+								className="flex gap-2 items-center mt-4"
+							>
+								<Text size={"3"}>With Delivary?</Text>
+								<Checkbox
+									name={field.name}
+									id={field.name}
+									checked={field.state.value!}
+									onCheckedChange={(e) => field.handleChange(Boolean(e))}
+									onBlur={field.handleBlur}
+								/>
+								<FieldInfo field={field} />
+							</label>
+						)}
+					/>
+					<Flex gap="3" mt="4" justify="end">
+						<form.Subscribe
+							selector={(state) => [state.canSubmit, state.isSubmitting]}
+							children={([canSubmit, isSubmitting]) => (
+								<Button
+									loading={isSubmitting}
+									type="submit"
+									disabled={!canSubmit || isSubmitting}
+									size={"4"}
 								>
-									<Text size={"3"}>With Delivary?</Text>
-									<Checkbox
-										name={field.name}
-										id={field.name}
-										checked={field.state.value!}
-										onCheckedChange={(e) => field.handleChange(Boolean(e))}
-										onBlur={field.handleBlur}
-									/>
-									<FieldInfo field={field} />
-								</label>
+									Save
+								</Button>
 							)}
 						/>
-						<Flex gap="3" mt="4" justify="end">
-							<form.Subscribe
-								selector={(state) => [state.canSubmit, state.isSubmitting]}
-								children={([canSubmit, isSubmitting]) => (
-									<Button
-										loading={isSubmitting}
-										type="submit"
-										disabled={!canSubmit || isSubmitting}
-										size={"4"}
-									>
-										Save
-									</Button>
-								)}
-							/>
-						</Flex>
-					</form>
-				</Dialog.Content>
-			</Dialog.Root>
-		</div>
+					</Flex>
+				</form>
+			</Dialog.Content>
+		</Dialog.Root>
 	);
 }

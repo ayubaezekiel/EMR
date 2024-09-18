@@ -3,8 +3,7 @@ import {
 	useDrugOrGenericQuery,
 	usePatientsQuery,
 } from "@/actions/queries";
-import { useQuantityType } from "@/lib/hooks";
-import { getProfile } from "@/lib/utils";
+import { useProfile, useQuantityType } from "@/lib/hooks";
 import supabase from "@/supabase/client";
 import { useForm } from "@mantine/form";
 import { randomId } from "@mantine/hooks";
@@ -45,6 +44,7 @@ export function CreatePharmRequestForm({ patientId }: { patientId?: string }) {
 		usePatientsQuery();
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		mode: "uncontrolled",
@@ -223,7 +223,8 @@ export function CreatePharmRequestForm({ patientId }: { patientId?: string }) {
 					isBrandPending ||
 					isDrugPending ||
 					isQuantityTypePending ||
-					isPatientsPending
+					isPatientsPending ||
+					isProfilePending
 				}
 			>
 				<Button
@@ -231,7 +232,8 @@ export function CreatePharmRequestForm({ patientId }: { patientId?: string }) {
 						isBrandPending ||
 						isDrugPending ||
 						isQuantityTypePending ||
-						isPatientsPending
+						isPatientsPending ||
+						isProfilePending
 					}
 					size={"4"}
 				>
@@ -248,11 +250,10 @@ export function CreatePharmRequestForm({ patientId }: { patientId?: string }) {
 				<form
 					onSubmit={form.onSubmit(async (values) => {
 						setIsLoading(true);
-
-						const prof = await getProfile();
-						const { error } = await supabase.from("requests").insert({
+						const { error, data } = await supabase.from("requests").insert({
 							patients_id: patientId ?? `${values.patients_id}`,
-							taken_by: `${prof?.id}`,
+							taken_by: `${profile_data?.id}`,
+							branch_id: `${profile_data?.branch_id}`,
 							is_pharm: true,
 							services: values.services.map((v) => ({
 								generic_drug: JSON.parse(v.generic_drug),
@@ -362,6 +363,7 @@ export function CreatePharmRequestForm({ patientId }: { patientId?: string }) {
 // 	);
 // 	const [open, onOpenChange] = useState(false);
 // 	const queryClient = useQueryClient();
+// const { isProfilePending, profile_data } = useProfile();
 
 // 	const services = JSON.parse(JSON.stringify(pharmData.services)).map(
 // 		(s: {
@@ -574,7 +576,7 @@ export function CreatePharmRequestForm({ patientId }: { patientId?: string }) {
 // 						setIsLoading(true);
 
 // 						const prof = await getProfile();
-// 						const { error } = await supabase
+// 						const { error, data } = await supabase
 // 							.from("requests")
 // 							.update({
 // 								patients_id: `${pharmData.patients_id}`,

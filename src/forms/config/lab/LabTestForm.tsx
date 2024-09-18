@@ -22,10 +22,12 @@ import {
 	useLabTestTempQuery,
 } from "../../../actions/queries";
 import { FieldInfo } from "../../../components/FieldInfo";
+import { useProfile } from "@/lib/hooks";
 
 export function CreateLabTestForm() {
 	const [open, onOpenChange] = useState(false);
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 	const { data: cat, isPending: isCatPending } = useLabTestCatQuery();
 	const { data: temp, isPending: isTempPending } = useLabTestTempQuery();
 
@@ -38,7 +40,10 @@ export function CreateLabTestForm() {
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await createLabTestAction(value);
+			await createLabTestAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["labTest"] });
@@ -47,8 +52,13 @@ export function CreateLabTestForm() {
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isCatPending || isTempPending}>
-				<Button variant="soft" loading={isCatPending || isTempPending}>
+			<Dialog.Trigger
+				disabled={isCatPending || isTempPending || isProfilePending}
+			>
+				<Button
+					variant="soft"
+					loading={isCatPending || isTempPending || isProfilePending}
+				>
 					New
 				</Button>
 			</Dialog.Trigger>
@@ -191,6 +201,7 @@ export function UpdateLabTestForm({
 	const { data: temp, isPending: isTempPending } = useLabTestTempQuery();
 
 	const queryClient = useQueryClient();
+	const { isProfilePending, profile_data } = useProfile();
 
 	const form = useForm({
 		defaultValues: {
@@ -199,7 +210,10 @@ export function UpdateLabTestForm({
 		},
 		validatorAdapter: zodValidator(),
 		onSubmit: async ({ value }) => {
-			await updateLabTestAction(value);
+			await updateLabTestAction({
+				...value,
+				branch_id: `${profile_data?.branch_id}`,
+			});
 			form.reset();
 			onOpenChange(false);
 			queryClient.invalidateQueries({ queryKey: ["labTest"] });
@@ -208,8 +222,13 @@ export function UpdateLabTestForm({
 
 	return (
 		<Dialog.Root open={open} onOpenChange={onOpenChange}>
-			<Dialog.Trigger disabled={isCatPending || isTempPending}>
-				<Button variant="ghost" loading={isCatPending || isTempPending}>
+			<Dialog.Trigger
+				disabled={isCatPending || isTempPending || isProfilePending}
+			>
+				<Button
+					variant="ghost"
+					loading={isCatPending || isTempPending || isProfilePending}
+				>
 					<Edit size={16} />
 				</Button>
 			</Dialog.Trigger>

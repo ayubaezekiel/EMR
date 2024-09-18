@@ -117,7 +117,10 @@ export function AppointmentCompleted({
 								<Badge radius="full">
 									From:{" "}
 									{a.duration
-										? `${new Date(`${a.duration}`.slice(2, 20)).toLocaleString()}`
+										? format(
+												`${a.duration}`.slice(2, 20),
+												"LLL MM yyy, HH:mm a",
+											)
 										: "No date"}
 								</Badge>
 							</div>
@@ -125,7 +128,10 @@ export function AppointmentCompleted({
 								<Badge radius="full" color="red">
 									To:{" "}
 									{a.duration
-										? `${new Date(`${a.duration}`.slice(24, 43)).toLocaleString()}`
+										? format(
+												`${a.duration}`.slice(24, 43),
+												"LLL MM yyy, HH:mm a",
+											)
 										: "No date"}
 								</Badge>
 							</div>

@@ -16,6 +16,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as ResetpasswordImport } from './routes/reset_password'
 import { Route as LayoutImport } from './routes/_layout'
 import { Route as IndexImport } from './routes/index'
+import { Route as LayoutDashboardUserreportsImport } from './routes/_layout/dashboard/user_reports'
 import { Route as LayoutDashboardBillingImport } from './routes/_layout/dashboard/billing'
 import { Route as LayoutDashboardUsersIndexImport } from './routes/_layout/dashboard/users/index'
 import { Route as LayoutDashboardRadiologyIndexImport } from './routes/_layout/dashboard/radiology/index'
@@ -68,6 +69,13 @@ const LayoutDashboardIndexLazyRoute = LayoutDashboardIndexLazyImport.update({
   getParentRoute: () => LayoutRoute,
 } as any).lazy(() =>
   import('./routes/_layout/dashboard/index.lazy').then((d) => d.Route),
+)
+
+const LayoutDashboardUserreportsRoute = LayoutDashboardUserreportsImport.update(
+  {
+    path: '/dashboard/user_reports',
+    getParentRoute: () => LayoutRoute,
+  } as any,
 )
 
 const LayoutDashboardBillingRoute = LayoutDashboardBillingImport.update({
@@ -249,6 +257,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/billing'
       fullPath: '/dashboard/billing'
       preLoaderRoute: typeof LayoutDashboardBillingImport
+      parentRoute: typeof LayoutImport
+    }
+    '/_layout/dashboard/user_reports': {
+      id: '/_layout/dashboard/user_reports'
+      path: '/dashboard/user_reports'
+      fullPath: '/dashboard/user_reports'
+      preLoaderRoute: typeof LayoutDashboardUserreportsImport
       parentRoute: typeof LayoutImport
     }
     '/_layout/dashboard/': {
@@ -435,6 +450,7 @@ export const routeTree = rootRoute.addChildren({
   IndexRoute,
   LayoutRoute: LayoutRoute.addChildren({
     LayoutDashboardBillingRoute,
+    LayoutDashboardUserreportsRoute,
     LayoutDashboardIndexLazyRoute,
     LayoutDashboardAdmissionsPatientIdRoute,
     LayoutDashboardAppointmentsPatientIdRoute,
@@ -484,6 +500,7 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_layout.tsx",
       "children": [
         "/_layout/dashboard/billing",
+        "/_layout/dashboard/user_reports",
         "/_layout/dashboard/",
         "/_layout/dashboard/admissions/$patientId",
         "/_layout/dashboard/appointments/$patientId",
@@ -516,6 +533,10 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_layout/dashboard/billing": {
       "filePath": "_layout/dashboard/billing.tsx",
+      "parent": "/_layout"
+    },
+    "/_layout/dashboard/user_reports": {
+      "filePath": "_layout/dashboard/user_reports.tsx",
       "parent": "/_layout"
     },
     "/_layout/dashboard/": {
