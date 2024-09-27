@@ -1576,10 +1576,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "patients_created_by_fkey"
+            foreignKeyName: "patients_created_by_fkey1"
             columns: ["created_by"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "profile"
             referencedColumns: ["id"]
           },
           {
@@ -1834,6 +1834,7 @@ export type Database = {
       profile: {
         Row: {
           branch_id: string
+          can_issue_request: boolean | null
           can_switch_branch: boolean | null
           created_at: string
           department_id: string | null
@@ -1841,21 +1842,15 @@ export type Database = {
           first_name: string
           gender: string
           has_access_to_accounting: boolean | null
-          has_access_to_admin_accounting: boolean | null
           has_access_to_admission: boolean | null
           has_access_to_billing: boolean | null
           has_access_to_config: boolean | null
-          has_access_to_dialysis_management: boolean | null
-          has_access_to_dialysis_records: boolean | null
           has_access_to_doctor_priviledges: boolean | null
           has_access_to_documents: boolean | null
-          has_access_to_front_desk: boolean | null
           has_access_to_lab: boolean | null
           has_access_to_nursing: boolean | null
           has_access_to_pharmacy: boolean | null
-          has_access_to_pharmacy_admin: boolean | null
           has_access_to_radiology: boolean | null
-          has_access_to_radiology_admin: boolean | null
           has_access_to_reports: boolean | null
           has_access_to_users: boolean | null
           id: string
@@ -1867,6 +1862,7 @@ export type Database = {
         }
         Insert: {
           branch_id: string
+          can_issue_request?: boolean | null
           can_switch_branch?: boolean | null
           created_at?: string
           department_id?: string | null
@@ -1874,21 +1870,15 @@ export type Database = {
           first_name: string
           gender: string
           has_access_to_accounting?: boolean | null
-          has_access_to_admin_accounting?: boolean | null
           has_access_to_admission?: boolean | null
           has_access_to_billing?: boolean | null
           has_access_to_config?: boolean | null
-          has_access_to_dialysis_management?: boolean | null
-          has_access_to_dialysis_records?: boolean | null
           has_access_to_doctor_priviledges?: boolean | null
           has_access_to_documents?: boolean | null
-          has_access_to_front_desk?: boolean | null
           has_access_to_lab?: boolean | null
           has_access_to_nursing?: boolean | null
           has_access_to_pharmacy?: boolean | null
-          has_access_to_pharmacy_admin?: boolean | null
           has_access_to_radiology?: boolean | null
-          has_access_to_radiology_admin?: boolean | null
           has_access_to_reports?: boolean | null
           has_access_to_users?: boolean | null
           id?: string
@@ -1900,6 +1890,7 @@ export type Database = {
         }
         Update: {
           branch_id?: string
+          can_issue_request?: boolean | null
           can_switch_branch?: boolean | null
           created_at?: string
           department_id?: string | null
@@ -1907,21 +1898,15 @@ export type Database = {
           first_name?: string
           gender?: string
           has_access_to_accounting?: boolean | null
-          has_access_to_admin_accounting?: boolean | null
           has_access_to_admission?: boolean | null
           has_access_to_billing?: boolean | null
           has_access_to_config?: boolean | null
-          has_access_to_dialysis_management?: boolean | null
-          has_access_to_dialysis_records?: boolean | null
           has_access_to_doctor_priviledges?: boolean | null
           has_access_to_documents?: boolean | null
-          has_access_to_front_desk?: boolean | null
           has_access_to_lab?: boolean | null
           has_access_to_nursing?: boolean | null
           has_access_to_pharmacy?: boolean | null
-          has_access_to_pharmacy_admin?: boolean | null
           has_access_to_radiology?: boolean | null
-          has_access_to_radiology_admin?: boolean | null
           has_access_to_reports?: boolean | null
           has_access_to_users?: boolean | null
           id?: string

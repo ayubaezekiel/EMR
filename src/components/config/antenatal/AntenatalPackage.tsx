@@ -5,25 +5,25 @@ import { useAntenatalPackage } from "@/lib/hooks";
 import { Flex, Heading, Spinner } from "@radix-ui/themes";
 
 export function AntenatalPackage() {
-	const { antenatal_package_data, isAntenatalPackagePending } =
-		useAntenatalPackage();
+  const { antenatal_package_data, isAntenatalPackagePending } =
+    useAntenatalPackage();
 
-	return (
-		<div>
-			<Flex mb={"3"} justify={"between"}>
-				<Heading>Antenatal Package</Heading>
-				<CreateAntenatalPackageForm />
-			</Flex>
-			{isAntenatalPackagePending ? (
-				<Spinner />
-			) : (
-				<DataTable
-					filterLabel="filter by name..."
-					filterer="name"
-					columns={antenatal_package_column}
-					data={antenatal_package_data ?? []}
-				/>
-			)}
-		</div>
-	);
+  return (
+    <div>
+      <Flex mb={"3"} justify={"between"}>
+        <Heading>Antenatal Package</Heading>
+        <CreateAntenatalPackageForm />
+      </Flex>
+      {isAntenatalPackagePending ? (
+        <Spinner />
+      ) : (
+        <DataTable
+          filterLabel="filter by name..."
+          filterer="name"
+          columns={antenatal_package_column}
+          data={antenatal_package_data ?? []}
+        />
+      )}
+    </div>
+  );
 }

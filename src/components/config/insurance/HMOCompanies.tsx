@@ -5,24 +5,24 @@ import { DataTable } from "../../table/DataTable";
 import { hmo_companies_column } from "../../table/columns/insurance/HMO_companies";
 
 export function HMOCompanies() {
-	const { data, isPending } = useHmoCompaniesQuery();
+  const { data, isPending } = useHmoCompaniesQuery();
 
-	return (
-		<div>
-			<Flex mb={"3"} justify={"between"}>
-				<Heading>HMO Companies</Heading>
-				<CreateHMOCompaniesForm />
-			</Flex>
-			{isPending ? (
-				<Spinner />
-			) : (
-				<DataTable
-					filterLabel="filter by name..."
-					filterer="name"
-					columns={hmo_companies_column}
-					data={data?.hmo_companies_data ?? []}
-				/>
-			)}
-		</div>
-	);
+  return (
+    <div>
+      <Flex mb={"3"} justify={"between"}>
+        <Heading>HMO Companies</Heading>
+        <CreateHMOCompaniesForm />
+      </Flex>
+      {isPending ? (
+        <Spinner />
+      ) : (
+        <DataTable
+          filterLabel="filter by name..."
+          filterer="name"
+          columns={hmo_companies_column}
+          data={data?.hmo_companies_data ?? []}
+        />
+      )}
+    </div>
+  );
 }

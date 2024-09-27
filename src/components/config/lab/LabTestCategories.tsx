@@ -5,24 +5,24 @@ import { DataTable } from "../../table/DataTable";
 import { lab_test_cat_column } from "../../table/columns/lab_test";
 
 export function LabTestCategories() {
-	const { data, isPending } = useLabTestCatQuery();
+  const { data, isPending } = useLabTestCatQuery();
 
-	return (
-		<div>
-			<Flex mb={"3"} justify={"between"}>
-				<Heading>Lab Test Categories</Heading>
-				<CreateLabCategoriesForm />
-			</Flex>
-			{isPending ? (
-				<Spinner />
-			) : (
-				<DataTable
-					filterLabel="filter by name..."
-					filterer="name"
-					columns={lab_test_cat_column}
-					data={data?.lab_test_categories_data ?? []}
-				/>
-			)}
-		</div>
-	);
+  return (
+    <div>
+      <Flex mb={"3"} justify={"between"}>
+        <Heading>Lab Test Categories</Heading>
+        <CreateLabCategoriesForm />
+      </Flex>
+      {isPending ? (
+        <Spinner />
+      ) : (
+        <DataTable
+          filterLabel="filter by name..."
+          filterer="name"
+          columns={lab_test_cat_column}
+          data={data?.lab_test_categories_data ?? []}
+        />
+      )}
+    </div>
+  );
 }

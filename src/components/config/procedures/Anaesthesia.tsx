@@ -6,34 +6,34 @@ import { DataTable } from "../../table/DataTable";
 import { anaesthesia_column } from "../../table/columns/procedure/anaesthesia";
 
 export function Anaesthesia() {
-	const { data, isPending } = useAnaesthesiaQuery();
+  const { data, isPending } = useAnaesthesiaQuery();
 
-	const anaesthesia =
-		useMemo(
-			() =>
-				data?.anaesthesia_data?.map((a) => ({
-					...a,
-					anaesthesia_type: a.anaesthesia_type?.title,
-				})),
-			[data?.anaesthesia_data],
-		) ?? [];
+  const anaesthesia =
+    useMemo(
+      () =>
+        data?.anaesthesia_data?.map((a) => ({
+          ...a,
+          anaesthesia_type: a.anaesthesia_type?.title,
+        })),
+      [data?.anaesthesia_data]
+    ) ?? [];
 
-	return (
-		<div>
-			<Flex mb={"3"} justify={"between"}>
-				<Heading>Anaesthesia</Heading>
-				<CreateAnaesthesiaForm />
-			</Flex>
-			{isPending ? (
-				<Spinner />
-			) : (
-				<DataTable
-					filterLabel="filter by name..."
-					filterer="name"
-					columns={anaesthesia_column}
-					data={anaesthesia}
-				/>
-			)}
-		</div>
-	);
+  return (
+    <div>
+      <Flex mb={"3"} justify={"between"}>
+        <Heading>Anaesthesia</Heading>
+        <CreateAnaesthesiaForm />
+      </Flex>
+      {isPending ? (
+        <Spinner />
+      ) : (
+        <DataTable
+          filterLabel="filter by name..."
+          filterer="name"
+          columns={anaesthesia_column}
+          data={anaesthesia}
+        />
+      )}
+    </div>
+  );
 }

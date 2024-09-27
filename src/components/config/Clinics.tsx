@@ -5,24 +5,24 @@ import { clinic_column } from "../table/columns/clinics";
 import { DataTable } from "../table/DataTable";
 
 export function Clinics() {
-	const { data, isPending } = useClinicsQuery();
+  const { data, isPending } = useClinicsQuery();
 
-	return (
-		<div>
-			<Flex mb={"3"} justify={"between"}>
-				<Heading>Clinics</Heading>
-				<CreateClinicsForm />
-			</Flex>
-			{isPending ? (
-				<Spinner />
-			) : (
-				<DataTable
-					filterLabel="filter by name..."
-					filterer="name"
-					columns={clinic_column}
-					data={data?.clinics_data ?? []}
-				/>
-			)}
-		</div>
-	);
+  return (
+    <div>
+      <Flex mb={"3"} justify={"between"}>
+        <Heading>Clinics</Heading>
+        <CreateClinicsForm />
+      </Flex>
+      {isPending ? (
+        <Spinner />
+      ) : (
+        <DataTable
+          filterLabel="filter by name..."
+          filterer="name"
+          columns={clinic_column}
+          data={data?.clinics_data ?? []}
+        />
+      )}
+    </div>
+  );
 }

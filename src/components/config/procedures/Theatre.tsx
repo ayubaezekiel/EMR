@@ -5,21 +5,21 @@ import { DataTable } from "../../table/DataTable";
 import { theatres_column } from "../../table/columns/procedure/theatre";
 
 export function Theatre() {
-	const { data } = useTheatreQuery();
+  const { data } = useTheatreQuery();
 
-	return (
-		<div>
-			<Flex mb={"3"} justify={"between"}>
-				<Heading>Theatre</Heading>
-				<CreateTheatreForm />
-			</Flex>
+  return (
+    <div>
+      <Flex mb={"3"} justify={"between"}>
+        <Heading>Theatre</Heading>
+        <CreateTheatreForm />
+      </Flex>
 
-			<DataTable
-				filterLabel="filter by name..."
-				filterer="name"
-				columns={theatres_column}
-				data={data?.theatre_data ?? []}
-			/>
-		</div>
-	);
+      <DataTable
+        filterLabel="filter by name..."
+        filterer="name"
+        columns={theatres_column}
+        data={data?.theatre_data ?? []}
+      />
+    </div>
+  );
 }

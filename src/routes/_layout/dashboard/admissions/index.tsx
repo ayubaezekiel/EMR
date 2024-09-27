@@ -1,4 +1,3 @@
-import { DateRangePicker } from "@nextui-org/date-picker";
 import { Card, Heading, Tabs } from "@radix-ui/themes";
 import { createFileRoute } from "@tanstack/react-router";
 import {
@@ -23,9 +22,6 @@ const AdmissionsView = () => {
 			<Card variant="ghost" my={"3"} style={{ background: "var(--accent-2)" }}>
 				<div className="flex justify-between flex-col gap-2 md:flex-row">
 					<CreateAdmissionForm />
-					<div className="flex gap-2 flex-col">
-						<DateRangePicker />
-					</div>
 				</div>
 			</Card>
 			<Tabs.Root defaultValue="active" my={"4"}>
