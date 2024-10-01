@@ -594,6 +594,32 @@ export type Database = {
           },
         ]
       }
+      diagnosis: {
+        Row: {
+          branch_id: string
+          id: string
+          name: string
+        }
+        Insert: {
+          branch_id: string
+          id?: string
+          name: string
+        }
+        Update: {
+          branch_id?: string
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnosis_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_reports: {
         Row: {
           branch_id: string
@@ -1342,27 +1368,27 @@ export type Database = {
         Row: {
           branch_id: string
           created_at: string
+          diagnosis: Json
           id: string
           is_admission: boolean | null
-          note: string
           patients_id: string
           taken_by: string
         }
         Insert: {
           branch_id: string
           created_at?: string
+          diagnosis: Json
           id?: string
           is_admission?: boolean | null
-          note: string
           patients_id: string
           taken_by: string
         }
         Update: {
           branch_id?: string
           created_at?: string
+          diagnosis?: Json
           id?: string
           is_admission?: boolean | null
-          note?: string
           patients_id?: string
           taken_by?: string
         }

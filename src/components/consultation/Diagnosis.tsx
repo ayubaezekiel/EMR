@@ -1,25 +1,10 @@
-import { useConsultationTemplatesQuery } from "@/actions/queries";
-import { useProfile } from "@/lib/hooks";
-import { Button, Modal, Select } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { Flex, Spinner, Text } from "@radix-ui/themes";
-import { useForm } from "@tanstack/react-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { zodValidator } from "@tanstack/zod-form-adapter";
-import { Editor } from "@tinymce/tinymce-react";
-import { Edit } from "lucide-react";
+import { CreatePatientDiagnosisForm } from "@/forms/consultation/DiagnosisForm";
+import { Spinner } from "@radix-ui/themes";
+import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { z } from "zod";
 import { getDiagnosisById } from "../../actions/actions";
-import {
-  createPatientDiagnosisAction,
-  updatePatientDiagnosisAction,
-} from "../../actions/consultation/actions";
-import { FieldInfo } from "../FieldInfo";
 import { DataTable } from "../table/DataTable";
 import { patient_diagnosis_column } from "../table/columns/consultation/diagnosis";
-import { editor_plugins } from "../textEditor/RichTextEditor";
-import { SharedConsultationTypes } from "./SharedTypes";
 
 export function Diagnosis({
   isAdmission,
@@ -33,24 +18,22 @@ export function Diagnosis({
     queryKey: ["diagnosis"],
   });
 
-  const diagnosis_data: SharedConsultationTypes[] =
+  const diagnosis_data: DB["patient_diagnosis"]["Row"][] =
     useMemo(
       () =>
         data?.diagnosis_data?.map((d) => ({
-          created_by: d.taken_by,
-          created_at: d.created_at,
-          id: d.id,
-          note: d.note,
-          patient_id: d.patients_id,
+          ...d,
           profile: `${d.profile?.first_name} ${d.profile?.middle_name ?? ""} ${d.profile?.last_name}`,
-          is_admission: Boolean(d.is_admission),
         })),
       [data?.diagnosis_data]
     ) ?? [];
 
   return (
     <div>
-      <CreateDiagnosisForm patientId={patientId} isAdmission={isAdmission} />
+      <CreatePatientDiagnosisForm
+        patientId={patientId}
+        isAdmission={isAdmission}
+      />
       <div>
         {isPending ? (
           <Spinner />
@@ -64,239 +47,5 @@ export function Diagnosis({
         )}
       </div>
     </div>
-  );
-}
-export function CreateDiagnosisForm({
-  isAdmission,
-  patientId,
-}: {
-  isAdmission: boolean;
-  patientId: string;
-}) {
-  const [opened, { close, open }] = useDisclosure(false);
-  const { data, isPending } = useConsultationTemplatesQuery();
-
-  const queryClient = useQueryClient();
-  const { isProfilePending, profile_data } = useProfile();
-
-  const form = useForm({
-    defaultValues: {
-      note: "",
-    },
-    validatorAdapter: zodValidator(),
-    onSubmit: async ({ value }) => {
-      await createPatientDiagnosisAction({
-        note: value.note,
-        patients_id: patientId,
-        taken_by: `${profile_data?.id}`,
-        branch_id: `${profile_data?.branch_id}`,
-        is_admission: isAdmission,
-      });
-      form.reset();
-      close();
-      queryClient.invalidateQueries({ queryKey: ["diagnosis"] });
-    },
-  });
-
-  return (
-    <>
-      <Button size="md" onClick={open} loading={isProfilePending}>
-        Add New
-      </Button>
-
-      <Modal
-        opened={opened}
-        onClose={close}
-        title={"New Diagnosis"}
-        size={"60rem"}
-      >
-        <form
-          onSubmit={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-        >
-          <div className="flex flex-col gap-1 w-96">
-            {isPending ? (
-              <Spinner />
-            ) : (
-              <Select
-                label="Use a template?"
-                onChange={(e) => {
-                  form.setFieldValue("note", e!);
-                }}
-                data={
-                  data?.consultation_templates_data?.map((t) => ({
-                    value: t.content,
-                    label: t.name,
-                  })) ?? []
-                }
-              />
-            )}
-          </div>
-          <form.Field
-            name="note"
-            validators={{
-              onChange: z
-                .string()
-                .min(10, { message: "must be atleast 3 characters" }),
-            }}
-          >
-            {(field) => (
-              <label htmlFor={field.name} className="flex flex-col">
-                <Text size={"3"}>Task</Text>
-                <Editor
-                  tinymceScriptSrc="/tinymce/tinymce.min.js"
-                  licenseKey="gpl"
-                  onBlur={(e) => {
-                    field.handleChange(e.target.getContent());
-                  }}
-                  initialValue={field.state.value}
-                  init={editor_plugins}
-                />
-                <FieldInfo field={field} />
-              </label>
-            )}
-          </form.Field>
-          <Flex gap="3" mt="4" justify="end">
-            <form.Subscribe
-              selector={(state) => [state.canSubmit, state.isSubmitting]}
-            >
-              {([canSubmit, isSubmitting]) => (
-                <Button
-                  mt="4"
-                  loading={isSubmitting}
-                  type="submit"
-                  disabled={!canSubmit || isSubmitting}
-                  size={"lg"}
-                >
-                  Save
-                </Button>
-              )}
-            </form.Subscribe>
-          </Flex>
-        </form>
-      </Modal>
-    </>
-  );
-}
-
-export function UpdateDiagnosisForm({
-  id,
-  ...values
-}: DB["patient_diagnosis"]["Update"] & { isAdmission: boolean }) {
-  const [opened, { close, open }] = useDisclosure(false);
-  const { data, isPending } = useConsultationTemplatesQuery();
-  const queryClient = useQueryClient();
-  const { isProfilePending, profile_data } = useProfile();
-
-  const form = useForm({
-    defaultValues: {
-      id: id,
-      ...values,
-    },
-    validatorAdapter: zodValidator(),
-
-    onSubmit: async ({ value }) => {
-      await updatePatientDiagnosisAction({
-        id,
-        note: value.note,
-        patients_id: values.patients_id,
-        taken_by: `${profile_data?.id}`,
-        branch_id: `${profile_data?.branch_id}`,
-      });
-      form.reset();
-      close();
-      queryClient.invalidateQueries({ queryKey: ["diagnosis"] });
-    },
-  });
-
-  return (
-    <>
-      <Button
-        variant="subtle"
-        size="compact-xs"
-        onClick={open}
-        loading={isProfilePending}
-      >
-        <Edit size={16} />
-      </Button>
-
-      <Modal
-        opened={opened}
-        onClose={close}
-        title={"Update Diagnosis"}
-        size={"60rem"}
-      >
-        <form
-          onSubmit={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-        >
-          <div className="flex flex-col gap-1 w-96">
-            {isPending ? (
-              <Spinner />
-            ) : (
-              <Select
-                label="Use a template?"
-                onChange={(e) => {
-                  form.setFieldValue("note", e!);
-                }}
-                data={
-                  data?.consultation_templates_data?.map((t) => ({
-                    value: t.content,
-                    label: t.name,
-                  })) ?? []
-                }
-              />
-            )}
-          </div>
-          <form.Field
-            name="note"
-            validators={{
-              onChange: z
-                .string()
-                .min(10, { message: "must be atleast 3 characters" }),
-            }}
-          >
-            {(field) => (
-              <label htmlFor={field.name} className="flex flex-col">
-                <Text size={"3"}>Note</Text>
-                <Editor
-                  tinymceScriptSrc="/tinymce/tinymce.min.js"
-                  licenseKey="gpl"
-                  onBlur={(e) => {
-                    field.handleChange(e.target.getContent());
-                  }}
-                  initialValue={field.state.value}
-                  init={editor_plugins}
-                />
-                <FieldInfo field={field} />
-              </label>
-            )}
-          </form.Field>
-          <Flex gap="3" mt="4" justify="end">
-            <form.Subscribe
-              selector={(state) => [state.canSubmit, state.isSubmitting]}
-            >
-              {([canSubmit, isSubmitting]) => (
-                <Button
-                  mt="4"
-                  loading={isSubmitting}
-                  type="submit"
-                  disabled={!canSubmit || isSubmitting}
-                  size={"lg"}
-                >
-                  Save
-                </Button>
-              )}
-            </form.Subscribe>
-          </Flex>
-        </form>
-      </Modal>
-    </>
   );
 }

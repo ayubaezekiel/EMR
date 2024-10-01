@@ -18,9 +18,7 @@ import {
   getNursingReportsById,
   getTreatmentPlanById,
 } from "../../../../actions/actions";
-import { CreateDiagnosisForm } from "../../../../components/consultation/Diagnosis";
 import { CreateExaminationForm } from "../../../../components/consultation/Examinitation";
-import { CreateHistoryTakingForm } from "../../../../components/consultation/HistoryTaking";
 import { IssueRequests } from "../../../../components/consultation/IssueRequests";
 import { PatientVitals } from "../../../../components/consultation/PatientVitals";
 import { SharedConsultationTypes } from "../../../../components/consultation/SharedTypes";
@@ -39,7 +37,8 @@ import { CreatePatientVitalsForm } from "../../../../forms/config/Vitals";
 import { useProfile } from "@/lib/hooks";
 import { AlertTriangle } from "lucide-react";
 import { CreateAntenatalRequestForm } from "@/forms/requests/AntenatalRequestForm";
-
+import { CreateHistoryTakingForm } from "@/forms/consultation/HistoryTakingForm";
+import { CreatePatientDiagnosisForm } from "@/forms/consultation/DiagnosisForm";
 export const Route = createFileRoute(
   "/_layout/dashboard/admissions/$patientId"
 )({
@@ -99,17 +98,12 @@ const AdmissionsPatientView = () => {
         })),
       [exam_data?.examination_data]
     ) ?? [];
-  const diagnosis_data: SharedConsultationTypes[] =
+  const diagnosis_data: DB["patient_diagnosis"]["Row"][] =
     useMemo(
       () =>
         diag?.diagnosis_data?.map((d) => ({
-          created_by: d.taken_by,
-          created_at: d.created_at,
-          id: d.id,
-          note: d.note,
-          patient_id: d.patients_id,
+          ...d,
           profile: `${d.profile?.first_name} ${d.profile?.middle_name ?? ""} ${d.profile?.last_name}`,
-          is_admission: Boolean(d.is_admission),
         })),
       [diag?.diagnosis_data]
     ) ?? [];
@@ -270,7 +264,7 @@ const AdmissionsPatientView = () => {
               {isDiagPending ? (
                 <Spinner />
               ) : (
-                <CreateDiagnosisForm isAdmission patientId={patientId} />
+                <CreatePatientDiagnosisForm isAdmission patientId={patientId} />
               )}
             </Flex>
             <DataTable

@@ -3,8 +3,8 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { DeleteActionForm } from "../../../../actions/DeleteAction";
 import { deleteHistoryTakingAction } from "../../../../actions/consultation/actions";
-import { UpdateHistoryTakingForm } from "../../../consultation/HistoryTaking";
 import { SharedConsultationTypes } from "../../../consultation/SharedTypes";
+import { UpdateHistoryTakingForm } from "@/forms/consultation/HistoryTakingForm";
 
 export const history_taking_column: ColumnDef<SharedConsultationTypes>[] = [
   {
@@ -58,9 +58,7 @@ export const history_taking_column: ColumnDef<SharedConsultationTypes>[] = [
     header: "Note",
     cell: ({ row }) => (
       <div className="md:max-w-[50rem] mx-auto">
-        <Card>
-          <div dangerouslySetInnerHTML={{ __html: row.getValue("note") }} />
-        </Card>
+        <Card>{row.getValue("note")}</Card>
       </div>
     ),
   },

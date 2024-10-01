@@ -617,6 +617,19 @@ export const getAppointmentTypes = async () => {
   return { appointment_type_data };
 };
 
+export const getAllDiagnosis = async () => {
+  const branch_id = await getProfile();
+  const { data: diagnosis_data, error: diagnosis_error } = await supabase
+    .from("diagnosis")
+    .select("*")
+    .eq("branch_id", branch_id?.branch_id as string);
+
+  if (diagnosis_error && !diagnosis_data) {
+    toast.error(diagnosis_error.message);
+  }
+  return { diagnosis_data };
+};
+
 export const getAppointments = async () => {
   const branch_id = await getProfile();
   const { data: appointment_data, error: appointment_error } = await supabase

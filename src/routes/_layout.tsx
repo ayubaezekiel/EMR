@@ -18,17 +18,17 @@ const Layout = () => {
     queryKey: ["user"],
   });
 
+  const auth_status = localStorage.getItem(
+    "sb-kdowzrjmnzhhabgyekjx-auth-token"
+  );
+
   const { isProfilePending, profile_data } = useProfile();
 
   useEffect(() => {
-    const block = async () => {
-      const auth = await checkAuth();
-      if (!auth?.id) {
-        navigate({ to: "/", replace: true });
-      }
-    };
-    block();
-  }, [navigate]);
+    if (!auth_status) {
+      navigate({ to: "/", replace: true });
+    }
+  }, [navigate, auth_status]);
 
   return (
     <Box>

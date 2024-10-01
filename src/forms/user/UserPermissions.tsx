@@ -84,6 +84,27 @@ export function UserPermission() {
           )}
         />
         <form.Field
+          name="has_access_to_config"
+          validators={{
+            onChange: z.boolean().optional(),
+          }}
+          children={(field) => (
+            <div className="flex gap-2 items-center">
+              <Switch
+                size={"3"}
+                disabled={!allowed}
+                name={field.name}
+                id={field.name}
+                checked={Boolean(field.state.value)}
+                onCheckedChange={(e) => field.handleChange(e)}
+                onBlur={field.handleBlur}
+              />
+              <Text size={"3"}>{field.name}</Text>
+              <FieldInfo field={field} />
+            </div>
+          )}
+        />
+        <form.Field
           name="can_issue_request"
           validators={{
             onChange: z.boolean().optional(),
