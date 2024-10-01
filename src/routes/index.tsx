@@ -56,113 +56,111 @@ function Login() {
 
   return (
     <section className="flex flex-col justify-between h-dvh gap-10 w-full">
-      <div className="flex flex-col md:mt-48 mt-24">
-        <div className="flex flex-col w-full md:w-2/3 lg:w-1/3 md:mx-auto px-10">
-          <Card className="shadow-md">
-            <img src={logo} className="size-24 mx-auto" />
-            <Heading size={"7"} my={"4"} align={"center"}>
-              Brightedge HMR
-            </Heading>
+      <div className="flex flex-col md:mt-48 mt-24 w-full md:w-2/3 lg:w-1/3 md:mx-auto md:px-10 px-2">
+        <Card className="shadow-md">
+          <img src={logo} className="size-24 mx-auto" />
+          <Heading size={"7"} my={"4"} align={"center"}>
+            Brightedge HMR
+          </Heading>
 
-            {isPending ? (
-              <Spinner />
-            ) : data?.user ? (
-              <Flex
-                justify={"center"}
-                align={"center"}
-                pb={"9"}
-                direction={"column"}
-                gap={"4"}
-              >
-                <Callout.Root>
-                  <Callout.Text>
-                    You are already logged in, click the button bellow
-                  </Callout.Text>
-                </Callout.Root>
-                <Link to="/dashboard">
-                  <Button loading={isPending} size={"4"}>
-                    Go to dashboard
-                  </Button>
-                </Link>
-              </Flex>
-            ) : (
-              <div className="p-10">
-                <SignIn />
-                <Flex justify={"end"} my={"4"}>
-                  <Dialog.Root onOpenChange={onOpenChange} open={open}>
-                    <Dialog.Trigger>
-                      <Button variant="soft">Forgot Password</Button>
-                    </Dialog.Trigger>
+          {isPending ? (
+            <Spinner />
+          ) : data?.user ? (
+            <Flex
+              justify={"center"}
+              align={"center"}
+              pb={"9"}
+              direction={"column"}
+              gap={"4"}
+            >
+              <Callout.Root>
+                <Callout.Text>
+                  You are already logged in, click the button bellow
+                </Callout.Text>
+              </Callout.Root>
+              <Link to="/dashboard">
+                <Button loading={isPending} size={"4"}>
+                  Go to dashboard
+                </Button>
+              </Link>
+            </Flex>
+          ) : (
+            <div className="p-10">
+              <SignIn />
+              <Flex justify={"end"} my={"4"}>
+                <Dialog.Root onOpenChange={onOpenChange} open={open}>
+                  <Dialog.Trigger>
+                    <Button variant="soft">Forgot Password</Button>
+                  </Dialog.Trigger>
 
-                    <Dialog.Content>
-                      <Dialog.Title>Send Confirmation Mail</Dialog.Title>
-                      <Dialog.Description size="2" mb="4">
-                        Fill the form with your email and wait for a
-                        confirmation in your mailbox
-                      </Dialog.Description>
-                      <form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          form.handleSubmit();
+                  <Dialog.Content>
+                    <Dialog.Title>Send Confirmation Mail</Dialog.Title>
+                    <Dialog.Description size="2" mb="4">
+                      Fill the form with your email and wait for a confirmation
+                      in your mailbox
+                    </Dialog.Description>
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        form.handleSubmit();
+                      }}
+                    >
+                      <form.Field
+                        name="email"
+                        validators={{
+                          onChange: z.string().email(),
                         }}
                       >
-                        <form.Field
-                          name="email"
-                          validators={{
-                            onChange: z.string().email(),
-                          }}
-                        >
-                          {(field) => (
-                            <Box>
-                              <TextField.Root
-                                id={field.name}
-                                name={field.name}
-                                value={field.state.value}
-                                onBlur={field.handleBlur}
-                                onChange={(e) =>
-                                  field.handleChange(e.target.value)
-                                }
-                                size="3"
-                                placeholder="email"
-                              >
-                                <TextField.Slot>
-                                  <Mail />
-                                </TextField.Slot>
-                                <TextField.Slot>
-                                  <Mail height="14" width="14" />
-                                </TextField.Slot>
-                              </TextField.Root>
-                              <FieldInfo field={field} />
-                            </Box>
+                        {(field) => (
+                          <Box>
+                            <TextField.Root
+                              id={field.name}
+                              name={field.name}
+                              value={field.state.value}
+                              onBlur={field.handleBlur}
+                              onChange={(e) =>
+                                field.handleChange(e.target.value)
+                              }
+                              size="3"
+                              placeholder="email"
+                            >
+                              <TextField.Slot>
+                                <Mail />
+                              </TextField.Slot>
+                              <TextField.Slot>
+                                <Mail height="14" width="14" />
+                              </TextField.Slot>
+                            </TextField.Root>
+                            <FieldInfo field={field} />
+                          </Box>
+                        )}
+                      </form.Field>
+                      <Flex justify={"end"} mt={"4"}>
+                        <form.Subscribe
+                          selector={(state) => [
+                            state.canSubmit,
+                            state.isSubmitting,
+                          ]}
+                          children={([canSubmit, isSubmitting]) => (
+                            <Button
+                              size={"4"}
+                              type="submit"
+                              disabled={!canSubmit}
+                              loading={isSubmitting}
+                            >
+                              Send Confirmation Mail
+                            </Button>
                           )}
-                        </form.Field>
-                        <Flex justify={"end"} mt={"4"}>
-                          <form.Subscribe
-                            selector={(state) => [
-                              state.canSubmit,
-                              state.isSubmitting,
-                            ]}
-                            children={([canSubmit, isSubmitting]) => (
-                              <Button
-                                size={"4"}
-                                type="submit"
-                                disabled={!canSubmit}
-                                loading={isSubmitting}
-                              >
-                                Send Confirmation Mail
-                              </Button>
-                            )}
-                          />
-                        </Flex>
-                      </form>
-                    </Dialog.Content>
-                  </Dialog.Root>
-                </Flex>
-              </div>
-            )}
-          </Card>
-        </div>
+                        />
+                      </Flex>
+                    </form>
+                  </Dialog.Content>
+                </Dialog.Root>
+              </Flex>
+            </div>
+          )}
+        </Card>
       </div>
       <Footer />
     </section>
