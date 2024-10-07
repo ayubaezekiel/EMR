@@ -26,7 +26,7 @@ export const useRequestById = ({ patientId }: { patientId: string }) => {
     queryFn: async () => {
       const { data } = await supabase
         .from("requests")
-        .select("*,patients(*)")
+        .select("*,patients(*),profile(*)")
         .eq("patients_id", patientId);
       return data;
     },
