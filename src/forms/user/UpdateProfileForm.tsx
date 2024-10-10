@@ -59,8 +59,9 @@ export function UpdateProfileForm() {
     isLoggedInProfilePending;
 
   const allowed =
-    logged_in_profile_data?.id === profileId || profile_data?.is_super_user;
-  const super_user_allowed = profile_data?.is_super_user;
+    logged_in_profile_data?.id === profileId ||
+    logged_in_profile_data?.is_super_user;
+  const super_user_allowed = logged_in_profile_data?.is_super_user;
 
   return (
     <form

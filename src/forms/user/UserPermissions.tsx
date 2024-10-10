@@ -1,16 +1,29 @@
 import { useProfile } from "@/lib/hooks";
-import { Button, Flex, Switch, Text } from "@radix-ui/themes";
+import { Button, Flex, Spinner, Switch, Text } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { z } from "zod";
 import { updateProfileAction } from "../../actions/config/user-profile";
 import { FieldInfo } from "../../components/FieldInfo";
+import { getProfileById } from "@/lib/utils";
+import { useParams } from "@tanstack/react-router";
 
 export function UserPermission() {
   const queryClient = useQueryClient();
+  const { profileId } = useParams({
+    from: "/_layout/dashboard/users/$profileId",
+  });
 
-  const { isProfilePending, profile_data } = useProfile();
+  const {
+    isProfilePending: isLoggedInProfilePending,
+    profile_data: logged_in_profile_data,
+  } = useProfile();
+
+  const { data: profile_data, isPending: isProfilePending } = useQuery({
+    queryKey: ["profileById"],
+    queryFn: () => getProfileById(profileId),
+  });
 
   const { branch, ...rest } = { ...profile_data };
   branch;
@@ -30,9 +43,13 @@ export function UserPermission() {
     },
   });
 
-  const allowed = profile_data?.is_super_user;
+  const allowed =
+    logged_in_profile_data?.is_super_user ||
+    logged_in_profile_data?.id === profileId;
 
-  return (
+  return isLoggedInProfilePending || isProfilePending ? (
+    <Spinner />
+  ) : (
     <form
       onSubmit={(e) => {
         e.stopPropagation();

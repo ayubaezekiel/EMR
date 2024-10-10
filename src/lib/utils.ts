@@ -46,10 +46,8 @@ export const getAllProfiles = async () => {
   const { data, error } = await supabase
     .from("profile")
     .select("*,branch(name)");
-
   if (error && !data) {
     toast.error(error.message);
-    return null;
   }
   return data;
 };

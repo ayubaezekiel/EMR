@@ -60,7 +60,7 @@ export function CreateProfileForm() {
         toast.success("Profile created successfully");
       }
       form.reset();
-      queryClient.resetQueries();
+      queryClient.invalidateQueries({ queryKey: ["allUsers"] });
     },
   });
 

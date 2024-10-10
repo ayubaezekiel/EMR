@@ -33,8 +33,8 @@ export const Route = createFileRoute("/_layout/dashboard/users/")({
 
 const AllUsers = () => {
   const { data: profiles, isPending: isProfilesPending } = useQuery({
-    queryKey: ["users"],
-    queryFn: () => getAllProfiles(),
+    queryKey: ["allUsers"],
+    queryFn: getAllProfiles,
   });
 
   const all_profiles = useMemo(() => profiles, [profiles]) ?? [];
