@@ -1,3 +1,4 @@
+
 export type Json =
   | string
   | number
@@ -1142,6 +1143,42 @@ export type Database = {
           },
         ]
       }
+      lab_reports: {
+        Row: {
+          created_by: string
+          id: string
+          request_id: string
+          results: Json
+        }
+        Insert: {
+          created_by: string
+          id?: string
+          request_id: string
+          results: Json
+        }
+        Update: {
+          created_by?: string
+          id?: string
+          request_id?: string
+          results?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_reports_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_reports_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lab_specimen: {
         Row: {
           created_at: string | null
@@ -1193,21 +1230,18 @@ export type Database = {
         Row: {
           branch_id: string
           created_at: string | null
-          data_type: string
           id: string
           name: string
         }
         Insert: {
           branch_id: string
           created_at?: string | null
-          data_type: string
           id?: string
           name: string
         }
         Update: {
           branch_id?: string
           created_at?: string | null
-          data_type?: string
           id?: string
           name?: string
         }
@@ -1227,21 +1261,21 @@ export type Database = {
           created_at: string | null
           id: string
           name: string
-          parameter_id: string
+          parameters: Json
         }
         Insert: {
           branch_id: string
           created_at?: string | null
           id?: string
           name: string
-          parameter_id: string
+          parameters: Json
         }
         Update: {
           branch_id?: string
           created_at?: string | null
           id?: string
           name?: string
-          parameter_id?: string
+          parameters?: Json
         }
         Relationships: [
           {
@@ -1249,13 +1283,6 @@ export type Database = {
             columns: ["branch_id"]
             isOneToOne: false
             referencedRelation: "branch"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "lab_test_template_parameter_id_fkey"
-            columns: ["parameter_id"]
-            isOneToOne: false
-            referencedRelation: "lab_test_parameter"
             referencedColumns: ["id"]
           },
         ]
@@ -1859,14 +1886,14 @@ export type Database = {
       }
       profile: {
         Row: {
-          branch_id: string
+          branch_id: string | null
           can_issue_request: boolean | null
           can_switch_branch: boolean | null
           created_at: string
           department_id: string | null
-          email: string
-          first_name: string
-          gender: string
+          email: string | null
+          first_name: string | null
+          gender: string | null
           has_access_to_accounting: boolean | null
           has_access_to_admission: boolean | null
           has_access_to_billing: boolean | null
@@ -1882,19 +1909,19 @@ export type Database = {
           id: string
           is_super_user: boolean | null
           job_position_id: string | null
-          last_name: string
+          last_name: string | null
           middle_name: string | null
           user_id: string
         }
         Insert: {
-          branch_id: string
+          branch_id?: string | null
           can_issue_request?: boolean | null
           can_switch_branch?: boolean | null
           created_at?: string
           department_id?: string | null
-          email: string
-          first_name: string
-          gender: string
+          email?: string | null
+          first_name?: string | null
+          gender?: string | null
           has_access_to_accounting?: boolean | null
           has_access_to_admission?: boolean | null
           has_access_to_billing?: boolean | null
@@ -1910,19 +1937,19 @@ export type Database = {
           id?: string
           is_super_user?: boolean | null
           job_position_id?: string | null
-          last_name: string
+          last_name?: string | null
           middle_name?: string | null
           user_id: string
         }
         Update: {
-          branch_id?: string
+          branch_id?: string | null
           can_issue_request?: boolean | null
           can_switch_branch?: boolean | null
           created_at?: string
           department_id?: string | null
-          email?: string
-          first_name?: string
-          gender?: string
+          email?: string | null
+          first_name?: string | null
+          gender?: string | null
           has_access_to_accounting?: boolean | null
           has_access_to_admission?: boolean | null
           has_access_to_billing?: boolean | null
@@ -1938,7 +1965,7 @@ export type Database = {
           id?: string
           is_super_user?: boolean | null
           job_position_id?: string | null
-          last_name?: string
+          last_name?: string | null
           middle_name?: string | null
           user_id?: string
         }

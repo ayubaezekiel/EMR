@@ -212,9 +212,9 @@ export function UpdatePatientDiagnosisForm({
             {(field) => {
               return (
                 <div>
-                  {field.state.value.map((name: string, i: number) => {
+                  {field.state.value.map((_name: string, i: number) => {
                     return (
-                      <form.Field key={name} name={`diagnosis.${i}.name`}>
+                      <form.Field key={i} name={`diagnosis.${i}.name`}>
                         {(subField) => {
                           return (
                             <div>

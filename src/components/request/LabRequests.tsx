@@ -1,5 +1,11 @@
+import { DeleteActionForm } from "@/actions/DeleteAction";
 import { useRequestQuery } from "@/actions/queries";
-import { useRequestById } from "@/lib/hooks";
+import {
+  CreateLabResultsForm,
+  UpdateLabResultsForm,
+} from "@/forms/requests/results/LabResults";
+import { useRequestById, useResults } from "@/lib/hooks";
+import { Json } from "@/lib/supabase.types";
 import {
   Badge,
   Button,
@@ -12,11 +18,12 @@ import {
 } from "@radix-ui/themes";
 import { Eye, X } from "lucide-react";
 import { useMemo } from "react";
-import { changeRequestStatus } from "../../actions/actions";
+import { changeRequestStatus, deleteResultAction } from "../../actions/actions";
 import { ConfirmRequestStatusUpdate } from "../../forms/requests/ConfirmRequestStatusUpdate";
 import { NoResultFound } from "../NoResultFound";
 import { PatientCardHeader } from "../PatientCardHeader";
 import PrintLabRequests from "./pdfs/LabRequestPdfs";
+import PrintLabResult from "./pdfs/LabResultsPdf";
 
 export function LabRequestWaitingCard() {
   const { data: request_data, isPending: isRequestPending } = useRequestQuery();
@@ -56,21 +63,6 @@ export function LabRequestWaitingCard() {
             <ConfirmRequestStatusUpdate
               inValidate="requests"
               id={a.id}
-              title="Move To Waiting?"
-              triggleLabel="Waiting"
-              disabled={a.is_waiting!}
-              warning="Are you sure you want to move this request to waiting?"
-              actionFn={async () => {
-                await changeRequestStatus({
-                  id: a.id,
-                  isWaiting: true,
-                  isCompleted: false,
-                });
-              }}
-            />
-            <ConfirmRequestStatusUpdate
-              inValidate="requests"
-              id={a.id}
               title="Mark As Completed?"
               triggleLabel="Complete"
               disabled={a.is_completed!}
@@ -83,6 +75,7 @@ export function LabRequestWaitingCard() {
                 });
               }}
             />
+
             <Dialog.Root>
               <Dialog.Trigger>
                 <Button variant={"outline"} size={"2"} radius="full">
@@ -137,13 +130,126 @@ export function LabRequestWaitingCard() {
                 </Flex>
               </Dialog.Content>
             </Dialog.Root>
-            <ProcessLabRequest {...a} />
+            <CreateLabResultsForm requestId={a.id} />
+            <ViewLabResults
+              dateOfBirth={`${new Date(a.patients?.dob as string).toDateString()}`}
+              gender={`${a.patients?.gender}`}
+              patient={`${a.patients?.first_name} ${a.patients?.middle_name ?? ""} ${a.patients?.last_name} [${a.patients_id.slice(0, 8).toUpperCase()}]`}
+              requestDate={`${new Date(a.patients?.created_at as string).toDateString()}`}
+              requestingDoctor={`${a.profile?.first_name} ${a.profile?.middle_name ?? ""} ${a.profile?.last_name}`}
+              requestId={a.id}
+            />
           </Flex>
         </Card>
       ))}
     </div>
   );
 }
+
+const ViewLabResults = ({
+  requestId,
+  dateOfBirth,
+  gender,
+  patient,
+  requestDate,
+  requestingDoctor,
+}: {
+  requestId: string;
+  dateOfBirth: string;
+  gender: string;
+  patient: string;
+  requestDate: string;
+  requestingDoctor: string;
+}) => {
+  const { isResultsPending, results_data } = useResults(requestId);
+
+  const results = JSON.parse(JSON.stringify(results_data?.results ?? []));
+
+  return (
+    <Dialog.Root>
+      <Dialog.Trigger>
+        <Button
+          loading={isResultsPending}
+          variant="classic"
+          size={"2"}
+          radius="full"
+        >
+          Results
+        </Button>
+      </Dialog.Trigger>
+      <Dialog.Content>
+        <div className="flex justify-between">
+          <Dialog.Title>Notes</Dialog.Title>
+          <Dialog.Close>
+            <IconButton variant="ghost">
+              <X />
+            </IconButton>
+          </Dialog.Close>
+        </div>
+
+        <Table.Root variant="surface">
+          <Table.Header>
+            <Table.Row>
+              <Table.ColumnHeaderCell>Paramter</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>value</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Reference</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Remark</Table.ColumnHeaderCell>
+            </Table.Row>
+          </Table.Header>
+
+          <Table.Body>
+            {results.map(
+              (d: {
+                parameter: string;
+                value: string;
+                reference_range: string;
+                is_abnormal: boolean;
+              }) => (
+                <Table.Row>
+                  <Table.RowHeaderCell>{d.parameter}</Table.RowHeaderCell>
+                  <Table.Cell>{d.value}</Table.Cell>
+                  <Table.Cell>{d.reference_range}</Table.Cell>
+                  <Table.Cell>
+                    {d.is_abnormal ? (
+                      <Badge color="red">Abnormal</Badge>
+                    ) : (
+                      <Badge>Normal</Badge>
+                    )}
+                  </Table.Cell>
+                </Table.Row>
+              )
+            )}
+          </Table.Body>
+        </Table.Root>
+        <Flex justify={"end"} mt={"4"} gap={"4"} align={"center"}>
+          <PrintLabResult
+            recordedBy={`${results_data?.profile?.first_name} ${results_data?.profile?.middle_name ?? ""} ${results_data?.profile?.last_name}`}
+            dateOfBirth={dateOfBirth}
+            gender={gender}
+            patient={patient}
+            requestDate={requestDate}
+            requestingDoctor={requestingDoctor}
+            results={results}
+          />
+          <UpdateLabResultsForm
+            id={results_data?.id as string}
+            request_id={results_data?.request_id as string}
+            results={results_data?.results as Json}
+            created_by={results_data?.created_by as string}
+          />
+          <DeleteActionForm
+            id={`${results_data?.id}`}
+            inValidate="results"
+            title="Delete Lab Result"
+            warning="Are you sure? this result type parameter will be parmanently deleted from the
+          database."
+            actionFn={() => deleteResultAction(`${results_data?.id}`)}
+          />
+        </Flex>
+      </Dialog.Content>
+    </Dialog.Root>
+  );
+};
 
 export function LabRequestCompletedCard() {
   const { data: request_data, isPending: isRequestPending } = useRequestQuery();
@@ -263,7 +369,7 @@ export function LabRequestCompletedCard() {
                   </Flex>
                 </Dialog.Content>
               </Dialog.Root>
-              <ProcessLabRequest {...a} />
+              {/* <CreateLabResultsForm /> */}
             </Flex>
           </Card>
         ))}
@@ -386,23 +492,3 @@ export function PatientLabRequestCard({ patientId }: { patientId: string }) {
     </div>
   );
 }
-const ProcessLabRequest = (data: DB["requests"]["Row"]) => {
-  return (
-    <div>
-      <Dialog.Root>
-        <Dialog.Trigger>
-          <Button disabled={data.is_completed!} size={"2"} radius="full">
-            Process
-          </Button>
-        </Dialog.Trigger>
-        <Dialog.Content>
-          <Dialog.Title>Process Lab Request</Dialog.Title>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Error cumque
-          nam laudantium vel, adipisci, pariatur, accusantium tempora nihil
-          aliquam exercitationem ut omnis totam earum provident asperiores
-          incidunt magnam neque. Dolores!
-        </Dialog.Content>
-      </Dialog.Root>
-    </div>
-  );
-};

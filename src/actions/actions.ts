@@ -730,6 +730,17 @@ export const deleteRequestAction = async (id: string) => {
   }
 };
 
+export const deleteResultAction = async (id: string) => {
+  const { error, data } = await supabase
+    .from("lab_reports")
+    .delete()
+    .eq("id", id);
+  if (error && !data) {
+    toast.error(error.message);
+  } else {
+    toast.success("result deleted successfully");
+  }
+};
 export const changeAdmissionStatus = async ({
   isDischarged,
   isActive,

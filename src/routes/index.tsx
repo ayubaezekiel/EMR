@@ -58,10 +58,12 @@ function Login() {
     <section className="flex flex-col justify-between h-dvh gap-10 w-full">
       <div className="flex flex-col md:mt-48 mt-24 w-full md:w-2/3 lg:w-1/3 md:mx-auto md:px-10 px-2">
         <Card className="shadow-md">
-          <img src={logo} className="size-24 mx-auto" />
-          <Heading size={"7"} my={"4"} align={"center"}>
-            Brightedge HMR
-          </Heading>
+          <Flex direction={"column"}>
+            <img src={logo} className="size-24 mx-auto" />
+            <Heading size={"7"} my={"4"} align={"center"}>
+              Brightedge HMR
+            </Heading>
+          </Flex>
 
           {isPending ? (
             <Spinner />
@@ -83,6 +85,16 @@ function Login() {
                   Go to dashboard
                 </Button>
               </Link>
+              <Button
+                color="red"
+                loading={isPending}
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  window.location.reload();
+                }}
+              >
+                Logout
+              </Button>
             </Flex>
           ) : (
             <div className="p-10">

@@ -122,13 +122,7 @@ export const lab_test_params_column: ColumnDef<
     header: "Name",
     cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
-  {
-    accessorKey: "data_type",
-    header: "Data Type",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("data_type")}</div>
-    ),
-  },
+
   {
     id: "actions",
     enableHiding: false,
