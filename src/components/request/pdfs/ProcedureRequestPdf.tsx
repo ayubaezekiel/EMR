@@ -1,15 +1,15 @@
+// @ts-nocheck
 import { IconButton } from "@radix-ui/themes";
 import {
   Document,
   Image,
   Page,
+  PDFDownloadLink,
   StyleSheet,
   Text,
-  usePDF,
   View,
 } from "@react-pdf/renderer";
 import { Printer } from "lucide-react";
-import { toast } from "sonner";
 import logo from "../../../assets/logo.png";
 
 // Define styles for PDF
@@ -156,18 +156,16 @@ const ProcedureRequestDocument = ({
 );
 
 export default function PrintProcedureRequests(props: RequestDataType) {
-  const [instance] = usePDF({
-    document: <ProcedureRequestDocument {...props} />,
-  });
-
-  if (instance.error) {
-    toast.error(instance.error);
-  }
   return (
-    <IconButton asChild loading={instance.loading}>
-      <a href={`${instance.url}`} download="procedure_request.pdf">
-        <Printer />
-      </a>
-    </IconButton>
+    <PDFDownloadLink
+      document={<ProcedureRequestDocument {...props} />}
+      fileName="procedure_request.pdf"
+    >
+      {({ loading }) => (
+        <IconButton loading={loading}>
+          <Printer />
+        </IconButton>
+      )}
+    </PDFDownloadLink>
   );
 }

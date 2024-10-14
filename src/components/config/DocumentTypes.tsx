@@ -17,8 +17,6 @@ export function DocumentTypes() {
         <Spinner />
       ) : (
         <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
           columns={document_type_column}
           data={document_type_data ?? []}
         />

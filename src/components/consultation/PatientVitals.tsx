@@ -34,12 +34,7 @@ export function PatientVitals({ patientId }: { patientId: string }) {
       {isPending ? (
         <Spinner />
       ) : (
-        <DataTable
-          columns={patient_vitals_column}
-          data={patient_vitals_data}
-          filterLabel="search by person recorded..."
-          filterer="profile"
-        />
+        <DataTable columns={patient_vitals_column} data={patient_vitals_data} />
       )}
     </div>
   );

@@ -28,12 +28,7 @@ export function LabTests() {
       {isPending ? (
         <Spinner />
       ) : (
-        <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
-          columns={lab_test_column}
-          data={lab_test}
-        />
+        <DataTable columns={lab_test_column} data={lab_test} />
       )}
     </div>
   );

@@ -45,12 +45,7 @@ export function HistoryTaking({
         />
       )}
       <div>
-        <DataTable
-          columns={history_taking_column}
-          data={history_data}
-          filterLabel="search by person recoreded..."
-          filterer="profile"
-        />
+        <DataTable columns={history_taking_column} data={history_data} />
       </div>
     </div>
   );

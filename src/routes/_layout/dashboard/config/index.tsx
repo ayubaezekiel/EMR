@@ -1,4 +1,6 @@
+import { DocumentTypes } from "@/components/config/DocumentTypes";
 import { FinancialAnalytics } from "@/components/config/FinancialAnalytics";
+import { Templates } from "@/components/config/Templates";
 import {
   Avatar,
   Badge,
@@ -16,6 +18,7 @@ import {
   Text,
 } from "@radix-ui/themes";
 import { Link, createFileRoute } from "@tanstack/react-router";
+import { AlertTriangle, ArrowLeft } from "lucide-react";
 import { AppointmentType } from "../../../../components/config/AppointmentType";
 import { Branch } from "../../../../components/config/Branch";
 import { Clinics } from "../../../../components/config/Clinics";
@@ -28,8 +31,6 @@ import { HMOPlans } from "../../../../components/config/insurance/HMOPlans";
 import { UpdateCenterForm } from "../../../../forms/config/CenterForm";
 import { config_services_routes } from "../../../../lib/constants";
 import { useCenter, useProfile } from "../../../../lib/hooks";
-import { DocumentTypes } from "@/components/config/DocumentTypes";
-import { AlertTriangle, ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/_layout/dashboard/config/")({
   component: () => {
@@ -170,6 +171,7 @@ const Center = () => {
           <Specialties />
           <Departments />
           <DocumentTypes />
+          <Templates />
         </div>
       </Tabs.Content>
       <Tabs.Content mt={"4"} value="finance">

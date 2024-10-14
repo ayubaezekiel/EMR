@@ -17,8 +17,6 @@ export function Specialties() {
         <Spinner />
       ) : (
         <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
           columns={specialties_column}
           data={data?.specialties_data ?? []}
         />

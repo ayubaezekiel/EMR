@@ -28,12 +28,7 @@ export function DrugOrGeneric() {
         {isPending ? <Spinner /> : <CreateDrugOrGeneric />}
       </Flex>
 
-      <DataTable
-        filterLabel="filter by name..."
-        filterer="name"
-        columns={drug_or_generic_column}
-        data={drug_or_generic_data}
-      />
+      <DataTable columns={drug_or_generic_column} data={drug_or_generic_data} />
     </div>
   );
 }

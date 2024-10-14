@@ -30,8 +30,6 @@ export function DrugOrGenericBrand() {
             <Spinner />
           ) : (
             <DataTable
-              filterLabel="filter by name..."
-              filterer="name"
               columns={drug_or_generic_brand_column}
               data={data?.drug_or_generic_brand_data ?? []}
             />

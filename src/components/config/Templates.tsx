@@ -1,25 +1,23 @@
-import { useConsultationTemplatesQuery } from "@/actions/queries";
+import { useTemplatesQuery } from "@/actions/queries";
 import { Flex, Heading, Spinner } from "@radix-ui/themes";
-import { CreateConsultationTemplateForm } from "../../forms/config/TemplatesForm";
+import { CreateTemplateForm } from "../../forms/config/TemplatesForm";
 import { DataTable } from "../table/DataTable";
-import { consultation_templates_column } from "../table/columns/templates";
+import { templates_column } from "../table/columns/templates";
 
-export function ConsultationTemplates() {
-  const { data, isPending } = useConsultationTemplatesQuery();
+export function Templates() {
+  const { data, isPending } = useTemplatesQuery();
 
   return (
     <div>
       <Flex mb={"3"} justify={"between"}>
         <Heading>Templates</Heading>
-        <CreateConsultationTemplateForm />
+        <CreateTemplateForm />
       </Flex>
       {isPending ? (
         <Spinner />
       ) : (
         <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
-          columns={consultation_templates_column}
+          columns={templates_column}
           data={data?.consultation_templates_data ?? []}
         />
       )}

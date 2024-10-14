@@ -16,12 +16,7 @@ export function Clinics() {
       {isPending ? (
         <Spinner />
       ) : (
-        <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
-          columns={clinic_column}
-          data={data?.clinics_data ?? []}
-        />
+        <DataTable columns={clinic_column} data={data?.clinics_data ?? []} />
       )}
     </div>
   );

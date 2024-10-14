@@ -1,4 +1,3 @@
-import { useConsultationTemplatesQuery } from "@/actions/queries";
 import { useProfile } from "@/lib/hooks";
 import { Button, Modal, Select } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -15,6 +14,7 @@ import {
 } from "../../actions/config/admission";
 import { FieldInfo } from "../../components/FieldInfo";
 import { editor_plugins } from "../../components/textEditor/RichTextEditor";
+import { useTemplatesQuery } from "@/actions/queries";
 
 export function RecordsAndTaskForm({
   patientId,
@@ -28,7 +28,7 @@ export function RecordsAndTaskForm({
   isProgressNote: boolean;
 }) {
   const queryClient = useQueryClient();
-  const { data, isPending } = useConsultationTemplatesQuery();
+  const { data, isPending } = useTemplatesQuery();
   const { isProfilePending, profile_data } = useProfile();
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -135,7 +135,7 @@ export function UpdateRecordsAndTaskForm(
   const [opened, { open, close }] = useDisclosure(false);
 
   const queryClient = useQueryClient();
-  const { data, isPending } = useConsultationTemplatesQuery();
+  const { data, isPending } = useTemplatesQuery();
   const { isProfilePending, profile_data } = useProfile();
 
   const form = useForm({

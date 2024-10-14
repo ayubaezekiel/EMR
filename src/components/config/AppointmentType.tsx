@@ -17,8 +17,6 @@ export function AppointmentType() {
         <Spinner />
       ) : (
         <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
           columns={appointment_type_column}
           data={data?.appointment_type_data ?? []}
         />

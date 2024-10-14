@@ -15,7 +15,7 @@ import {
 import { FieldInfo } from "../../components/FieldInfo";
 import { editor_plugins } from "../../components/textEditor/RichTextEditor";
 
-export function CreateConsultationTemplateForm() {
+export function CreateTemplateForm() {
   const [opened, { close, open }] = useDisclosure(false);
   const queryClient = useQueryClient();
   const { isProfilePending, profile_data } = useProfile();
@@ -44,7 +44,7 @@ export function CreateConsultationTemplateForm() {
       </Button>
       <Modal
         size={"60rem"}
-        title="New Consultation Template"
+        title="New Template"
         opened={opened}
         onClose={close}
       >
@@ -121,10 +121,10 @@ export function CreateConsultationTemplateForm() {
   );
 }
 
-export function UpdateConsultationTemplateForm({
+export function UpdateTemplateForm({
   id,
   ...values
-}: DB["consultation_templates"]["Update"]) {
+}: DB["templates"]["Update"]) {
   const [opened, { close, open }] = useDisclosure(false);
   const queryClient = useQueryClient();
   const { isProfilePending, profile_data } = useProfile();
@@ -154,7 +154,7 @@ export function UpdateConsultationTemplateForm({
       </Button>
       <Modal
         size={"60rem"}
-        title="Update Consultation Template"
+        title="Update Template"
         opened={opened}
         onClose={close}
       >

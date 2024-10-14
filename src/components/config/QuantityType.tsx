@@ -29,8 +29,6 @@ export function QuantityType() {
             <Spinner />
           ) : (
             <DataTable
-              filterLabel="filter by name..."
-              filterer="name"
               columns={quantity_type_column}
               data={quantity_type_data ?? []}
             />

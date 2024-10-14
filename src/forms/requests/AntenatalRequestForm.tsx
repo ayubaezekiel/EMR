@@ -1,7 +1,4 @@
-import {
-  useConsultationTemplatesQuery,
-  usePatientsQuery,
-} from "@/actions/queries";
+import { usePatientsQuery, useTemplatesQuery } from "@/actions/queries";
 import { FieldInfo } from "@/components/FieldInfo";
 import { editor_plugins } from "@/components/textEditor/RichTextEditor";
 import { useAntenatalPackage, useProfile } from "@/lib/hooks";
@@ -22,7 +19,7 @@ export function CreateAntenatalRequestForm() {
   const [opened, { open, close }] = useDisclosure(false);
   const { antenatal_package_data, isAntenatalPackagePending } =
     useAntenatalPackage();
-  const { data, isPending } = useConsultationTemplatesQuery();
+  const { data, isPending } = useTemplatesQuery();
   const { data: patient_data, isPending: isPatientsPending } =
     usePatientsQuery();
 

@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { IconButton } from "@radix-ui/themes";
+import { Button } from "@radix-ui/themes";
 import {
   Document,
   Image,
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   tableCol: {
-    width: "50%",
+    width: "25%",
     borderStyle: "solid",
     borderWidth: 1,
     borderLeftWidth: 0,
@@ -79,30 +79,25 @@ const styles = StyleSheet.create({
   },
 });
 
-// Sample laboratory request data
-type RequestDataType = {
+type ResultsDataType = {
   patient: string;
   dateOfBirth: string;
   gender: string;
   requestingDoctor: string;
+  recordedBy: string;
   requestDate: string;
-  requests: [
-    {
-      note: string;
-      name: string;
-    },
-  ];
+  results: string;
 };
 
-// Create PDF Document
-const ConsumableRequestDocument = ({
+const RadiologyResultsDocument = ({
   dateOfBirth,
   gender,
   patient,
   requestDate,
   requestingDoctor,
-  requests,
-}: RequestDataType) => (
+  results,
+  recordedBy,
+}: ResultsDataType) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.header}>
@@ -110,7 +105,7 @@ const ConsumableRequestDocument = ({
         <Text style={styles.hospitalName}>Brightedge Hospital</Text>
       </View>
       <View style={styles.section}>
-        <Text style={styles.title}>Consumable Request Form</Text>
+        <Text style={styles.title}>Radiology Report</Text>
       </View>
       <View style={styles.section}>
         <Text style={styles.subtitle}>Patient Information</Text>
@@ -121,21 +116,13 @@ const ConsumableRequestDocument = ({
       <View style={styles.section}>
         <Text style={styles.subtitle}>Request Details</Text>
         <Text style={styles.text}>Requesting Doctor: {requestingDoctor}</Text>
+        <Text style={styles.text}>Recoreded By: {recordedBy}</Text>
         <Text style={styles.text}>Request Date: {requestDate}</Text>
       </View>
       <View style={styles.section}>
-        <Text style={styles.subtitle}>Requested Tests</Text>
-        <View style={styles.table}>
-          {requests?.map((service, index) => (
-            <View style={styles.tableRow} key={index}>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{service.name}</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>{service.note}</Text>
-              </View>
-            </View>
-          ))}
+        <Text style={styles.subtitle}>Requested Tests Results</Text>
+        <View style={styles.tableRow}>
+          <Text style={styles.tableCell}>{results}</Text>
         </View>
       </View>
       <View style={styles.section}>
@@ -156,16 +143,16 @@ const ConsumableRequestDocument = ({
   </Document>
 );
 
-export default function PrintConsumableRequests(props: RequestDataType) {
+export default function PrintRadiologyResult(props: ResultsDataType) {
   return (
     <PDFDownloadLink
-      document={<ConsumableRequestDocument {...props} />}
-      fileName="consumable_request.pdf"
+      document={<RadiologyResultsDocument {...props} />}
+      fileName="radiology_result.pdf"
     >
       {({ loading }) => (
-        <IconButton loading={loading}>
+        <Button loading={loading}>
           <Printer />
-        </IconButton>
+        </Button>
       )}
     </PDFDownloadLink>
   );

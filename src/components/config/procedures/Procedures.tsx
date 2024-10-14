@@ -28,12 +28,7 @@ export function Procedures() {
       {isPending ? (
         <Spinner />
       ) : (
-        <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
-          columns={procedures_column}
-          data={procedures}
-        />
+        <DataTable columns={procedures_column} data={procedures} />
       )}
     </div>
   );

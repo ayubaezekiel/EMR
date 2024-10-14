@@ -203,8 +203,6 @@ const AdmissionsPatientView = () => {
             <DataTable
               columns={nursing_report_column}
               data={progress_notes_data}
-              filterLabel="filter by created_by..."
-              filterer="created_by"
             />
           </Tabs.Content>
           <Tabs.Content value="report" mt={"2"}>
@@ -216,12 +214,7 @@ const AdmissionsPatientView = () => {
                 isProgressNote={false}
               />
             </Flex>
-            <DataTable
-              columns={nursing_report_column}
-              data={report_data}
-              filterLabel="filte by created_by..."
-              filterer="created_by"
-            />
+            <DataTable columns={nursing_report_column} data={report_data} />
           </Tabs.Content>
           <Tabs.Content value="viatls" mt={"2"}>
             <Flex justify={"end"}>
@@ -237,12 +230,7 @@ const AdmissionsPatientView = () => {
                 <CreateHistoryTakingForm isAdmission patientId={patientId} />
               )}
             </Flex>
-            <DataTable
-              columns={history_taking_column}
-              data={history_data}
-              filterLabel="filte by created_by..."
-              filterer="created_by"
-            />
+            <DataTable columns={history_taking_column} data={history_data} />
           </Tabs.Content>
           <Tabs.Content value="examination" mt={"2"}>
             <Flex justify={"end"}>
@@ -255,8 +243,6 @@ const AdmissionsPatientView = () => {
             <DataTable
               columns={patient_examination_column}
               data={examination_data}
-              filterLabel="filte by created_by..."
-              filterer="created_by"
             />
           </Tabs.Content>
           <Tabs.Content value="diagnosis" mt={"2"}>
@@ -270,8 +256,6 @@ const AdmissionsPatientView = () => {
             <DataTable
               columns={patient_diagnosis_column}
               data={diagnosis_data}
-              filterLabel="filte by created_by..."
-              filterer="created_by"
             />
           </Tabs.Content>
           <Tabs.Content value="plans" mt={"2"}>
@@ -282,12 +266,7 @@ const AdmissionsPatientView = () => {
                 <CreateTreatmentPlanForm isAdmission patientId={patientId} />
               )}
             </Flex>
-            <DataTable
-              columns={treatment_plan_column}
-              data={plan_data}
-              filterLabel="filte by created_by..."
-              filterer="created_by"
-            />
+            <DataTable columns={treatment_plan_column} data={plan_data} />
           </Tabs.Content>
         </Tabs.Root>
       ) : (

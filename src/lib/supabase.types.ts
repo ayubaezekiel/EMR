@@ -534,38 +534,6 @@ export type Database = {
           },
         ]
       }
-      consultation_templates: {
-        Row: {
-          branch_id: string
-          content: string
-          created_at: string | null
-          id: string
-          name: string
-        }
-        Insert: {
-          branch_id: string
-          content: string
-          created_at?: string | null
-          id?: string
-          name: string
-        }
-        Update: {
-          branch_id?: string
-          content?: string
-          created_at?: string | null
-          id?: string
-          name?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "consultation_templates_branch_id_fkey"
-            columns: ["branch_id"]
-            isOneToOne: false
-            referencedRelation: "branch"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       departments: {
         Row: {
           branch_id: string
@@ -1075,38 +1043,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "imaging_category_branch_id_fkey"
-            columns: ["branch_id"]
-            isOneToOne: false
-            referencedRelation: "branch"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      imaging_templates: {
-        Row: {
-          branch_id: string
-          created_at: string | null
-          id: string
-          note: string
-          title: string
-        }
-        Insert: {
-          branch_id: string
-          created_at?: string | null
-          id?: string
-          note: string
-          title: string
-        }
-        Update: {
-          branch_id?: string
-          created_at?: string | null
-          id?: string
-          note?: string
-          title?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "imaging_templates_branch_id_fkey"
             columns: ["branch_id"]
             isOneToOne: false
             referencedRelation: "branch"
@@ -2029,6 +1965,42 @@ export type Database = {
           },
         ]
       }
+      radiology_results: {
+        Row: {
+          created_by: string
+          id: string
+          request_id: string
+          results: string
+        }
+        Insert: {
+          created_by: string
+          id?: string
+          request_id: string
+          results: string
+        }
+        Update: {
+          created_by?: string
+          id?: string
+          request_id?: string
+          results?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "radioogy_resultd_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "radioogy_resultd_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       requests: {
         Row: {
           branch_id: string
@@ -2127,6 +2099,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "specialties_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      templates: {
+        Row: {
+          branch_id: string
+          content: string
+          created_at: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          branch_id: string
+          content: string
+          created_at?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          branch_id?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultation_templates_branch_id_fkey"
             columns: ["branch_id"]
             isOneToOne: false
             referencedRelation: "branch"

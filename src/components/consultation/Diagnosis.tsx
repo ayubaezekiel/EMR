@@ -38,12 +38,7 @@ export function Diagnosis({
         {isPending ? (
           <Spinner />
         ) : (
-          <DataTable
-            columns={patient_diagnosis_column}
-            data={diagnosis_data}
-            filterLabel="search by person recorded..."
-            filterer="profile"
-          />
+          <DataTable columns={patient_diagnosis_column} data={diagnosis_data} />
         )}
       </div>
     </div>

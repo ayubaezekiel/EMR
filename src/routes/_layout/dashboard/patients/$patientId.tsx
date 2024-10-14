@@ -108,12 +108,7 @@ const PatientProfileLayout = () => {
         <Flex justify={"end"}>
           <CreatePatientVitalsForm patientId={patientId} />
         </Flex>
-        <DataTable
-          columns={patient_vitals_column}
-          data={vitals}
-          filterLabel="search by person recorded..."
-          filterer="profile"
-        />
+        <DataTable columns={patient_vitals_column} data={vitals} />
       </Tabs.Content>
       <Tabs.Content value="appointment" mt={"4"}>
         <PatientAppointments patientId={patientId} />

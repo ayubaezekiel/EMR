@@ -2,7 +2,6 @@ import { useAdmissionsQuery } from "@/actions/queries";
 import {
   Badge,
   Button,
-  Callout,
   Card,
   Flex,
   Inset,
@@ -13,10 +12,11 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { endOfDay } from "date-fns";
-import { ArrowRightCircle, FileQuestion } from "lucide-react";
+import { ArrowRightCircle } from "lucide-react";
 import { useMemo } from "react";
 import { changeAdmissionStatus } from "../../actions/actions";
 import { ConfirmAdmissionUpdate } from "../../forms/requests/ConfirmAdmissionUpdate";
+import { NoResultFound } from "../NoResultFound";
 import { PatientCardHeader } from "../PatientCardHeader";
 
 export function AdmissionActiveCard() {
@@ -36,14 +36,7 @@ export function AdmissionActiveCard() {
   ) : (
     <div className="w-full">
       {admission_data_filtered?.length === 0 ? (
-        <Flex justify={"center"}>
-          <Callout.Root mt={"9"}>
-            <Callout.Icon>
-              <FileQuestion />
-            </Callout.Icon>
-            <Callout.Text ml={"1"}>No result found</Callout.Text>
-          </Callout.Root>
-        </Flex>
+        <NoResultFound />
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
           {admission_data_filtered?.map((a) => (
@@ -165,14 +158,7 @@ export function AdmissionDischargedCard() {
   ) : (
     <div className="w-full">
       {admission_data_filtered?.length === 0 ? (
-        <Flex justify={"center"}>
-          <Callout.Root mt={"9"}>
-            <Callout.Icon>
-              <FileQuestion />
-            </Callout.Icon>
-            <Callout.Text ml={"1"}>No result found</Callout.Text>
-          </Callout.Root>
-        </Flex>
+        <NoResultFound />
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
           {admission_data_filtered?.map((a) => (

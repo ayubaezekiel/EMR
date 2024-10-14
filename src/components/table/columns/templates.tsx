@@ -1,12 +1,10 @@
 import { Checkbox } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
-import { deleteConsultationTemplatesAction } from "../../../actions/config/templates";
 import { DeleteActionForm } from "../../../actions/DeleteAction";
-import { UpdateConsultationTemplateForm } from "../../../forms/config/TemplatesForm";
+import { UpdateTemplateForm } from "../../../forms/config/TemplatesForm";
+import { deleteTemplatesAction } from "@/actions/config/templates";
 
-export const consultation_templates_column: ColumnDef<
-  DB["consultation_templates"]["Row"]
->[] = [
+export const templates_column: ColumnDef<DB["templates"]["Row"]>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -42,14 +40,14 @@ export const consultation_templates_column: ColumnDef<
 
       return (
         <div className="flex gap-4">
-          <UpdateConsultationTemplateForm {...temp} />
+          <UpdateTemplateForm {...temp} />
           <DeleteActionForm
             id={temp.id}
             inValidate="consultationTemplates"
-            title="Delete Consultation Template"
+            title="Delete Template"
             warning="Are you sure? this template will be parmanently deleted from the
           database."
-            actionFn={() => deleteConsultationTemplatesAction({ id: temp.id })}
+            actionFn={() => deleteTemplatesAction({ id: temp.id })}
           />
         </div>
       );

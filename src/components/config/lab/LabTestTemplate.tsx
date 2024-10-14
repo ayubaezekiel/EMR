@@ -17,8 +17,6 @@ export function LabTestTemplate() {
         <Spinner />
       ) : (
         <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
           columns={lab_test_temp_column}
           data={data?.lab_test_template_data ?? []}
         />

@@ -17,8 +17,6 @@ export function AnaesthesiaType() {
         <Spinner />
       ) : (
         <DataTable
-          filterLabel="filter by name..."
-          filterer="title"
           columns={anaesthesia_type_column}
           data={data?.anaesthesia_type_data ?? []}
         />

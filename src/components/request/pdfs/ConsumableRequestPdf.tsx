@@ -160,6 +160,8 @@ export default function PrintPharmacyRequests(props: RequestDataType) {
     document: <PharmacyRequestDocument {...props} />,
   });
 
+  if (!instance) return;
+
   if (instance.error) {
     toast.error(instance.error);
   }

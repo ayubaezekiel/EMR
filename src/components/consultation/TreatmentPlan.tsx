@@ -1,4 +1,3 @@
-import { useConsultationTemplatesQuery } from "@/actions/queries";
 import { useProfile } from "@/lib/hooks";
 import { Button, Modal, Select } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -20,6 +19,7 @@ import { DataTable } from "../table/DataTable";
 import { treatment_plan_column } from "../table/columns/consultation/plan";
 import { editor_plugins } from "../textEditor/RichTextEditor";
 import { SharedConsultationTypes } from "./SharedTypes";
+import { useTemplatesQuery } from "@/actions/queries";
 
 export function TreatmentPlan({
   isAdmission,
@@ -59,12 +59,7 @@ export function TreatmentPlan({
         />
       )}
       <div>
-        <DataTable
-          columns={treatment_plan_column}
-          data={plan_data}
-          filterLabel="search by person recorded..."
-          filterer="profile"
-        />
+        <DataTable columns={treatment_plan_column} data={plan_data} />
       </div>
     </div>
   );
@@ -77,7 +72,7 @@ export function CreateTreatmentPlanForm({
   patientId: string;
 }) {
   const [opened, { close, open }] = useDisclosure(false);
-  const { data, isPending } = useConsultationTemplatesQuery();
+  const { data, isPending } = useTemplatesQuery();
 
   const queryClient = useQueryClient();
   const { isProfilePending, profile_data } = useProfile();
@@ -190,7 +185,7 @@ export function CreateTreatmentPlanForm({
 export function UpdateTreatmentPlanForm({
   ...values
 }: DB["treatment_plan"]["Update"]) {
-  const { data, isPending } = useConsultationTemplatesQuery();
+  const { data, isPending } = useTemplatesQuery();
   const [opened, { close, open }] = useDisclosure(false);
   const queryClient = useQueryClient();
   const { isProfilePending, profile_data } = useProfile();

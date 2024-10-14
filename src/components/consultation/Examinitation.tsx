@@ -1,4 +1,3 @@
-import { useConsultationTemplatesQuery } from "@/actions/queries";
 import { useProfile } from "@/lib/hooks";
 import { Button, Modal, Select } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -20,6 +19,7 @@ import { DataTable } from "../table/DataTable";
 import { patient_examination_column } from "../table/columns/consultation/patient_examination";
 import { editor_plugins } from "../textEditor/RichTextEditor";
 import { SharedConsultationTypes } from "./SharedTypes";
+import { useTemplatesQuery } from "@/actions/queries";
 
 export function Examination({
   isAdmission,
@@ -62,8 +62,6 @@ export function Examination({
         <DataTable
           columns={patient_examination_column}
           data={examination_data}
-          filterLabel="search by person recorded..."
-          filterer="profile"
         />
       </div>
     </div>
@@ -78,7 +76,7 @@ export function CreateExaminationForm({
 }) {
   const [opened, { open, close }] = useDisclosure(false);
 
-  const { data, isPending } = useConsultationTemplatesQuery();
+  const { data, isPending } = useTemplatesQuery();
   const queryClient = useQueryClient();
   const { isProfilePending, profile_data } = useProfile();
 
@@ -189,7 +187,7 @@ export function UpdateExaminationForm({
   id,
   ...values
 }: DB["patient_examination"]["Update"]) {
-  const { data, isPending } = useConsultationTemplatesQuery();
+  const { data, isPending } = useTemplatesQuery();
   const [opened, { open, close }] = useDisclosure(false);
 
   const queryClient = useQueryClient();

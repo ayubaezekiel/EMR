@@ -18,8 +18,6 @@ export function AntenatalPackage() {
         <Spinner />
       ) : (
         <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
           columns={antenatal_package_column}
           data={antenatal_package_data ?? []}
         />

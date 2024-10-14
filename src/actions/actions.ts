@@ -565,23 +565,11 @@ export const getImagingCategories = async () => {
   return { imaging_categories_data };
 };
 
-export const getImagingTemplate = async () => {
-  const branch_id = await getProfile();
-  const { data: imaging_temp_data, error: imaging_temp_err } = await supabase
-    .from("imaging_templates")
-    .select("*")
-    .eq("branch_id", branch_id?.branch_id as string);
-
-  if (imaging_temp_err && !imaging_temp_data) {
-    toast.error(imaging_temp_err.message);
-  }
-  return { imaging_temp_data };
-};
-export const getConsultationTemplates = async () => {
+export const getTemplates = async () => {
   const branch_id = await getProfile();
   const { data: consultation_templates_data, error: templates_err } =
     await supabase
-      .from("consultation_templates")
+      .from("templates")
       .select("*")
       .eq("branch_id", branch_id?.branch_id as string);
 
@@ -730,9 +718,21 @@ export const deleteRequestAction = async (id: string) => {
   }
 };
 
-export const deleteResultAction = async (id: string) => {
+export const deleteLabResultAction = async (id: string) => {
   const { error, data } = await supabase
     .from("lab_reports")
+    .delete()
+    .eq("id", id);
+  if (error && !data) {
+    toast.error(error.message);
+  } else {
+    toast.success("result deleted successfully");
+  }
+};
+
+export const deleteRadiologyResultAction = async (id: string) => {
+  const { error, data } = await supabase
+    .from("radiology_results")
     .delete()
     .eq("id", id);
   if (error && !data) {

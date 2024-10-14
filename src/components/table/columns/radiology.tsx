@@ -4,11 +4,9 @@ import { DeleteActionForm } from "../../../actions/DeleteAction";
 import {
   deleteImagingAction,
   deleteImagingCategoryAction,
-  deleteImagingTemplateAction,
 } from "../../../actions/config/radiology";
 import { UpdateImagingCategoriesForm } from "../../../forms/config/radiology/ImagingCategoriesForm";
 import { UpdateImagingForm } from "../../../forms/config/radiology/ImagingForm";
-import { UpdateImagingTemplateForm } from "../../../forms/config/radiology/ImagingTemplateForm";
 
 export const imaging_column: ColumnDef<DB["imaging"]["Row"]>[] = [
   {
@@ -132,59 +130,3 @@ export const imaging_cat_column: ColumnDef<DB["imaging_category"]["Row"]>[] = [
     },
   },
 ];
-
-export const imaging_temp_column: ColumnDef<DB["imaging_templates"]["Row"]>[] =
-  [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      accessorKey: "title",
-      header: "Title",
-      cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("title")}</div>
-      ),
-    },
-    {
-      id: "actions",
-      enableHiding: false,
-      cell: ({ row }) => {
-        const params = row.original;
-
-        return (
-          <div className="flex gap-4">
-            <UpdateImagingTemplateForm {...params} />
-            <DeleteActionForm
-              id={params.id}
-              inValidate="imagingTemp"
-              title="Delete Template"
-              warning="Are you sure? this template will be parmanently deleted from the
-          database."
-              actionFn={async () =>
-                await deleteImagingTemplateAction({ id: params.id })
-              }
-            />
-          </div>
-        );
-      },
-    },
-  ];

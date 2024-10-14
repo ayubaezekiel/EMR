@@ -27,12 +27,7 @@ export function Anaesthesia() {
       {isPending ? (
         <Spinner />
       ) : (
-        <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
-          columns={anaesthesia_column}
-          data={anaesthesia}
-        />
+        <DataTable columns={anaesthesia_column} data={anaesthesia} />
       )}
     </div>
   );

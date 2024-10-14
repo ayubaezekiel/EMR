@@ -38,12 +38,7 @@ export function UserReports() {
           {isUserReportPending ? (
             <Spinner />
           ) : (
-            <DataTable
-              filterLabel="filter by person's name..."
-              filterer="profile"
-              columns={user_reports_column}
-              data={report_data ?? []}
-            />
+            <DataTable columns={user_reports_column} data={report_data ?? []} />
           )}
         </div>
       )}

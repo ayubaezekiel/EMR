@@ -1,6 +1,5 @@
 import { useAppointmentsQuery } from "@/actions/queries";
 import {
-  Avatar,
   Badge,
   Button,
   Card,
@@ -8,212 +7,240 @@ import {
   Spinner,
   Strong,
   Text,
+  TextField,
 } from "@radix-ui/themes";
 import { useQueryClient } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import {
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 import { format } from "date-fns";
-import { UserCheck } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { changeAppointmentStatus } from "../../actions/actions";
 import { CreatePatientVitalsForm } from "../../forms/config/Vitals";
 import { NoResultFound } from "../NoResultFound";
+import { PatientCardHeader } from "../PatientCardHeader";
 import { ConfirmAppointmentUpdate } from "./ConfirmAppointmentUpdate";
+import { appointment_columns, AppointmentCardType } from "./shared";
 
-export function AppointmentWaiting({
-  type,
-  to,
-  from,
-  searchName,
-}: {
-  type: string;
-  to: string;
-  from: string;
-  searchName: string;
-}) {
+export function AppointmentWaiting() {
   const queryClient = useQueryClient();
+  const [globalFilter, setGlobalFilter] = useState("");
 
   const { data: appointments, isPending: isAppointmentPending } =
     useAppointmentsQuery();
 
-  const appointment_data_waiting = useMemo(
-    () =>
-      appointments?.appointment_data?.filter((a) => {
-        if (searchName.length > 3 && type.length > 3) {
-          return (
-            a.appointment_types?.name.toLowerCase() === type.toLowerCase() &&
-            `${a.patients?.first_name} ${a.patients?.middle_name} ${a.patients?.last_name}`
-              .replace(/\s/g, "")
-              .toLowerCase()
-              .includes(searchName.replace(/\s/g, "").toLowerCase()) &&
-            a.is_waiting === true
-          );
-        }
-        if (type.length > 3) {
-          return (
-            a.appointment_types?.name.toLowerCase() === type.toLowerCase() &&
-            a.is_waiting === true
-          );
-        }
-        if (searchName.length > 3) {
-          return (
-            `${a.patients?.first_name} ${a.patients?.middle_name} ${a.patients?.last_name}`
-              .replace(/\s/g, "")
-              .toLowerCase()
-              .includes(searchName.replace(/\s/g, "").toLowerCase()) &&
-            a.is_waiting === true
-          );
-        }
-        if (
-          `[${from}, ${to})`.length > 10 &&
-          `[${from}, ${to})` !== "[2000-01-01 15:00, 2000-01-01 16:00)"
-        ) {
-          return () => a.is_waiting === true;
-        }
-        return a.is_waiting === true;
-      }),
-    [appointments?.appointment_data, searchName, from, to, type]
-  );
+  const appointment_data_waiting: AppointmentCardType[] =
+    useMemo(
+      () =>
+        appointments?.appointment_data
+          ?.map((d) => ({
+            id: d.id,
+            is_missed: d.is_missed as boolean,
+            is_waiting: d.is_waiting as boolean,
+            is_completed: d.is_completed as boolean,
+            is_checkedin: d.is_checkedin as boolean,
+            created_at: d.created_at as string,
+            duration: d.duration as string,
+            appointment_types: d.appointment_types?.name as string,
+            patients_id: d.patients_id as string,
+            clinics_name: d.clinics?.name as string,
+            first_name: d.patients?.first_name as string,
+            middle_name: d.patients?.middle_name as string,
+            last_name: d.patients?.last_name as string,
+          }))
+          .filter((a) => {
+            return a.is_waiting;
+          }),
+      [appointments?.appointment_data]
+    ) ?? [];
 
-  return isAppointmentPending ? (
-    <Spinner />
-  ) : appointment_data_waiting?.length === 0 ? (
-    <NoResultFound />
-  ) : (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-      {appointment_data_waiting?.map((a) => (
-        <Card key={a.id}>
-          <Flex justify={"between"}>
-            <Flex gap={"2"} align={"center"}>
-              <Avatar fallback={<UserCheck />} radius="full" size={"3"} />
-              <Flex direction={"column"}>
-                <Flex gap={"1"} align={"center"}>
-                  <Link to={`/dashboard/patients/${a.patients_id}`}>
-                    <Strong className="hover:underline">
-                      {a.patients?.first_name} {a.patients?.middle_name}{" "}
-                      {a.patients?.last_name} [
-                      {a.patients_id.slice(0, 8).toUpperCase()}]
-                    </Strong>
-                  </Link>
+  const table = useReactTable({
+    data: appointment_data_waiting,
+    columns: appointment_columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      globalFilter,
+    },
+    onGlobalFilterChange: setGlobalFilter,
+  });
+  return (
+    <>
+      <div className="mb-4">
+        <TextField.Root
+          placeholder="Search all fields..."
+          value={globalFilter ?? ""}
+          onChange={(event) => setGlobalFilter(event.target.value)}
+          className="max-w-sm"
+        />
+      </div>
+      {isAppointmentPending ? (
+        <Spinner />
+      ) : appointment_data_waiting?.length === 0 ? (
+        <NoResultFound />
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+          {table.getRowModel().rows.map((row) => (
+            <Card key={row.id}>
+              <PatientCardHeader
+                createdAt={`${row.original.created_at}`}
+                firstName={row.getValue("first_name") as string}
+                lastName={row.getValue("last_name") as string}
+                patientId={row.getValue("patients_id") as string}
+                middleName={row.getValue("middle_name") as string}
+              />
+
+              <Flex direction={"column"} mt={"4"}>
+                <Flex gap={"2"} mb={"4"} direction={"column"} justify={"end"}>
+                  <div>
+                    <Badge radius="full">
+                      From:{" "}
+                      {row.getValue("duration")
+                        ? format(
+                            `${row.getValue("duration")}`.slice(2, 20),
+                            "LLL MM yyy, HH:mm a"
+                          )
+                        : "No date"}
+                    </Badge>
+                  </div>
+                  <div>
+                    <Badge radius="full" color="red">
+                      To:{" "}
+                      {row.getValue("duration")
+                        ? format(
+                            `${row.getValue("duration")}`.slice(24, 43),
+                            "LLL MM yyy, HH:mm a"
+                          )
+                        : "No date"}
+                    </Badge>
+                  </div>
                 </Flex>
-                <Flex gap={"1"} align={"center"}>
-                  <Text size={"1"}>
-                    <Strong>created</Strong>
-                  </Text>
-                  .
-                  <Text size={"1"}>
-                    {format(a.created_at!, "LLL MM yyy, HH:mm a")}
-                  </Text>
+                <Strong>
+                  {`${row.getValue("appointment_types")}`.toUpperCase()}
+                </Strong>
+                <Flex gap={"2"} justify={"between"} align={"center"}>
+                  <Text>{row.getValue("clinics_name")}</Text>
+                  <div className="flex gap-2">
+                    {row.original.is_waiting && (
+                      <Badge color="amber">
+                        waiting
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+                    {row.original.is_missed && (
+                      <Badge color="red">
+                        missed
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+                    {row.original.is_checkedin && (
+                      <Badge color="blue">
+                        checked in{" "}
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+
+                    {row.original.is_completed && (
+                      <Badge>
+                        completed
+                        <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
+                      </Badge>
+                    )}
+                  </div>
                 </Flex>
               </Flex>
-            </Flex>
-          </Flex>
+              <Flex justify={"between"} mt={"4"}>
+                <CreatePatientVitalsForm patientId={row.original.patients_id} />
+                <ConfirmAppointmentUpdate
+                  id={row.original.id}
+                  title="Mark As Missed?"
+                  triggleLabel="Missed"
+                  disabled={row.original.is_missed!}
+                  warning="Are you sure you want to mark this appointment as missed?"
+                  actionFn={async () => {
+                    await changeAppointmentStatus({
+                      id: row.original.id,
+                      isMissed: true,
+                      isWaiting: false,
+                      isCheckedIn: false,
+                      isCompleted: false,
+                    });
+                    queryClient.invalidateQueries({
+                      queryKey: ["appointments"],
+                    });
+                  }}
+                />
+                <ConfirmAppointmentUpdate
+                  id={row.original.id}
+                  title="Has Checked In?"
+                  triggleLabel="Checked In"
+                  disabled={row.original.is_checkedin!}
+                  warning="Are you sure this patient has checked in?"
+                  actionFn={async () => {
+                    await changeAppointmentStatus({
+                      id: row.original.id,
+                      isCheckedIn: true,
+                      isWaiting: false,
+                      isCompleted: false,
+                      isMissed: false,
+                    });
+                    queryClient.invalidateQueries({
+                      queryKey: ["appointments"],
+                    });
+                  }}
+                />
 
-          <Flex direction={"column"} mt={"4"}>
-            <Flex gap={"2"} mb={"4"} direction={"column"} justify={"end"}>
-              <div>
-                <Badge radius="full">
-                  From:{" "}
-                  {a.duration
-                    ? format(
-                        `${a.duration}`.slice(2, 20),
-                        "LLL MM yyy, HH:mm a"
-                      )
-                    : "No date"}
-                </Badge>
-              </div>
-              <div>
-                <Badge radius="full" color="red">
-                  To:{" "}
-                  {a.duration
-                    ? format(
-                        `${a.duration}`.slice(24, 43),
-                        "LLL MM yyy, HH:mm a"
-                      )
-                    : "No date"}
-                </Badge>
-              </div>
-            </Flex>
-            <Strong>{a.appointment_types?.name.toUpperCase()}</Strong>
-            <Flex gap={"2"} justify={"between"} align={"center"}>
-              <Text>{a.clinics?.name}</Text>
-              <div className="flex gap-2">
-                {a.is_waiting && (
-                  <Badge color="amber">
-                    waiting
-                    <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
-                  </Badge>
-                )}
-                {a.is_missed && (
-                  <Badge color="red">
-                    missed
-                    <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
-                  </Badge>
-                )}
-                {a.is_checkedin && (
-                  <Badge color="blue">
-                    checked in{" "}
-                    <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
-                  </Badge>
-                )}
+                <Button
+                  asChild
+                  disabled={!row.original.is_checkedin}
+                  size={"2"}
+                  radius="full"
+                >
+                  Attend
+                </Button>
+              </Flex>
+            </Card>
+          ))}
+        </div>
+      )}
 
-                {a.is_completed && (
-                  <Badge>
-                    completed
-                    <span className="p-1 bg-[var(--accent-9)] rounded-full animate-pulse" />
-                  </Badge>
-                )}
-              </div>
-            </Flex>
-          </Flex>
-          <Flex justify={"between"} mt={"4"}>
-            <CreatePatientVitalsForm patientId={a.patients_id} />
-            <ConfirmAppointmentUpdate
-              id={a.id}
-              title="Mark As Missed?"
-              triggleLabel="Missed"
-              disabled={a.is_missed!}
-              warning="Are you sure you want to mark this appointment as missed?"
-              actionFn={async () => {
-                await changeAppointmentStatus({
-                  id: a.id,
-                  isMissed: true,
-                  isWaiting: false,
-                  isCheckedIn: false,
-                  isCompleted: false,
-                });
-                queryClient.invalidateQueries({
-                  queryKey: ["appointments"],
-                });
-              }}
-            />
-            <ConfirmAppointmentUpdate
-              id={a.id}
-              title="Has Checked In?"
-              triggleLabel="Checked In"
-              disabled={a.is_checkedin!}
-              warning="Are you sure this patient has checked in?"
-              actionFn={async () => {
-                await changeAppointmentStatus({
-                  id: a.id,
-                  isCheckedIn: true,
-                  isWaiting: false,
-                  isCompleted: false,
-                  isMissed: false,
-                });
-                queryClient.invalidateQueries({
-                  queryKey: ["appointments"],
-                });
-              }}
-            />
-
-            <Button asChild disabled={!a.is_checkedin} size={"2"} radius="full">
-              <Link to={`/dashboard/appointments/${a.patients_id}`}>
-                Attend
-              </Link>
-            </Button>
-          </Flex>
-        </Card>
-      ))}
-    </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex items-center space-x-2">
+          <Text size={"1"}>Page</Text>
+          <TextField.Root
+            className="w-16"
+            type="number"
+            value={table.getState().pagination.pageIndex + 1}
+            onChange={(e) => {
+              const page = e.target.value ? Number(e.target.value) - 1 : 0;
+              table.setPageIndex(page);
+            }}
+          />
+          <Text size={"1"}>of {table.getPageCount()}</Text>
+        </div>
+        <div className="space-x-2">
+          <Button
+            variant="soft"
+            size="1"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="soft"
+            size="1"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    </>
   );
 }

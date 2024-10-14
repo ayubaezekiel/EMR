@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import supabase from "../supabase/client";
-import { getProfile, getResults } from "./utils";
+import { getLabResults, getProfile, getRadiologyResults } from "./utils";
 import { toast } from "sonner";
 import { getAllDiagnosis } from "@/actions/actions";
 
@@ -119,10 +119,19 @@ export const useProfile = () => {
   return { profile_data, isProfilePending };
 };
 
-export const useResults = (id: string) => {
+export const useLabResults = (id: string) => {
   const { data: results_data, isPending: isResultsPending } = useQuery({
-    queryKey: ["results"],
-    queryFn: () => getResults(id),
+    queryKey: ["labResults"],
+    queryFn: () => getLabResults(id),
+  });
+
+  return { results_data, isResultsPending };
+};
+
+export const useRadiologyResults = (id: string) => {
+  const { data: results_data, isPending: isResultsPending } = useQuery({
+    queryKey: ["radResults"],
+    queryFn: () => getRadiologyResults(id),
   });
 
   return { results_data, isResultsPending };

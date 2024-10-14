@@ -17,8 +17,6 @@ export function Cashpoint() {
         <Spinner />
       ) : (
         <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
           columns={cashpoint_column}
           data={data?.cashpoint_data ?? []}
         />

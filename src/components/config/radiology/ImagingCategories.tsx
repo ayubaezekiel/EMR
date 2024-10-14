@@ -23,12 +23,7 @@ export function ImagingCategories() {
       {isPending ? (
         <Spinner />
       ) : (
-        <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
-          columns={imaging_cat_column}
-          data={imaging_cat}
-        />
+        <DataTable columns={imaging_cat_column} data={imaging_cat} />
       )}
     </div>
   );

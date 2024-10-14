@@ -18,12 +18,7 @@ export function Vitals() {
       {isPending ? (
         <Spinner />
       ) : (
-        <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
-          columns={vitals_column}
-          data={data?.vitals_data ?? []}
-        />
+        <DataTable columns={vitals_column} data={data?.vitals_data ?? []} />
       )}
     </div>
   );
@@ -42,8 +37,6 @@ export function NursingVitatls() {
         <Spinner />
       ) : (
         <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
           columns={appointment_type_column}
           data={data?.appointment_type_data ?? []}
         />

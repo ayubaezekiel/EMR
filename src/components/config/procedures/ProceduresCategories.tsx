@@ -17,8 +17,6 @@ export function ProceduresCategories() {
         <Spinner />
       ) : (
         <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
           columns={procedure_cat_column}
           data={data?.procedure_categories_data ?? []}
         />

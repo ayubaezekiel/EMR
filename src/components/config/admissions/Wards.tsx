@@ -16,12 +16,7 @@ export function Wards() {
       {isPending ? (
         <Spinner />
       ) : (
-        <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
-          columns={wards_column}
-          data={data?.wards_data ?? []}
-        />
+        <DataTable columns={wards_column} data={data?.wards_data ?? []} />
       )}
     </div>
   );

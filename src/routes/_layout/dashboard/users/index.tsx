@@ -44,12 +44,7 @@ const AllUsers = () => {
       {isProfilesPending ? (
         <Spinner />
       ) : (
-        <DataTable
-          columns={profiles_column}
-          data={all_profiles}
-          filterLabel="filter by email..."
-          filterer="email"
-        />
+        <DataTable columns={profiles_column} data={all_profiles} />
       )}
     </div>
   );

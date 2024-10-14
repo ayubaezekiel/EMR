@@ -17,8 +17,6 @@ export function LabTestParams() {
         <Spinner />
       ) : (
         <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
           columns={lab_test_params_column}
           data={data?.lab_params_data ?? []}
         />

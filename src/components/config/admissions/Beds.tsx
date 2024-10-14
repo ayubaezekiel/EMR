@@ -6,34 +6,29 @@ import { DataTable } from "../../table/DataTable";
 import { beds_column } from "../../table/columns/admission/beds";
 
 export function Beds() {
-	const { data, isPending } = useBedsQuery();
+  const { data, isPending } = useBedsQuery();
 
-	const bed_datas =
-		useMemo(
-			() =>
-				data?.beds_data?.map((b) => ({
-					...b,
-					ward: `${b.wards?.name}`,
-				})),
-			[data?.beds_data],
-		) ?? [];
+  const bed_datas =
+    useMemo(
+      () =>
+        data?.beds_data?.map((b) => ({
+          ...b,
+          ward: `${b.wards?.name}`,
+        })),
+      [data?.beds_data]
+    ) ?? [];
 
-	return (
-		<div>
-			<Flex mb={"3"} justify={"between"}>
-				<Heading>Beds</Heading>
-				<CreateBedForm />
-			</Flex>
-			{isPending ? (
-				<Spinner />
-			) : (
-				<DataTable
-					filterLabel="filter by name..."
-					filterer="name"
-					columns={beds_column}
-					data={bed_datas}
-				/>
-			)}
-		</div>
-	);
+  return (
+    <div>
+      <Flex mb={"3"} justify={"between"}>
+        <Heading>Beds</Heading>
+        <CreateBedForm />
+      </Flex>
+      {isPending ? (
+        <Spinner />
+      ) : (
+        <DataTable columns={beds_column} data={bed_datas} />
+      )}
+    </div>
+  );
 }

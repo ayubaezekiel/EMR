@@ -17,8 +17,6 @@ export function HMOGroups() {
         <Spinner />
       ) : (
         <DataTable
-          filterer="name"
-          filterLabel="filter by name..."
           columns={hmo_groups_column}
           data={data?.hmo_group_data ?? []}
         />

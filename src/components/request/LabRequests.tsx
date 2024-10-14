@@ -4,7 +4,7 @@ import {
   CreateLabResultsForm,
   UpdateLabResultsForm,
 } from "@/forms/requests/results/LabResults";
-import { useRequestById, useResults } from "@/lib/hooks";
+import { useLabResults, useRequestById } from "@/lib/hooks";
 import { Json } from "@/lib/supabase.types";
 import {
   Badge,
@@ -18,7 +18,10 @@ import {
 } from "@radix-ui/themes";
 import { Eye, X } from "lucide-react";
 import { useMemo } from "react";
-import { changeRequestStatus, deleteResultAction } from "../../actions/actions";
+import {
+  changeRequestStatus,
+  deleteLabResultAction,
+} from "../../actions/actions";
 import { ConfirmRequestStatusUpdate } from "../../forms/requests/ConfirmRequestStatusUpdate";
 import { NoResultFound } from "../NoResultFound";
 import { PatientCardHeader } from "../PatientCardHeader";
@@ -161,7 +164,7 @@ const ViewLabResults = ({
   requestDate: string;
   requestingDoctor: string;
 }) => {
-  const { isResultsPending, results_data } = useResults(requestId);
+  const { isResultsPending, results_data } = useLabResults(requestId);
 
   const results = JSON.parse(JSON.stringify(results_data?.results ?? []));
 
@@ -243,7 +246,7 @@ const ViewLabResults = ({
             title="Delete Lab Result"
             warning="Are you sure? this result type parameter will be parmanently deleted from the
           database."
-            actionFn={() => deleteResultAction(`${results_data?.id}`)}
+            actionFn={() => deleteLabResultAction(`${results_data?.id}`)}
           />
         </Flex>
       </Dialog.Content>
@@ -369,7 +372,6 @@ export function LabRequestCompletedCard() {
                   </Flex>
                 </Dialog.Content>
               </Dialog.Root>
-              {/* <CreateLabResultsForm /> */}
             </Flex>
           </Card>
         ))}

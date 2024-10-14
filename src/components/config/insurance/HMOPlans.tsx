@@ -27,12 +27,7 @@ export function HMOPlans() {
       {isPending ? (
         <Spinner />
       ) : (
-        <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
-          columns={hmo_plans_column}
-          data={all_hmo_pans}
-        />
+        <DataTable columns={hmo_plans_column} data={all_hmo_pans} />
       )}
     </div>
   );

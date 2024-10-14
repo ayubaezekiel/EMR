@@ -14,12 +14,7 @@ export function Theatre() {
         <CreateTheatreForm />
       </Flex>
 
-      <DataTable
-        filterLabel="filter by name..."
-        filterer="name"
-        columns={theatres_column}
-        data={data?.theatre_data ?? []}
-      />
+      <DataTable columns={theatres_column} data={data?.theatre_data ?? []} />
     </div>
   );
 }

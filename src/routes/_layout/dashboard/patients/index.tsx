@@ -6,39 +6,34 @@ import { DataTable } from "../../../../components/table/DataTable";
 import { patients } from "../../../../components/table/columns/patients";
 
 export const Route = createFileRoute("/_layout/dashboard/patients/")({
-	component: () => (
-		<>
-			<Heading mb={"3"}>Patients</Heading>
-			<PatientTable />
-		</>
-	),
+  component: () => (
+    <>
+      <Heading mb={"3"}>Patients</Heading>
+      <PatientTable />
+    </>
+  ),
 });
 
 const PatientTable = () => {
-	const { data, isPending } = usePatientsQuery();
+  const { data, isPending } = usePatientsQuery();
 
-	const patient_data =
-		useMemo(
-			() =>
-				data?.patient_data?.map((p) => ({
-					...p,
-					hmo_plans: p.hmo_plans?.name,
-				})),
-			[data?.patient_data],
-		) ?? [];
+  const patient_data =
+    useMemo(
+      () =>
+        data?.patient_data?.map((p) => ({
+          ...p,
+          hmo_plans: p.hmo_plans?.name,
+        })),
+      [data?.patient_data]
+    ) ?? [];
 
-	return (
-		<div>
-			{isPending ? (
-				<Spinner />
-			) : (
-				<DataTable
-					filterLabel="filter names...."
-					filterer="patients"
-					columns={patients}
-					data={patient_data}
-				/>
-			)}
-		</div>
-	);
+  return (
+    <div>
+      {isPending ? (
+        <Spinner />
+      ) : (
+        <DataTable columns={patients} data={patient_data} />
+      )}
+    </div>
+  );
 };

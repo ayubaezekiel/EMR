@@ -16,9 +16,21 @@ export const checkAuth = async () => {
   return data.session?.user;
 };
 
-export const getResults = async (id: string) => {
+export const getLabResults = async (id: string) => {
   const { data, error } = await supabase
     .from("lab_reports")
+    .select("*,profile(*)")
+    .eq("request_id", id)
+    .single();
+  if (error && !data) {
+    return null;
+  }
+  return data;
+};
+
+export const getRadiologyResults = async (id: string) => {
+  const { data, error } = await supabase
+    .from("radiology_results")
     .select("*,profile(*)")
     .eq("request_id", id)
     .single();

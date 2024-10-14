@@ -17,8 +17,6 @@ export function PaymentMethod() {
         <Spinner />
       ) : (
         <DataTable
-          filterLabel="filter by name..."
-          filterer="name"
           columns={payment_method_column}
           data={data?.payment_method_data ?? []}
         />
