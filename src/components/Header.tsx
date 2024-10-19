@@ -85,7 +85,7 @@ export function Header() {
             className="overflow-auto bg-white/90 text-black"
           >
             <Box>
-              <div className="flex justify-between my-6 items-center">
+              <div className="flex justify-between my-3 items-center">
                 <HeaderProfile
                   branch={profile_data?.branch?.name as string}
                   isProfilePending={isProfilePending}
