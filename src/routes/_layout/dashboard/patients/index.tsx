@@ -1,4 +1,5 @@
-import { Heading, Spinner } from "@radix-ui/themes";
+import { PatientForm } from "@/forms/PatientForm";
+import { Card, Heading, Spinner } from "@radix-ui/themes";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { usePatientsQuery } from "../../../../actions/queries";
@@ -8,7 +9,13 @@ import { patients } from "../../../../components/table/columns/patients";
 export const Route = createFileRoute("/_layout/dashboard/patients/")({
   component: () => (
     <>
-      <Heading mb={"3"}>Patients</Heading>
+      <Card variant="ghost" my={"4"} style={{ background: "var(--accent-2)" }}>
+        <div className="flex justify-between flex-col gap-2 md:flex-row">
+          <Heading mb={"3"}>Patient Registration</Heading>
+          <PatientForm />
+        </div>
+      </Card>
+
       <PatientTable />
     </>
   ),

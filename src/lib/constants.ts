@@ -15,6 +15,11 @@ import {
 
 export const services_routes = [
   {
+    route: "/dashboard/patients/",
+    name: "Registration",
+    icon: UserCheck2,
+  },
+  {
     route: "/dashboard/admissions/",
     name: "Admissions",
     icon: BedDouble,
@@ -53,12 +58,6 @@ export const services_routes = [
     route: "/dashboard/lab/",
     name: "Laboratory",
     icon: Pipette,
-  },
-
-  {
-    route: "/dashboard/patients/",
-    name: "Patients",
-    icon: UserCheck2,
   },
 
   {
