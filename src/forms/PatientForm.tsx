@@ -95,6 +95,7 @@ export function PatientForm() {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>First Name*</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value}
@@ -115,6 +116,7 @@ export function PatientForm() {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>Middle Name</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value ?? ""}
@@ -138,6 +140,7 @@ export function PatientForm() {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>Last Name*</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value}
@@ -158,6 +161,7 @@ export function PatientForm() {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>DoB*</Text>
                   <TextField.Root
+                    size={"3"}
                     type="date"
                     name={field.name}
                     id={field.name}
@@ -182,6 +186,7 @@ export function PatientForm() {
                 <div className="flex flex-col">
                   <Text size={"3"}>Gender*</Text>
                   <Select.Root
+                    size={"3"}
                     name={field.name}
                     value={field.state.value}
                     onValueChange={(e) => field.handleChange(e)}
@@ -213,6 +218,7 @@ export function PatientForm() {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>Phone*</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value}
@@ -232,6 +238,7 @@ export function PatientForm() {
                 <div className="flex flex-col">
                   <Text size={"3"}>Relationship Status*</Text>
                   <Select.Root
+                    size={"3"}
                     name={field.name}
                     value={field.state.value}
                     onValueChange={(e) => field.handleChange(e)}
@@ -261,6 +268,7 @@ export function PatientForm() {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>Residential Address*</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value}
@@ -282,6 +290,7 @@ export function PatientForm() {
                 <div className="flex flex-col">
                   <Text size={"3"}>State of Origin*</Text>
                   <Select.Root
+                    size={"3"}
                     name={field.name}
                     value={field.state.value}
                     onValueChange={(e) => {
@@ -313,6 +322,7 @@ export function PatientForm() {
                 <div className="flex flex-col">
                   <Text size={"3"}>LGA*</Text>
                   <Select.Root
+                    size={"3"}
                     name={field.name}
                     value={field.state.value}
                     onValueChange={(e) => field.handleChange(e)}
@@ -344,6 +354,7 @@ export function PatientForm() {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>Parmanent Home Address*</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value}
@@ -365,6 +376,7 @@ export function PatientForm() {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>Next of Kin*</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value}
@@ -390,6 +402,7 @@ export function PatientForm() {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>Next of Kin Phone*</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value}
@@ -412,6 +425,7 @@ export function PatientForm() {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>Next of Kin Address*</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value}
@@ -431,6 +445,7 @@ export function PatientForm() {
                 <div className="flex flex-col">
                   <Text size={"3"}>Next of Kin Relationship*</Text>
                   <Select.Root
+                    size={"3"}
                     name={field.name}
                     value={field.state.value}
                     onValueChange={(e) => field.handleChange(e)}
@@ -457,12 +472,13 @@ export function PatientForm() {
             <form.Field
               name="hmo_plan_id"
               validators={{
-                onChange: z.string(),
+                onChange: z.string().optional(),
               }}
               children={(field) => (
                 <div className="flex flex-col">
-                  <Text size={"3"}>HMO Plan*</Text>
+                  <Text size={"3"}>HMO Plan</Text>
                   <Select.Root
+                    size={"3"}
                     name={field.name}
                     value={field.state.value!}
                     onValueChange={(e) => field.handleChange(e)}
@@ -492,6 +508,7 @@ export function PatientForm() {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>HMO Code(fill if insured)</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value!}
@@ -606,6 +623,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>First Name*</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value}
@@ -626,6 +644,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>Middle Name</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value ?? ""}
@@ -649,6 +668,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>Last Name*</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value}
@@ -669,6 +689,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>DoB*</Text>
                   <TextField.Root
+                    size={"3"}
                     type="date"
                     name={field.name}
                     id={field.name}
@@ -693,6 +714,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
                 <div className="flex flex-col">
                   <Text size={"3"}>Gender*</Text>
                   <Select.Root
+                    size={"3"}
                     name={field.name}
                     value={field.state.value}
                     onValueChange={(e) => field.handleChange(e)}
@@ -724,6 +746,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>Phone*</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value}
@@ -743,6 +766,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
                 <div className="flex flex-col">
                   <Text size={"3"}>Relationship Status*</Text>
                   <Select.Root
+                    size={"3"}
                     name={field.name}
                     value={field.state.value}
                     onValueChange={(e) => field.handleChange(e)}
@@ -772,6 +796,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>Residential Address*</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value}
@@ -793,6 +818,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
                 <div className="flex flex-col">
                   <Text size={"3"}>State of Origin*</Text>
                   <Select.Root
+                    size={"3"}
                     name={field.name}
                     value={field.state.value}
                     onValueChange={(e) => {
@@ -824,6 +850,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
                 <div className="flex flex-col">
                   <Text size={"3"}>LGA*</Text>
                   <Select.Root
+                    size={"3"}
                     name={field.name}
                     value={field.state.value}
                     onValueChange={(e) => field.handleChange(e)}
@@ -855,6 +882,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>Parmanent Home Address*</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value}
@@ -876,6 +904,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>Next of Kin*</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value}
@@ -901,6 +930,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>Next of Kin Phone*</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value}
@@ -923,6 +953,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>Next of Kin Address*</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value}
@@ -942,6 +973,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
                 <div className="flex flex-col">
                   <Text size={"3"}>Next of Kin Relationship*</Text>
                   <Select.Root
+                    size={"3"}
                     name={field.name}
                     value={field.state.value}
                     onValueChange={(e) => field.handleChange(e)}
@@ -968,12 +1000,13 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
             <form.Field
               name="hmo_plan_id"
               validators={{
-                onChange: z.string(),
+                onChange: z.string().optional(),
               }}
               children={(field) => (
                 <div className="flex flex-col">
-                  <Text size={"3"}>HMO Plan*</Text>
+                  <Text size={"3"}>HMO Plan</Text>
                   <Select.Root
+                    size={"3"}
                     name={field.name}
                     value={field.state.value!}
                     onValueChange={(e) => field.handleChange(e)}
@@ -1003,6 +1036,7 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
                 <label htmlFor={field.name}>
                   <Text size={"3"}>HMO Code(fill if insured)</Text>
                   <TextField.Root
+                    size={"3"}
                     name={field.name}
                     id={field.name}
                     value={field.state.value!}
