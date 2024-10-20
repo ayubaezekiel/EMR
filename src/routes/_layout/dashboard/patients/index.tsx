@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { usePatientsQuery } from "../../../../actions/queries";
 import { DataTable } from "../../../../components/table/DataTable";
 import { patients } from "../../../../components/table/columns/patients";
+import { CreateAppointmentForm } from "@/forms/AppointmentForm";
 
 export const Route = createFileRoute("/_layout/dashboard/patients/")({
   component: () => (
@@ -34,12 +35,22 @@ const PatientTable = () => {
       [data?.patient_data]
     ) ?? [];
 
+  const { id, schedule } = Route.useSearch<{ schedule: boolean; id: string }>();
+  console.log(id);
+
   return (
     <div>
       {isPending ? (
         <Spinner />
       ) : (
-        <DataTable columns={patients} data={patient_data} />
+        <div>
+          <DataTable columns={patients} data={patient_data} />
+          <CreateAppointmentForm
+            isSchedule={schedule}
+            patientId={id}
+            key={id}
+          />
+        </div>
       )}
     </div>
   );

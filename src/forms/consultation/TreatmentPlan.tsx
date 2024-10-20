@@ -1,4 +1,4 @@
-import { createHistoryTakingAction } from "@/actions/consultation/actions";
+import { createPlanAction } from "@/actions/consultation/actions";
 import { useTemplatesQuery } from "@/actions/queries";
 import { FieldInfo } from "@/components/FieldInfo";
 import RichTextEditor from "@/components/textEditor/TipTapRichTextEditor";
@@ -10,16 +10,17 @@ import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { z } from "zod";
 
-export function CreateHistoryTakingForm({
+export function CreateTreatmentPlanForm({
   isAdmission,
   patientId,
 }: {
   isAdmission: boolean;
   patientId: string;
 }) {
+  const { data, isPending } = useTemplatesQuery();
+
   const queryClient = useQueryClient();
   const { isProfilePending, profile_data } = useProfile();
-  const { data, isPending } = useTemplatesQuery();
 
   const form = useForm({
     defaultValues: {
@@ -29,7 +30,7 @@ export function CreateHistoryTakingForm({
     },
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
-      await createHistoryTakingAction({
+      await createPlanAction({
         note: value.note,
         patients_id: patientId,
         taken_by: `${profile_data?.id}`,
@@ -37,7 +38,8 @@ export function CreateHistoryTakingForm({
         is_admission: isAdmission,
       });
       form.reset();
-      queryClient.invalidateQueries({ queryKey: ["historyTaking"] });
+      close();
+      queryClient.invalidateQueries({ queryKey: ["treatmentPlan"] });
     },
   });
 
@@ -72,14 +74,14 @@ export function CreateHistoryTakingForm({
         }}
       >
         {(field) => (
-          <div className="flex flex-col">
-            <Text size={"3"}>Note*</Text>
+          <label htmlFor={field.name} className="flex flex-col">
+            <Text size={"3"}>Task</Text>
             <RichTextEditor
               content={field.state.value}
               onChange={field.handleChange}
             />
             <FieldInfo field={field} />
-          </div>
+          </label>
         )}
       </form.Field>
       <Flex gap="3" mt="4" justify="end">
@@ -91,7 +93,7 @@ export function CreateHistoryTakingForm({
               mt="4"
               loading={isSubmitting || isProfilePending || isPending}
               type="submit"
-              disabled={!canSubmit}
+              disabled={!canSubmit || isSubmitting}
               size={"4"}
             >
               Save

@@ -16,8 +16,8 @@ import { PatientRadiologyCard } from "../../../../components/request/RadiologyRe
 import { DataTable } from "../../../../components/table/DataTable";
 import { patient_vitals_column } from "../../../../components/table/columns/vitals";
 import { UpdatePatientForm } from "../../../../forms/PatientForm";
-import { CreatePatientVitalsForm } from "../../../../forms/config/Vitals";
 import { PatientAntenatalRequestCard } from "@/components/request/AntenatalRequest";
+import { CreatePatientVitalsForm } from "@/forms/consultation/PatientVitalsForm";
 
 export const Route = createFileRoute("/_layout/dashboard/patients/$patientId")({
   component: () => (

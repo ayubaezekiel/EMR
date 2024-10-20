@@ -1,3 +1,9 @@
+import { CreatePatientDiagnosisForm } from "@/forms/consultation/DiagnosisForm";
+import { CreateExaminationForm } from "@/forms/consultation/ExaminationForm";
+import { CreateHistoryTakingForm } from "@/forms/consultation/HistoryTakingForm";
+import { CreateTreatmentPlanForm } from "@/forms/consultation/TreatmentPlan";
+import { CreateAntenatalRequestForm } from "@/forms/requests/AntenatalRequestForm";
+import { useProfile } from "@/lib/hooks";
 import {
   Button,
   Callout,
@@ -10,6 +16,7 @@ import {
 } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { AlertTriangle } from "lucide-react";
 import { useMemo } from "react";
 import {
   getDiagnosisById,
@@ -18,11 +25,9 @@ import {
   getNursingReportsById,
   getTreatmentPlanById,
 } from "../../../../actions/actions";
-import { CreateExaminationForm } from "../../../../components/consultation/Examinitation";
 import { IssueRequests } from "../../../../components/consultation/IssueRequests";
 import { PatientVitals } from "../../../../components/consultation/PatientVitals";
 import { SharedConsultationTypes } from "../../../../components/consultation/SharedTypes";
-import { CreateTreatmentPlanForm } from "../../../../components/consultation/TreatmentPlan";
 import { DataTable } from "../../../../components/table/DataTable";
 import {
   NursingReportProps,
@@ -33,12 +38,8 @@ import { history_taking_column } from "../../../../components/table/columns/cons
 import { patient_examination_column } from "../../../../components/table/columns/consultation/patient_examination";
 import { treatment_plan_column } from "../../../../components/table/columns/consultation/plan";
 import { RecordsAndTaskForm } from "../../../../forms/admission/RecordsAndTaskForm";
-import { CreatePatientVitalsForm } from "../../../../forms/config/Vitals";
-import { useProfile } from "@/lib/hooks";
-import { AlertTriangle } from "lucide-react";
-import { CreateAntenatalRequestForm } from "@/forms/requests/AntenatalRequestForm";
-import { CreateHistoryTakingForm } from "@/forms/consultation/HistoryTakingForm";
-import { CreatePatientDiagnosisForm } from "@/forms/consultation/DiagnosisForm";
+import { CreatePatientVitalsForm } from "@/forms/consultation/PatientVitalsForm";
+
 export const Route = createFileRoute(
   "/_layout/dashboard/admissions/$patientId"
 )({

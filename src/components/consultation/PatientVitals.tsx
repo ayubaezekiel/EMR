@@ -5,6 +5,7 @@ import { DataTable } from "../table/DataTable";
 import { patient_vitals_column } from "../table/columns/vitals";
 import { Json } from "../../lib/supabase.types";
 import { Spinner } from "@radix-ui/themes";
+import { format } from "date-fns";
 
 export interface VitalsProps {
   id: string;
@@ -24,6 +25,7 @@ export function PatientVitals({ patientId }: { patientId: string }) {
       () =>
         data?.patient_vitals_data?.map((v) => ({
           ...v,
+          date_created: format(v.date_created, "LLL MM yyy, HH:mm a"),
           profile: `${v.profile?.first_name} ${v.profile?.middle_name ?? ""} ${v.profile?.last_name}`,
         })),
       [data?.patient_vitals_data]

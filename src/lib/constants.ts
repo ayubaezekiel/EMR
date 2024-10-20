@@ -20,14 +20,24 @@ export const services_routes = [
     icon: UserCheck2,
   },
   {
-    route: "/dashboard/admissions/",
-    name: "Admissions",
-    icon: BedDouble,
-  },
-  {
     route: "/dashboard/appointments/",
     name: "Appointments",
     icon: Building2,
+  },
+  {
+    route: "/dashboard/pharmacy/",
+    name: "Pharmacy",
+    icon: Beaker,
+  },
+  {
+    route: "/dashboard/lab/",
+    name: "Laboratory",
+    icon: Pipette,
+  },
+  {
+    route: "/dashboard/radiology/",
+    name: "Radiology",
+    icon: Scan,
   },
   {
     route: "/dashboard/antenatal/",
@@ -35,19 +45,19 @@ export const services_routes = [
     icon: Bed,
   },
   {
-    route: "/dashboard/billing/",
-    name: "Billing",
-    icon: DollarSign,
-  },
-  {
     route: "/dashboard/consultations",
     name: "Consultation Requests",
     icon: Bed,
   },
   {
-    route: "/dashboard/consumables/",
-    name: "Consumables",
-    icon: Pill,
+    route: "/dashboard/procedures/",
+    name: "Medical Procedures",
+    icon: Scissors,
+  },
+  {
+    route: "/dashboard/admissions/",
+    name: "Admissions",
+    icon: BedDouble,
   },
   {
     route: "/dashboard/user_reports/",
@@ -55,37 +65,26 @@ export const services_routes = [
     icon: BookCheck,
   },
   {
-    route: "/dashboard/lab/",
-    name: "Laboratory",
-    icon: Pipette,
-  },
-
-  {
-    route: "/dashboard/pharmacy/",
-    name: "Pharmacy",
-    icon: Beaker,
-  },
-  {
-    route: "/dashboard/procedures/",
-    name: "Medical Procedures",
-    icon: Scissors,
-  },
-  // {
-  // 	route: "/dashboard/reports/",
-  // 	name: "Medical Reports",
-  // 	icon: BookA,
-  // },
-
-  {
-    route: "/dashboard/radiology/",
-    name: "Radiology",
-    icon: Scan,
+    route: "/dashboard/consumables/",
+    name: "Consumables",
+    icon: Pill,
   },
   {
     route: "/dashboard/users/",
     name: "Users",
     icon: User2,
   },
+  {
+    route: "/dashboard/billing/",
+    name: "Billing",
+    icon: DollarSign,
+  },
+
+  // {
+  // 	route: "/dashboard/reports/",
+  // 	name: "Medical Reports",
+  // 	icon: BookA,
+  // },
 ];
 
 export const config_services_routes = [

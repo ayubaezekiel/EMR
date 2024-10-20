@@ -3,7 +3,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { DeleteActionForm } from "../../../../actions/DeleteAction";
 import { deleteExaminationAction } from "../../../../actions/consultation/actions";
-import { UpdateExaminationForm } from "../../../consultation/Examinitation";
 import { SharedConsultationTypes } from "../../../consultation/SharedTypes";
 
 export const patient_examination_column: ColumnDef<SharedConsultationTypes>[] =
@@ -73,14 +72,14 @@ export const patient_examination_column: ColumnDef<SharedConsultationTypes>[] =
 
         return (
           <div className="flex gap-4">
-            <UpdateExaminationForm
+            {/* <UpdateExaminationForm
               patients_id={exam.patient_id}
               taken_by={exam.created_by}
               created_at={exam.created_at}
               id={exam.id}
               note={exam.note}
               is_admission={exam.is_admission}
-            />
+            /> */}
             <DeleteActionForm
               id={exam.id}
               inValidate="examinations"

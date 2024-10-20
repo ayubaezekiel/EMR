@@ -1,8 +1,10 @@
 import { useAppointmentsQuery } from "@/actions/queries";
+import { CreatePatientVitalsForm } from "@/forms/consultation/PatientVitalsForm";
 import {
   Badge,
   Button,
   Card,
+  Dialog,
   Flex,
   Spinner,
   Strong,
@@ -19,9 +21,9 @@ import {
 import { format } from "date-fns";
 import { useMemo, useState } from "react";
 import { changeAppointmentStatus } from "../../actions/actions";
-import { CreatePatientVitalsForm } from "../../forms/config/Vitals";
 import { NoResultFound } from "../NoResultFound";
 import { PatientCardHeader } from "../PatientCardHeader";
+import { PatientVitals } from "../consultation/PatientVitals";
 import { ConfirmAppointmentUpdate } from "./ConfirmAppointmentUpdate";
 import { appointment_columns, AppointmentCardType } from "./shared";
 
@@ -155,6 +157,24 @@ export function AppointmentWaiting() {
               </Flex>
               <Flex justify={"between"} mt={"4"}>
                 <CreatePatientVitalsForm patientId={row.original.patients_id} />
+                <Dialog.Root>
+                  <Dialog.Trigger>
+                    <Button
+                      variant="soft"
+                      radius="full"
+                      loading={isAppointmentPending}
+                    >
+                      Nursing Records
+                    </Button>
+                  </Dialog.Trigger>
+                  <Dialog.Content maxWidth={"80rem"}>
+                    <Dialog.Title>Patient Vital Signs</Dialog.Title>
+                    <Dialog.Description size={"1"}>
+                      Here are all the recorded patient vital signs
+                    </Dialog.Description>
+                    <PatientVitals patientId={row.original.patients_id} />
+                  </Dialog.Content>
+                </Dialog.Root>
                 <ConfirmAppointmentUpdate
                   id={row.original.id}
                   title="Mark As Missed?"

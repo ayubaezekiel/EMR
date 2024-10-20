@@ -1,4 +1,5 @@
 import { useProfile } from "@/lib/hooks";
+import supabase from "@/supabase/client";
 import {
   Button,
   Dialog,
@@ -9,16 +10,18 @@ import {
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
-import { patientAction, updatePatientAction } from "../actions/patient";
+import { updatePatientAction } from "../actions/patient";
 import { useHmoPlansQuery } from "../actions/queries";
 import { FieldInfo } from "../components/FieldInfo";
 import states from "../lib/statesAndLocalGov.json";
 
 export function PatientForm() {
+  const [appSchedule, setAppScedule] = useState(false);
   const [myStates, setMyState] = useState<string[] | undefined>([]);
   const [open, onOpenChange] = useState(false);
   const queryClient = useQueryClient();
@@ -26,6 +29,7 @@ export function PatientForm() {
 
   const { data, isPending } = useHmoPlansQuery();
 
+  const navigate = useNavigate();
   const form = useForm({
     defaultValues: {
       first_name: "",
@@ -48,11 +52,24 @@ export function PatientForm() {
     },
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
-      await patientAction({
-        ...value,
-        created_by: `${profile_data?.id}`,
-        branch_id: `${profile_data?.branch_id}`,
-      });
+      const { data, error } = await supabase
+        .from("patients")
+        .insert({
+          ...value,
+          created_by: `${profile_data?.id}`,
+          branch_id: `${profile_data?.branch_id}`,
+        })
+        .select();
+
+      if (data && !error) {
+        if (appSchedule) {
+          navigate({
+            to: "/dashboard/patients",
+            search: { schedule: true, id: data[0].id },
+          });
+        }
+      }
+
       form.reset();
       onOpenChange(false);
       queryClient.invalidateQueries({ queryKey: ["patients"] });
@@ -455,9 +472,12 @@ export function PatientForm() {
                       <Select.Group>
                         <Select.Item value="father">FATHER</Select.Item>
                         <Select.Item value="mother">MOTHER</Select.Item>
+                        <Select.Item value="husband">HUSBAND</Select.Item>
+                        <Select.Item value="wife">WIFE</Select.Item>
                         <Select.Item value="brother">BROTHER</Select.Item>
                         <Select.Item value="sister">SISTER</Select.Item>
                         <Select.Item value="son">SON</Select.Item>
+                        <Select.Item value="daughter">DAUGHTER</Select.Item>
                         <Select.Item value="uncle">UNCLE</Select.Item>
                         <Select.Item value="sibling">SIBLING</Select.Item>
                         <Select.Item value="other">OTHER</Select.Item>
@@ -472,11 +492,11 @@ export function PatientForm() {
             <form.Field
               name="hmo_plan_id"
               validators={{
-                onChange: z.string().optional(),
+                onChange: z.string().min(1, { message: "required" }),
               }}
               children={(field) => (
                 <div className="flex flex-col">
-                  <Text size={"3"}>HMO Plan</Text>
+                  <Text size={"3"}>Plan*</Text>
                   <Select.Root
                     size={"3"}
                     name={field.name}
@@ -521,6 +541,28 @@ export function PatientForm() {
             />
           </div>
           <Flex gap="3" mt="4" justify="end">
+            <form.Subscribe
+              selector={(state) => [state.canSubmit, state.isSubmitting]}
+              children={([canSubmit, isSubmitting]) => (
+                <Button
+                  variant="soft"
+                  loading={isSubmitting}
+                  type="button"
+                  onClick={() => {
+                    setAppScedule(true);
+                    form.handleSubmit();
+                  }}
+                  disabled={
+                    !canSubmit ||
+                    isSubmitting ||
+                    !profile_data?.has_access_to_billing
+                  }
+                  size={"4"}
+                >
+                  Save and schedule appointment
+                </Button>
+              )}
+            />
             <form.Subscribe
               selector={(state) => [state.canSubmit, state.isSubmitting]}
               children={([canSubmit, isSubmitting]) => (
@@ -1000,11 +1042,11 @@ export function UpdatePatientForm({ id, ...values }: DB["patients"]["Update"]) {
             <form.Field
               name="hmo_plan_id"
               validators={{
-                onChange: z.string().optional(),
+                onChange: z.string().min(1, { message: "required" }),
               }}
               children={(field) => (
                 <div className="flex flex-col">
-                  <Text size={"3"}>HMO Plan</Text>
+                  <Text size={"3"}>Plan*</Text>
                   <Select.Root
                     size={"3"}
                     name={field.name}

@@ -3,7 +3,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { DeleteActionForm } from "../../../../actions/DeleteAction";
 import { deletePatientDiagnosisAction } from "../../../../actions/consultation/actions";
-import { UpdatePatientDiagnosisForm } from "@/forms/consultation/DiagnosisForm";
 
 export const patient_diagnosis_column: ColumnDef<
   DB["patient_diagnosis"]["Row"]
@@ -79,7 +78,7 @@ export const patient_diagnosis_column: ColumnDef<
 
       return (
         <div className="flex gap-4">
-          <UpdatePatientDiagnosisForm
+          {/* <UpdatePatientDiagnosisForm
             isAdmission={Boolean(params.is_admission)}
             patients_id={params.patients_id}
             taken_by={params.taken_by}
@@ -88,7 +87,7 @@ export const patient_diagnosis_column: ColumnDef<
             diagnosis={params.diagnosis}
             is_admission={params.is_admission}
             branch_id={params.branch_id}
-          />
+          /> */}
           <DeleteActionForm
             id={params.id}
             inValidate="diagnosis"

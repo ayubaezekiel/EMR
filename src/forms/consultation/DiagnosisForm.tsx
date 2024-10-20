@@ -28,7 +28,6 @@ export function CreatePatientDiagnosisForm({
   const { isProfilePending, profile_data } = useProfile();
   const { diagnosis_data, isDiagnosisPending } = useDiagnosis();
 
-  const [open, onOpenChange] = useState(false);
   const form = useForm({
     defaultValues: {
       diagnosis: [{ name: "" }],
@@ -43,111 +42,92 @@ export function CreatePatientDiagnosisForm({
         is_admission: isAdmission,
       });
       form.reset();
-      onOpenChange(false);
       queryClient.invalidateQueries({ queryKey: ["diagnosis"] });
     },
   });
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Trigger
-        disabled={
-          isProfilePending || !profile_data?.has_access_to_doctor_priviledges
-        }
-      >
-        <Button size="4" loading={isProfilePending || isDiagnosisPending}>
-          Add New
-        </Button>
-      </Dialog.Trigger>
-      <Dialog.Content maxWidth={"60rem"}>
-        <Dialog.Title>New Diagnosis</Dialog.Title>
-        <form
-          onSubmit={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-        >
-          <form.Field name="diagnosis" mode="array">
-            {(field) => {
-              return (
-                <div>
-                  {field.state.value.map((_, i) => {
-                    return (
-                      <form.Field key={i} name={`diagnosis[${i}].name`}>
-                        {(subField) => {
-                          return (
-                            <div>
-                              <Text size={"3"}>Name*</Text>
-                              <Flex gap={"2"} align={"center"}>
-                                <Select.Root
-                                  size={"3"}
-                                  value={subField.state.value}
-                                  onValueChange={(e) =>
-                                    subField.handleChange(e)
-                                  }
-                                >
-                                  <Select.Trigger
-                                    className="w-[95%]"
-                                    placeholder="select diagnosis..."
-                                  />
-                                  <Select.Content position="popper">
-                                    {diagnosis_data?.diagnosis_data?.map(
-                                      (d) => (
-                                        <Select.Item value={d.name}>
-                                          {d.name}
-                                        </Select.Item>
-                                      )
-                                    )}
-                                  </Select.Content>
-                                </Select.Root>
-                                <IconButton
-                                  disabled={field.state.value.length === 1}
-                                  color="red"
-                                  onClick={() => field.removeValue(i)}
-                                >
-                                  <X />
-                                </IconButton>
-                              </Flex>
-                            </div>
-                          );
-                        }}
-                      </form.Field>
-                    );
-                  })}
-                  <Button
-                    variant="soft"
-                    mt={"2"}
-                    onClick={() => field.pushValue({ name: "" })}
-                    type="button"
-                  >
-                    Add More
-                  </Button>
-                </div>
-              );
-            }}
-          </form.Field>
+    <form
+      onSubmit={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+    >
+      <form.Field name="diagnosis" mode="array">
+        {(field) => {
+          return (
+            <div>
+              {field.state.value.map((_, i) => {
+                return (
+                  <form.Field key={i} name={`diagnosis[${i}].name`}>
+                    {(subField) => {
+                      return (
+                        <div>
+                          <Text size={"3"}>Name*</Text>
+                          <Flex gap={"2"} align={"center"}>
+                            <Select.Root
+                              size={"3"}
+                              value={subField.state.value}
+                              onValueChange={(e) => subField.handleChange(e)}
+                            >
+                              <Select.Trigger
+                                className="w-[95%]"
+                                placeholder="select diagnosis..."
+                              />
+                              <Select.Content position="popper">
+                                {diagnosis_data?.diagnosis_data?.map((d) => (
+                                  <Select.Item value={d.name}>
+                                    {d.name}
+                                  </Select.Item>
+                                ))}
+                              </Select.Content>
+                            </Select.Root>
+                            <IconButton
+                              disabled={field.state.value.length === 1}
+                              color="red"
+                              onClick={() => field.removeValue(i)}
+                            >
+                              <X />
+                            </IconButton>
+                          </Flex>
+                        </div>
+                      );
+                    }}
+                  </form.Field>
+                );
+              })}
+              <Button
+                variant="soft"
+                mt={"2"}
+                onClick={() => field.pushValue({ name: "" })}
+                type="button"
+              >
+                Add More
+              </Button>
+            </div>
+          );
+        }}
+      </form.Field>
 
-          <Flex gap="3" mt="4" justify="end">
-            <form.Subscribe
-              selector={(state) => [state.canSubmit, state.isSubmitting]}
+      <Flex gap="3" mt="4" justify="end">
+        <form.Subscribe
+          selector={(state) => [state.canSubmit, state.isSubmitting]}
+        >
+          {([canSubmit, isSubmitting]) => (
+            <Button
+              mt="4"
+              loading={isSubmitting || isProfilePending || isDiagnosisPending}
+              type="submit"
+              disabled={!canSubmit}
+              size={"4"}
             >
-              {([canSubmit, isSubmitting]) => (
-                <Button
-                  mt="4"
-                  loading={isSubmitting}
-                  type="submit"
-                  disabled={!canSubmit}
-                  size={"4"}
-                >
-                  Save
-                </Button>
-              )}
-            </form.Subscribe>
-          </Flex>
-        </form>
-      </Dialog.Content>
-    </Dialog.Root>
+              Save
+            </Button>
+          )}
+        </form.Subscribe>
+      </Flex>
+    </form>
   );
 }
 

@@ -4,7 +4,6 @@ import { ArrowUpDown } from "lucide-react";
 import { DeleteActionForm } from "../../../../actions/DeleteAction";
 import { deleteHistoryTakingAction } from "../../../../actions/consultation/actions";
 import { SharedConsultationTypes } from "../../../consultation/SharedTypes";
-import { UpdateHistoryTakingForm } from "@/forms/consultation/HistoryTakingForm";
 
 export const history_taking_column: ColumnDef<SharedConsultationTypes>[] = [
   {
@@ -70,14 +69,14 @@ export const history_taking_column: ColumnDef<SharedConsultationTypes>[] = [
 
       return (
         <div className="flex gap-4">
-          <UpdateHistoryTakingForm
+          {/* <UpdateHistoryTakingForm
             patients_id={history.patient_id}
             taken_by={history.created_by}
             created_at={history.created_at}
             id={history.id}
             note={history.note}
             is_admission={history.is_admission}
-          />
+          /> */}
           <DeleteActionForm
             id={history.id}
             inValidate="historyTaking"

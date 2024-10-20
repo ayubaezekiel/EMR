@@ -35,7 +35,7 @@ export function HistoryTaking({
     ) ?? [];
 
   return (
-    <div>
+    <div className="grid md:grid-cols-2 md:gap-10 gap-4">
       {isPending ? (
         <Spinner />
       ) : (

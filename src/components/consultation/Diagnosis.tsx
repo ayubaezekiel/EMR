@@ -1,5 +1,5 @@
 import { CreatePatientDiagnosisForm } from "@/forms/consultation/DiagnosisForm";
-import { Spinner } from "@radix-ui/themes";
+import { Card, Spinner } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { getDiagnosisById } from "../../actions/actions";
@@ -29,11 +29,13 @@ export function Diagnosis({
     ) ?? [];
 
   return (
-    <div>
-      <CreatePatientDiagnosisForm
-        patientId={patientId}
-        isAdmission={isAdmission}
-      />
+    <div className="grid md:grid-cols-2 md:gap-10 gap-4">
+      <Card>
+        <CreatePatientDiagnosisForm
+          patientId={patientId}
+          isAdmission={isAdmission}
+        />
+      </Card>
       <div>
         {isPending ? (
           <Spinner />
