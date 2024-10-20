@@ -7,6 +7,7 @@ import {
   Dialog,
   Flex,
   IconButton,
+  SegmentedControl,
   Select,
   Switch,
   Text,
@@ -19,9 +20,11 @@ import { X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { CreateHistoryTakingForm } from "./HistoryTakingForm";
 
 export function CreatePatientVitalsForm({ patientId }: { patientId: string }) {
   const { data, isPending } = useVitalsQuery();
+  const [segment, setSegment] = useState("vitals");
 
   const queryClient = useQueryClient();
   const { isProfilePending, profile_data } = useProfile();
@@ -69,182 +72,206 @@ export function CreatePatientVitalsForm({ patientId }: { patientId: string }) {
   });
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Trigger disabled={isPending || isProfilePending}>
-        <Button
-          variant="soft"
-          radius="full"
-          loading={isPending || isProfilePending}
-        >
-          Nursing
-        </Button>
-      </Dialog.Trigger>
-      <Dialog.Content maxWidth={"40rem"}>
-        <Dialog.Title>Record Vitals</Dialog.Title>
-        <Dialog.Description size={"1"} mb={"4"}>
-          Record all the patient vitals
-        </Dialog.Description>
-        <form
-          onSubmit={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-        >
-          <form.Field name="vitals" mode="array">
-            {(field) => {
-              return (
-                <div>
-                  {field.state.value.map((params, i: number) => {
-                    return (
-                      <div
-                        key={i}
-                        className="flex items-center justify-between gap-2 my-2"
-                      >
-                        <form.Field
-                          name={`vitals[${i}].name`}
-                          validators={{
-                            onChangeListenTo: [`vitals[${i}].name`],
-                            onChange: ({ value, fieldApi }) => {
-                              if (
-                                fieldApi.form
-                                  .getFieldValue("vitals")
-                                  .filter((v) => v.name === value).length > 1
-                              ) {
-                                return `${value.split("###")[0].replace('"', "")} already selected`;
-                              }
-                              return undefined;
-                            },
-                          }}
-                        >
-                          {(subField) => {
-                            return (
-                              <div className="flex flex-col w-[70%]">
-                                <Select.Root
-                                  size={"3"}
-                                  defaultValue={params.name}
-                                  onValueChange={(e) =>
-                                    subField.handleChange(e)
-                                  }
-                                >
-                                  <Select.Trigger placeholder="parameter" />
-                                  <Select.Content position="popper">
-                                    {data?.vitals_data?.map((v) => (
-                                      <Select.Item
-                                        value={JSON.stringify(
-                                          `${v.name}###${v.unit}`
-                                        )}
-                                      >
-                                        {v.name}
-                                      </Select.Item>
-                                    ))}
-                                  </Select.Content>
-                                </Select.Root>
-                                <Text size={"1"} ml={"1"} color="green">
-                                  {subField.state.value.length > 2
-                                    ? subField.state.value
-                                        .split("###")[1]
-                                        .replace('"', "")
-                                    : ""}
-                                </Text>
-                                <FieldInfo field={subField} />
-                              </div>
-                            );
-                          }}
-                        </form.Field>
-                        <form.Field
-                          name={`vitals[${i}].value`}
-                          validators={{
-                            onChange: z
-                              .string({ required_error: "required" })
-                              .min(1, { message: "required" }),
-                          }}
-                        >
-                          {(subField) => {
-                            return (
-                              <div className="flex flex-col">
-                                <TextField.Root
-                                  required
-                                  mt={"-4"}
-                                  placeholder="value"
-                                  size={"3"}
-                                  value={subField.state.value}
-                                  onBlur={subField.handleBlur}
-                                  onChange={(e) =>
-                                    subField.handleChange(e.target.value)
-                                  }
-                                />
-                                <FieldInfo field={subField} />
-                              </div>
-                            );
-                          }}
-                        </form.Field>
-
-                        <form.Field name={`vitals[${i}].is_abnormal`}>
-                          {(field) => (
-                            <Flex
-                              mt={"-4"}
-                              gap={"2"}
-                              justify={"end"}
-                              align={"center"}
-                            >
-                              <Switch
-                                size={"3"}
-                                checked={field.state.value}
-                                onCheckedChange={(e) => field.handleChange(e)}
-                              />
-                              <Text size={"1"}>abnormal?</Text>
-                            </Flex>
-                          )}
-                        </form.Field>
-                        <IconButton
-                          size={"1"}
-                          color="red"
-                          mt={"-3"}
-                          onClick={() => field.removeValue(i)}
-                        >
-                          <X />
-                        </IconButton>
-                      </div>
-                    );
-                  })}
-                  <Button
-                    type="button"
-                    variant="soft"
-                    onClick={() =>
-                      field.pushValue({
-                        is_abnormal: false,
-                        name: "",
-                        value: "",
-                      })
-                    }
-                  >
-                    Add more
-                  </Button>
-                </div>
-              );
-            }}
-          </form.Field>
-
-          <Flex gap="3" mt="4" justify="end">
-            <form.Subscribe
-              selector={(state) => [state.canSubmit, state.isSubmitting]}
+    <>
+      <Dialog.Root open={open} onOpenChange={onOpenChange}>
+        <Dialog.Trigger disabled={isPending || isProfilePending}>
+          <Button
+            variant="soft"
+            radius="full"
+            loading={isPending || isProfilePending}
+          >
+            Nursing
+          </Button>
+        </Dialog.Trigger>
+        <Dialog.Content maxWidth={"60rem"}>
+          <Dialog.Title>Nursing</Dialog.Title>
+          <Dialog.Description size={"1"} mb={"4"}>
+            Record patient vitals or take history
+          </Dialog.Description>
+          <SegmentedControl.Root
+            defaultValue={segment}
+            onValueChange={setSegment}
+          >
+            <SegmentedControl.Item value="vitals">
+              Vital Signs
+            </SegmentedControl.Item>
+            <SegmentedControl.Item value="history">
+              History Taking
+            </SegmentedControl.Item>
+          </SegmentedControl.Root>
+          {segment === "vitals" && (
+            <form
+              onSubmit={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                form.handleSubmit();
+              }}
             >
-              {([canSubmit, isSubmitting]) => (
-                <Button
-                  mt="4"
-                  loading={isSubmitting}
-                  type="submit"
-                  disabled={!canSubmit}
-                  size={"4"}
+              <form.Field name="vitals" mode="array">
+                {(field) => {
+                  return (
+                    <div>
+                      {field.state.value.map((params, i: number) => {
+                        return (
+                          <div
+                            key={i}
+                            className="flex items-center justify-between gap-2 my-2"
+                          >
+                            <form.Field
+                              name={`vitals[${i}].name`}
+                              validators={{
+                                onChangeListenTo: [`vitals[${i}].name`],
+                                onChange: ({ value, fieldApi }) => {
+                                  if (
+                                    fieldApi.form
+                                      .getFieldValue("vitals")
+                                      .filter((v) => v.name === value).length >
+                                    1
+                                  ) {
+                                    return `${value.split("###")[0].replace('"', "")} already selected`;
+                                  }
+                                  return undefined;
+                                },
+                              }}
+                            >
+                              {(subField) => {
+                                return (
+                                  <div className="flex flex-col w-[70%] md:w-[50%]">
+                                    <Select.Root
+                                      size={"3"}
+                                      defaultValue={params.name}
+                                      onValueChange={(e) =>
+                                        subField.handleChange(e)
+                                      }
+                                    >
+                                      <Select.Trigger placeholder="parameter" />
+                                      <Select.Content position="popper">
+                                        {data?.vitals_data?.map((v) => (
+                                          <Select.Item
+                                            value={JSON.stringify(
+                                              `${v.name}###${v.unit}`
+                                            )}
+                                          >
+                                            {v.name}
+                                          </Select.Item>
+                                        ))}
+                                      </Select.Content>
+                                    </Select.Root>
+                                    <Text size={"1"} ml={"1"} color="green">
+                                      {subField.state.value.length > 2
+                                        ? subField.state.value
+                                            .split("###")[1]
+                                            .replace('"', "")
+                                        : ""}
+                                    </Text>
+                                    <FieldInfo field={subField} />
+                                  </div>
+                                );
+                              }}
+                            </form.Field>
+                            <form.Field
+                              name={`vitals[${i}].value`}
+                              validators={{
+                                onChange: z
+                                  .string({ required_error: "required" })
+                                  .min(1, { message: "required" }),
+                              }}
+                            >
+                              {(subField) => {
+                                return (
+                                  <div className="flex flex-col">
+                                    <TextField.Root
+                                      required
+                                      mt={"-4"}
+                                      placeholder="value"
+                                      size={"3"}
+                                      value={subField.state.value}
+                                      onBlur={subField.handleBlur}
+                                      onChange={(e) =>
+                                        subField.handleChange(e.target.value)
+                                      }
+                                    />
+                                    <FieldInfo field={subField} />
+                                  </div>
+                                );
+                              }}
+                            </form.Field>
+
+                            <form.Field name={`vitals[${i}].is_abnormal`}>
+                              {(field) => (
+                                <Flex
+                                  mt={"-4"}
+                                  gap={"2"}
+                                  justify={"end"}
+                                  align={"center"}
+                                >
+                                  <Switch
+                                    size={"3"}
+                                    checked={field.state.value}
+                                    onCheckedChange={(e) =>
+                                      field.handleChange(e)
+                                    }
+                                  />
+                                  <Text size={"1"}>abnormal?</Text>
+                                </Flex>
+                              )}
+                            </form.Field>
+                            <IconButton
+                              size={"1"}
+                              color="red"
+                              mt={"-3"}
+                              onClick={() => field.removeValue(i)}
+                            >
+                              <X />
+                            </IconButton>
+                          </div>
+                        );
+                      })}
+                      <Button
+                        type="button"
+                        variant="soft"
+                        onClick={() =>
+                          field.pushValue({
+                            is_abnormal: false,
+                            name: "",
+                            value: "",
+                          })
+                        }
+                      >
+                        Add more
+                      </Button>
+                    </div>
+                  );
+                }}
+              </form.Field>
+
+              <Flex gap="3" mt="4" justify="end">
+                <form.Subscribe
+                  selector={(state) => [state.canSubmit, state.isSubmitting]}
                 >
-                  Save
-                </Button>
-              )}
-            </form.Subscribe>
-          </Flex>
-        </form>
-      </Dialog.Content>
-    </Dialog.Root>
+                  {([canSubmit, isSubmitting]) => (
+                    <Button
+                      mt="4"
+                      loading={isSubmitting}
+                      type="submit"
+                      disabled={!canSubmit}
+                      size={"4"}
+                    >
+                      Save
+                    </Button>
+                  )}
+                </form.Subscribe>
+              </Flex>
+            </form>
+          )}
+          {segment === "history" && (
+            <CreateHistoryTakingForm
+              patientId={patientId}
+              isAdmission={false}
+            />
+          )}
+        </Dialog.Content>
+      </Dialog.Root>
+    </>
   );
 }

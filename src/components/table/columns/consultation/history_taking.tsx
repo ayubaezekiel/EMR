@@ -1,4 +1,5 @@
-import { Button, Card, Checkbox } from "@radix-ui/themes";
+import { ViewNote } from "@/components/ViewNote";
+import { Button, Checkbox } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { DeleteActionForm } from "../../../../actions/DeleteAction";
@@ -57,7 +58,7 @@ export const history_taking_column: ColumnDef<SharedConsultationTypes>[] = [
     header: "Note",
     cell: ({ row }) => (
       <div className="md:max-w-[50rem] mx-auto">
-        <Card>{row.getValue("note")}</Card>
+        <ViewNote note={row.getValue("note")} />
       </div>
     ),
   },

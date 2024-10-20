@@ -2,6 +2,10 @@ import { Card, DataList, Flex, Heading, Spinner, Tabs } from "@radix-ui/themes";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useParams } from "@tanstack/react-router";
 
+import { PatientHistory } from "@/components/consultation/HistoryTaking";
+import { PatientAntenatalRequestCard } from "@/components/request/AntenatalRequest";
+import { CreatePatientVitalsForm } from "@/forms/consultation/PatientVitalsForm";
+import { format } from "date-fns";
 import { useMemo } from "react";
 import {
   getPatientById,
@@ -16,8 +20,6 @@ import { PatientRadiologyCard } from "../../../../components/request/RadiologyRe
 import { DataTable } from "../../../../components/table/DataTable";
 import { patient_vitals_column } from "../../../../components/table/columns/vitals";
 import { UpdatePatientForm } from "../../../../forms/PatientForm";
-import { PatientAntenatalRequestCard } from "@/components/request/AntenatalRequest";
-import { CreatePatientVitalsForm } from "@/forms/consultation/PatientVitalsForm";
 
 export const Route = createFileRoute("/_layout/dashboard/patients/$patientId")({
   component: () => (
@@ -87,6 +89,7 @@ const PatientProfileLayout = () => {
       () =>
         data?.patient_vitals_data?.map((v) => ({
           ...v,
+          date_created: format(v.date_created, "LLL MM yyy, HH:mm a"),
           profile: `${v.profile?.first_name} ${v.profile?.middle_name ?? ""} ${v.profile?.last_name}`,
           patient_id: v.patient_id,
         })),
@@ -96,19 +99,26 @@ const PatientProfileLayout = () => {
   return isPending ? (
     <Spinner />
   ) : (
-    <Tabs.Root defaultValue="vitals">
+    <Tabs.Root defaultValue="nursing">
       <Tabs.List>
-        <Tabs.Trigger value="vitals">Vitals</Tabs.Trigger>
+        <Tabs.Trigger value="nursing">Nursing</Tabs.Trigger>
         <Tabs.Trigger value="appointment">Appointments</Tabs.Trigger>
         <Tabs.Trigger value="requests">Requests</Tabs.Trigger>
         <Tabs.Trigger value="admission">Admission</Tabs.Trigger>
         <Tabs.Trigger value="bills">Bills</Tabs.Trigger>
       </Tabs.List>
-      <Tabs.Content value="vitals" mt={"4"}>
+      <Tabs.Content value="nursing" mt={"4"}>
         <Flex justify={"end"}>
           <CreatePatientVitalsForm patientId={patientId} />
         </Flex>
-        <DataTable columns={patient_vitals_column} data={vitals} />
+        <div className="flex flex-col md:flex-row md:gap-10 gap-4">
+          <div className="md:w-full">
+            <DataTable columns={patient_vitals_column} data={vitals} />
+          </div>
+          <div className="md:w-[40%]">
+            <PatientHistory patientId={patientId} />
+          </div>
+        </div>
       </Tabs.Content>
       <Tabs.Content value="appointment" mt={"4"}>
         <PatientAppointments patientId={patientId} />

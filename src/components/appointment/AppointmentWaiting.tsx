@@ -6,6 +6,7 @@ import {
   Card,
   Dialog,
   Flex,
+  SegmentedControl,
   Spinner,
   Strong,
   Text,
@@ -23,6 +24,7 @@ import { useMemo, useState } from "react";
 import { changeAppointmentStatus } from "../../actions/actions";
 import { NoResultFound } from "../NoResultFound";
 import { PatientCardHeader } from "../PatientCardHeader";
+import { PatientHistory } from "../consultation/HistoryTaking";
 import { PatientVitals } from "../consultation/PatientVitals";
 import { ConfirmAppointmentUpdate } from "./ConfirmAppointmentUpdate";
 import { appointment_columns, AppointmentCardType } from "./shared";
@@ -30,6 +32,7 @@ import { appointment_columns, AppointmentCardType } from "./shared";
 export function AppointmentWaiting() {
   const queryClient = useQueryClient();
   const [globalFilter, setGlobalFilter] = useState("");
+  const [segment, setSegment] = useState("vitals");
 
   const { data: appointments, isPending: isAppointmentPending } =
     useAppointmentsQuery();
@@ -168,11 +171,28 @@ export function AppointmentWaiting() {
                     </Button>
                   </Dialog.Trigger>
                   <Dialog.Content maxWidth={"80rem"}>
-                    <Dialog.Title>Patient Vital Signs</Dialog.Title>
+                    <Dialog.Title>Nursing</Dialog.Title>
                     <Dialog.Description size={"1"}>
                       Here are all the recorded patient vital signs
                     </Dialog.Description>
-                    <PatientVitals patientId={row.original.patients_id} />
+                    <SegmentedControl.Root
+                      mt={"4"}
+                      defaultValue={segment}
+                      onValueChange={setSegment}
+                    >
+                      <SegmentedControl.Item value="vitals">
+                        Vital Signs
+                      </SegmentedControl.Item>
+                      <SegmentedControl.Item value="history">
+                        History Taking
+                      </SegmentedControl.Item>
+                    </SegmentedControl.Root>
+                    {segment === "vitals" && (
+                      <PatientVitals patientId={row.original.patients_id} />
+                    )}
+                    {segment === "history" && (
+                      <PatientHistory patientId={row.original.patients_id} />
+                    )}
                   </Dialog.Content>
                 </Dialog.Root>
                 <ConfirmAppointmentUpdate

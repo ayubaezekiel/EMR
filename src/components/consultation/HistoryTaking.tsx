@@ -14,6 +14,18 @@ export function HistoryTaking({
   isAdmission: boolean;
   patientId: string;
 }) {
+  return (
+    <div className="grid md:grid-cols-2 md:gap-10 gap-4">
+      <CreateHistoryTakingForm
+        patientId={patientId}
+        isAdmission={isAdmission}
+      />
+      <PatientHistory patientId={patientId} />
+    </div>
+  );
+}
+
+export const PatientHistory = ({ patientId }: { patientId: string }) => {
   const { data, isPending } = useQuery({
     queryFn: () => getHistoryTakingById(patientId),
     queryKey: ["historyTaking", patientId],
@@ -33,20 +45,9 @@ export function HistoryTaking({
         })),
       [data?.history_taking_data]
     ) ?? [];
-
-  return (
-    <div className="grid md:grid-cols-2 md:gap-10 gap-4">
-      {isPending ? (
-        <Spinner />
-      ) : (
-        <CreateHistoryTakingForm
-          patientId={patientId}
-          isAdmission={isAdmission}
-        />
-      )}
-      <div>
-        <DataTable columns={history_taking_column} data={history_data} />
-      </div>
-    </div>
+  return isPending ? (
+    <Spinner />
+  ) : (
+    <DataTable columns={history_taking_column} data={history_data} />
   );
-}
+};

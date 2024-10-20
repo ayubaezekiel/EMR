@@ -1,6 +1,5 @@
-import { Badge, Button, Card, Checkbox, Flex } from "@radix-ui/themes";
+import { Badge, Card, Checkbox, Flex } from "@radix-ui/themes";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
 import { DeleteActionForm } from "../../../actions/DeleteAction";
 import {
   deletePatientVitalsAction,
@@ -87,27 +86,21 @@ export const patient_vitals_column: ColumnDef<DB["patient_vitals"]["Row"]>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  {
-    accessorKey: "date_created",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Date
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => <div>{row.getValue("date_created")}</div>,
-  },
+
   {
     accessorKey: "profile",
     header: () => <div className="text-center">Vitals</div>,
     cell: ({ row }) => (
       <div>
-        Recoreded By - <Badge>{row.getValue("profile")}</Badge>
+        <Flex gap={"4"}>
+          <div>
+            Date - <Badge>{row.original.date_created}</Badge>
+          </div>
+          <div>
+            Recoreded By - <Badge>{row.getValue("profile")}</Badge>
+          </div>
+        </Flex>
+
         <div className="grid md:grid-cols-4 gap-2 mt-2">
           {JSON.parse(JSON.stringify(row.original.vitals)).map(
             (v: {
