@@ -25,12 +25,9 @@ import { CreateHistoryTakingForm } from "./HistoryTakingForm";
 export function CreatePatientVitalsForm({ patientId }: { patientId: string }) {
   const { data, isPending } = useVitalsQuery();
   const [segment, setSegment] = useState("vitals");
-
   const queryClient = useQueryClient();
   const { isProfilePending, profile_data } = useProfile();
-
   const [open, onOpenChange] = useState(false);
-
   const form = useForm({
     defaultValues: {
       vitals:
@@ -265,10 +262,7 @@ export function CreatePatientVitalsForm({ patientId }: { patientId: string }) {
             </form>
           )}
           {segment === "history" && (
-            <CreateHistoryTakingForm
-              patientId={patientId}
-              isAdmission={false}
-            />
+            <CreateHistoryTakingForm isAdmission={false} />
           )}
         </Dialog.Content>
       </Dialog.Root>

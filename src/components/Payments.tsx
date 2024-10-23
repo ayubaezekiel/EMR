@@ -1,6 +1,8 @@
 import { useCashpointsQuery, usePaymentMethodsQuery } from "@/actions/queries";
 import { useProfile } from "@/lib/hooks";
+import supabase from "@/supabase/client";
 import {
+  Badge,
   Button,
   Dialog,
   Flex,
@@ -12,10 +14,9 @@ import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { useState } from "react";
-import { toast } from "sonner";
 import { z } from "zod";
-import supabase from "../supabase/client";
 import { FieldInfo } from "./FieldInfo";
+import { toast } from "sonner";
 
 interface PaymentActionType {
   patientId: string;
@@ -28,7 +29,9 @@ interface PaymentActionType {
   is_request?: boolean;
   isApproved?: boolean;
   isAdmission?: boolean;
+  isBulk: boolean;
 }
+
 export const ApprovePayments = ({
   amount,
   patientId,
@@ -40,192 +43,234 @@ export const ApprovePayments = ({
   isApproved,
   isAdmission,
   admissionId,
+  isBulk,
 }: PaymentActionType) => {
   const { isPending: isPaymentMethodPending, data: payment_method_data } =
     usePaymentMethodsQuery();
   const { isPending: isCashpointPending, data: cashpoint_data } =
     useCashpointsQuery();
-  const [open, onOpenChange] = useState(false);
+  const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const { isProfilePending, profile_data } = useProfile();
 
+  const refined_amount = new Intl.NumberFormat("en-NG", {
+    currency: "NGN",
+    style: "currency",
+  }).format(Number(amount));
+
   const form = useForm({
     defaultValues: {
-      amount: `N${new Intl.NumberFormat().format(Number(amount))}`,
+      amount: refined_amount,
       patient_id: patientId,
-      cash_points_id: "",
       is_appointment: is_appointment,
       is_request: is_request,
       admissions_id: admissionId,
       is_admission: isAdmission,
       appointment_id: appointmentId,
       request_id: requestId,
-      services: services,
-      payments_method_id: "",
+      services: {
+        services,
+        payments_method: "",
+        cash_point: "",
+      },
     },
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
-      const { error, data } = await supabase
-        .from("payments")
-        .insert({
-          ...value,
-          approved_by: `${profile_data?.id}`,
-          amount: amount,
-          branch_id: profile_data?.branch_id as string,
-        })
-        .select();
-      if (error && !data) {
-        toast.error(error.message);
-      } else {
-        toast.success("payment approved successfully");
-        onOpenChange(false);
-        if (is_appointment) {
-          queryClient.invalidateQueries({
-            queryKey: ["appointments"],
-          });
-        }
+      const paymentData = {
+        is_admission: Boolean(isAdmission),
+        is_appointment: Boolean(is_appointment),
+        is_request: Boolean(is_request),
+        patient_id: patientId,
+        services: value.services,
+        approved_by: `${profile_data?.id}`,
+        branch_id: profile_data?.branch_id as string,
+      };
 
-        if (is_request) {
-          queryClient.invalidateQueries({
-            queryKey: ["requests"],
-          });
+      if (isBulk) {
+        // Handle bulk submission
+        const bulkPayments = [
+          { ...paymentData },
+          { ...paymentData },
+          { ...paymentData },
+        ];
+        console.log(bulkPayments);
+
+        const { error, data } = await supabase
+          .from("payments")
+          .insert(bulkPayments)
+          .select();
+
+        if (error && !data) {
+          toast.error(error.message);
+        } else {
+          toast.success("Bulk payments approved successfully");
+          setOpen(false);
+          queryClient.invalidateQueries({ queryKey: ["billingData"] });
         }
-        if (isAdmission) {
-          queryClient.invalidateQueries({ queryKey: ["admissions"] });
+      } else {
+        // Handle single submission
+        const { error, data } = await supabase
+          .from("payments")
+          .insert(paymentData)
+          .select();
+
+        if (error && !data) {
+          toast.error(error.message);
+        } else {
+          toast.success("Payment approved successfully");
+          setOpen(false);
+          queryClient.invalidateQueries({ queryKey: ["billingData"] });
         }
       }
     },
   });
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Trigger
-        disabled={
-          isCashpointPending ||
-          isPaymentMethodPending ||
-          isProfilePending ||
-          !profile_data?.has_access_to_billing
-        }
-      >
-        <Button
-          disabled={isApproved}
-          loading={
-            isCashpointPending ||
-            isPaymentMethodPending ||
-            !profile_data?.has_access_to_billing
-          }
-          size={"2"}
-          radius="full"
-        >
-          Approve Payment
-        </Button>
-      </Dialog.Trigger>
-      <Dialog.Content maxWidth="450px">
-        <Dialog.Title>Approve Payment</Dialog.Title>
-        <Dialog.Description />
+    <Flex mt={"4"} justify={"between"} align={"center"}>
+      {isBulk && <Badge>{refined_amount}</Badge>}
+      <Dialog.Root open={open} onOpenChange={setOpen}>
+        <Dialog.Trigger>
+          <Button
+            disabled={
+              isCashpointPending ||
+              isPaymentMethodPending ||
+              isProfilePending ||
+              !profile_data?.has_access_to_billing ||
+              isApproved
+            }
+            color={isBulk ? "red" : "grass"}
+            radius="full"
+          >
+            {isBulk ? "Approve All" : "Approve Payment"}
+          </Button>
+        </Dialog.Trigger>
+        <Dialog.Content>
+          <Dialog.Title>
+            Approve {isBulk ? "Bulk Payments" : "Payment"}
+          </Dialog.Title>
+          <Dialog.Description>
+            {isBulk
+              ? "This will approve all pending payments for this patient."
+              : "Approve the payment for the selected service."}
+          </Dialog.Description>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit();
-          }}
-        >
-          <div className="flex flex-col gap-2 w-full">
-            <form.Field
-              name="payments_method_id"
-              validators={{
-                onChange: z
-                  .string()
-                  .min(3, { message: "select a payment method" }),
-              }}
-              children={(field) => (
-                <div className="flex flex-col w-full">
-                  <Text size={"3"}>Payment Method*</Text>
-                  <Select.Root
-                    required
-                    size={"3"}
-                    name={field.name}
-                    onValueChange={(e) => field.handleChange(e)}
-                    value={field.state.value}
+          <form
+            onSubmit={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              form.handleSubmit();
+            }}
+          >
+            <div className="space-y-4">
+              <form.Field
+                name="services.payments_method"
+                validators={{
+                  onChange: z
+                    .string()
+                    .min(3, { message: "Select a payment method" }),
+                }}
+              >
+                {(field) => (
+                  <div>
+                    <Text>Payment Method*</Text>
+                    <Select.Root
+                      size={"3"}
+                      required
+                      name={field.name}
+                      onValueChange={field.handleChange}
+                      value={field.state.value}
+                    >
+                      <Select.Trigger
+                        className="w-full"
+                        placeholder="Select payment method..."
+                      />
+                      <Select.Content>
+                        {payment_method_data?.payment_method_data?.map((p) => (
+                          <Select.Item key={p.id} value={p.name}>
+                            {p.name}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Root>
+                    <FieldInfo field={field} />
+                  </div>
+                )}
+              </form.Field>
+
+              <form.Field
+                name="services.cash_point"
+                validators={{
+                  onChange: z
+                    .string()
+                    .min(3, { message: "Select a cashpoint" }),
+                }}
+              >
+                {(field) => (
+                  <div>
+                    <Text>Cashpoint*</Text>
+                    <Select.Root
+                      size={"3"}
+                      name={field.name}
+                      onValueChange={field.handleChange}
+                      value={field.state.value}
+                    >
+                      <Select.Trigger
+                        className="w-full"
+                        placeholder="Select cashpoint..."
+                      />
+                      <Select.Content>
+                        {cashpoint_data?.cashpoint_data?.map((p) => (
+                          <Select.Item key={p.id} value={p.name}>
+                            {p.name}
+                          </Select.Item>
+                        ))}
+                      </Select.Content>
+                    </Select.Root>
+                    <FieldInfo field={field} />
+                  </div>
+                )}
+              </form.Field>
+
+              <form.Field name="amount">
+                {(field) => (
+                  <div>
+                    <Text>Amount*</Text>
+                    <TextField.Root
+                      size={"3"}
+                      type="text"
+                      name={field.name}
+                      disabled
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      value={field.state.value}
+                      placeholder="Amount..."
+                    />
+                  </div>
+                )}
+              </form.Field>
+            </div>
+
+            <Flex justify="end" className="mt-4">
+              <form.Subscribe
+                selector={(state) => [state.canSubmit, state.isSubmitting]}
+              >
+                {([canSubmit, isSubmitting]) => (
+                  <Button
+                    size={"4"}
+                    type="submit"
+                    disabled={
+                      !canSubmit || !profile_data?.has_access_to_billing
+                    }
+                    loading={isSubmitting}
                   >
-                    <Select.Trigger placeholder="select payment method...." />
-                    <Select.Content position="popper">
-                      {payment_method_data?.payment_method_data?.map((p) => (
-                        <Select.Item key={p.id} value={p.id}>
-                          {p.name}
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Root>
-                  <FieldInfo field={field} />
-                </div>
-              )}
-            />
-            <form.Field
-              name="cash_points_id"
-              validators={{
-                onChange: z.string().min(3, { message: "select a cashpoint" }),
-              }}
-              children={(field) => (
-                <div className="flex flex-col w-full">
-                  <Text size={"3"}>Cashpoint*</Text>
-                  <Select.Root
-                    size={"3"}
-                    name={field.name}
-                    onValueChange={(e) => field.handleChange(e)}
-                    value={field.state.value}
-                  >
-                    <Select.Trigger placeholder="select cashpoint...." />
-                    <Select.Content position="popper">
-                      {cashpoint_data?.cashpoint_data?.map((p) => (
-                        <Select.Item key={p.id} value={p.id}>
-                          {p.name}
-                        </Select.Item>
-                      ))}
-                    </Select.Content>
-                  </Select.Root>
-                  <FieldInfo field={field} />
-                </div>
-              )}
-            />
-            <form.Field
-              name="amount"
-              children={(field) => (
-                <div className="flex flex-col w-full">
-                  <Text size={"3"}>Amount*</Text>
-                  <TextField.Root
-                    variant="soft"
-                    size={"3"}
-                    name={field.name}
-                    disabled
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder="Amount..."
-                    value={field.state.value}
-                  />
-                </div>
-              )}
-            />
-          </div>
-          <Flex gap="3" mt="4" justify="end">
-            <form.Subscribe
-              selector={(state) => [state.canSubmit, state.isSubmitting]}
-              children={([canSubmit, isSubmitting]) => (
-                <Button
-                  variant="soft"
-                  type="submit"
-                  loading={isSubmitting}
-                  disabled={!canSubmit || !profile_data?.has_access_to_billing}
-                  size={"4"}
-                >
-                  Confirm
-                </Button>
-              )}
-            />
-          </Flex>
-        </form>
-      </Dialog.Content>
-    </Dialog.Root>
+                    Confirm {isBulk ? "Bulk Approval" : "Approval"}
+                  </Button>
+                )}
+              </form.Subscribe>
+            </Flex>
+          </form>
+        </Dialog.Content>
+      </Dialog.Root>
+    </Flex>
   );
 };

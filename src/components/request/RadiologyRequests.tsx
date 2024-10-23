@@ -46,7 +46,6 @@ export function RadiologyCardWaiting() {
           {radiology_request_waiting?.map((a) => (
             <Card key={a.id}>
               <PatientCardHeader
-                createdAt={a.created_at}
                 firstName={a.patients?.first_name as string}
                 lastName={a.patients?.last_name as string}
                 patientId={a.patients_id}
@@ -158,7 +157,6 @@ export const RadiologyCardCompleted = () => {
       {radiology_request_completed?.map((a) => (
         <Card key={a.id}>
           <PatientCardHeader
-            createdAt={a.created_at}
             firstName={a.patients?.first_name as string}
             lastName={a.patients?.last_name as string}
             patientId={a.patients_id}
@@ -279,7 +277,6 @@ export function PatientRadiologyCard({ patientId }: { patientId: string }) {
             <Card key={a.id}>
               <Flex justify={"between"}>
                 <PatientCardHeader
-                  createdAt={a.created_at}
                   firstName={a.patients?.first_name as string}
                   lastName={a.patients?.last_name as string}
                   patientId={a.patients_id}

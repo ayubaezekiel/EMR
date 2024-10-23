@@ -6,14 +6,14 @@ import { DataTable } from "../table/DataTable";
 import { patient_examination_column } from "../table/columns/consultation/patient_examination";
 import { SharedConsultationTypes } from "./SharedTypes";
 import { CreateExaminationForm } from "@/forms/consultation/ExaminationForm";
+import { useParams } from "@tanstack/react-router";
 
-export function Examination({
-  isAdmission,
-  patientId,
-}: {
-  isAdmission: boolean;
-  patientId: string;
-}) {
+export function Examination({ isAdmission }: { isAdmission: boolean }) {
+  const { patientId } = useParams({
+    from: isAdmission
+      ? "/_layout/dashboard/admissions/$patientId"
+      : "/_layout/dashboard/appointments/$patientId",
+  });
   const { data, isPending } = useQuery({
     queryFn: () => getExaminationById(patientId),
     queryKey: ["examinations"],
@@ -39,10 +39,7 @@ export function Examination({
       {isPending ? (
         <Spinner />
       ) : (
-        <CreateExaminationForm
-          patientId={patientId}
-          isAdmission={isAdmission}
-        />
+        <CreateExaminationForm isAdmission={isAdmission} />
       )}
       <div>
         <DataTable

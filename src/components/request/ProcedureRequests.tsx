@@ -35,7 +35,6 @@ export function ProcedureRequestWaitingCard() {
       {procedure_request_waiting?.map((a) => (
         <Card key={a.id}>
           <PatientCardHeader
-            createdAt={a.created_at}
             firstName={a.patients?.first_name as string}
             lastName={a.patients?.last_name as string}
             patientId={a.patients_id}
@@ -149,7 +148,6 @@ export function ProcedureRequestCompletedCard() {
       {procedure_request_completed?.map((a) => (
         <Card key={a.id}>
           <PatientCardHeader
-            createdAt={a.created_at}
             firstName={a.patients?.first_name as string}
             lastName={a.patients?.last_name as string}
             patientId={a.patients_id}
@@ -286,7 +284,6 @@ export function PatientProcedureRequestCard({
       {procedure_request_completed?.map((a) => (
         <Card key={a.id}>
           <PatientCardHeader
-            createdAt={a.created_at}
             firstName={a.patients?.first_name as string}
             lastName={a.patients?.last_name as string}
             patientId={a.patients_id}

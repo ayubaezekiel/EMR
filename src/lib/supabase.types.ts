@@ -15,6 +15,7 @@ export type Database = {
           admission_id: string
           branch_id: string
           created_at: string | null
+          created_by: string
           id: string
           is_completed: boolean | null
           note: string
@@ -23,6 +24,7 @@ export type Database = {
           admission_id: string
           branch_id: string
           created_at?: string | null
+          created_by: string
           id?: string
           is_completed?: boolean | null
           note: string
@@ -31,6 +33,7 @@ export type Database = {
           admission_id?: string
           branch_id?: string
           created_at?: string | null
+          created_by?: string
           id?: string
           is_completed?: boolean | null
           note?: string
@@ -48,6 +51,13 @@ export type Database = {
             columns: ["branch_id"]
             isOneToOne: false
             referencedRelation: "branch"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "admission_consultations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profile"
             referencedColumns: ["id"]
           },
         ]
@@ -284,7 +294,6 @@ export type Database = {
           duration: unknown | null
           follow_up: boolean | null
           id: string
-          is_all_day: boolean | null
           is_approved: boolean | null
           is_checkedin: boolean | null
           is_completed: boolean | null
@@ -301,7 +310,6 @@ export type Database = {
           duration?: unknown | null
           follow_up?: boolean | null
           id?: string
-          is_all_day?: boolean | null
           is_approved?: boolean | null
           is_checkedin?: boolean | null
           is_completed?: boolean | null
@@ -318,7 +326,6 @@ export type Database = {
           duration?: unknown | null
           follow_up?: boolean | null
           id?: string
-          is_all_day?: boolean | null
           is_approved?: boolean | null
           is_checkedin?: boolean | null
           is_completed?: boolean | null
@@ -1497,6 +1504,7 @@ export type Database = {
           hmo_code: string | null
           hmo_plan_id: string | null
           id: string
+          is_approved: boolean
           last_name: string
           lga: string
           middle_name: string | null
@@ -1520,6 +1528,7 @@ export type Database = {
           hmo_code?: string | null
           hmo_plan_id?: string | null
           id?: string
+          is_approved?: boolean
           last_name: string
           lga: string
           middle_name?: string | null
@@ -1543,6 +1552,7 @@ export type Database = {
           hmo_code?: string | null
           hmo_plan_id?: string | null
           id?: string
+          is_approved?: boolean
           last_name?: string
           lga?: string
           middle_name?: string | null
@@ -1614,71 +1624,39 @@ export type Database = {
       }
       payments: {
         Row: {
-          admissions_id: string | null
-          amount: string
-          appointment_id: string | null
-          approved_by: string | null
+          approved_by: string
           branch_id: string
-          cash_points_id: string
           created_at: string | null
           id: string
-          is_admission: boolean | null
-          is_appointment: boolean | null
-          is_request: boolean | null
+          is_admission: boolean
+          is_appointment: boolean
+          is_request: boolean
           patient_id: string
-          payments_method_id: string
-          request_id: string | null
           services: Json | null
         }
         Insert: {
-          admissions_id?: string | null
-          amount: string
-          appointment_id?: string | null
-          approved_by?: string | null
+          approved_by: string
           branch_id: string
-          cash_points_id: string
           created_at?: string | null
           id?: string
-          is_admission?: boolean | null
-          is_appointment?: boolean | null
-          is_request?: boolean | null
+          is_admission: boolean
+          is_appointment: boolean
+          is_request: boolean
           patient_id: string
-          payments_method_id: string
-          request_id?: string | null
           services?: Json | null
         }
         Update: {
-          admissions_id?: string | null
-          amount?: string
-          appointment_id?: string | null
-          approved_by?: string | null
+          approved_by?: string
           branch_id?: string
-          cash_points_id?: string
           created_at?: string | null
           id?: string
-          is_admission?: boolean | null
-          is_appointment?: boolean | null
-          is_request?: boolean | null
+          is_admission?: boolean
+          is_appointment?: boolean
+          is_request?: boolean
           patient_id?: string
-          payments_method_id?: string
-          request_id?: string | null
           services?: Json | null
         }
         Relationships: [
-          {
-            foreignKeyName: "payments_admissions_id_fkey"
-            columns: ["admissions_id"]
-            isOneToOne: false
-            referencedRelation: "admissions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "payments_appointment_id_fkey"
-            columns: ["appointment_id"]
-            isOneToOne: false
-            referencedRelation: "appointments"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "payments_approved_by_fkey"
             columns: ["approved_by"]
@@ -1694,31 +1672,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "payments_cash_points_id_fkey"
-            columns: ["cash_points_id"]
-            isOneToOne: false
-            referencedRelation: "cash_points"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "payments_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "payments_payments_method_id_fkey"
-            columns: ["payments_method_id"]
-            isOneToOne: false
-            referencedRelation: "payment_methods"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "payments_request_id_fkey"
-            columns: ["request_id"]
-            isOneToOne: false
-            referencedRelation: "requests"
             referencedColumns: ["id"]
           },
         ]
@@ -1927,13 +1884,6 @@ export type Database = {
             referencedRelation: "job_positions"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "profile_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
         ]
       }
       quantity_type: {
@@ -1995,7 +1945,7 @@ export type Database = {
           {
             foreignKeyName: "radioogy_resultd_request_id_fkey"
             columns: ["request_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "requests"
             referencedColumns: ["id"]
           },
@@ -2388,4 +2338,19 @@ export type Enums<
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
     ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof PublicSchema["CompositeTypes"]
+    | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
+    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never

@@ -55,6 +55,7 @@ export function AdmissionActiveCard() {
           .filter((a) => a.is_approved && a.is_active),
       [admission_data?.admissions_data]
     ) ?? [];
+
   const table = useReactTable({
     data: admission_data_filtered,
     columns: admission_columns,
@@ -86,7 +87,6 @@ export function AdmissionActiveCard() {
             table.getRowModel().rows.map((row) => (
               <Card key={row.id}>
                 <PatientCardHeader
-                  createdAt={`${row.original.created_at}`}
                   firstName={row.getValue("first_name") as string}
                   lastName={row.getValue("last_name") as string}
                   patientId={row.getValue("patients_id") as string}
@@ -244,6 +244,7 @@ export function AdmissionDischargedCard() {
           .filter((a) => a.is_discharged),
       [admission_data?.admissions_data]
     ) ?? [];
+
   const table = useReactTable({
     data: admission_data_filtered,
     columns: admission_columns,
@@ -276,7 +277,6 @@ export function AdmissionDischargedCard() {
             table.getRowModel().rows.map((row) => (
               <Card key={row.id}>
                 <PatientCardHeader
-                  createdAt={`${row.original.created_at}`}
                   firstName={row.getValue("first_name") as string}
                   lastName={row.getValue("last_name") as string}
                   patientId={row.getValue("patients_id") as string}

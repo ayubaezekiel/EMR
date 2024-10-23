@@ -228,7 +228,7 @@ const AdmissionsPatientView = () => {
               {isHistoryPending ? (
                 <Spinner />
               ) : (
-                <CreateHistoryTakingForm isAdmission patientId={patientId} />
+                <CreateHistoryTakingForm isAdmission />
               )}
             </Flex>
             <DataTable columns={history_taking_column} data={history_data} />
@@ -238,7 +238,7 @@ const AdmissionsPatientView = () => {
               {isExamPending ? (
                 <Spinner />
               ) : (
-                <CreateExaminationForm isAdmission patientId={patientId} />
+                <CreateExaminationForm isAdmission />
               )}
             </Flex>
             <DataTable
@@ -251,7 +251,7 @@ const AdmissionsPatientView = () => {
               {isDiagPending ? (
                 <Spinner />
               ) : (
-                <CreatePatientDiagnosisForm isAdmission patientId={patientId} />
+                <CreatePatientDiagnosisForm isAdmission />
               )}
             </Flex>
             <DataTable
@@ -264,7 +264,7 @@ const AdmissionsPatientView = () => {
               {isPlanPending ? (
                 <Spinner />
               ) : (
-                <CreateTreatmentPlanForm isAdmission patientId={patientId} />
+                <CreateTreatmentPlanForm isAdmission />
               )}
             </Flex>
             <DataTable columns={treatment_plan_column} data={plan_data} />
@@ -282,14 +282,13 @@ const AdmissionsPatientView = () => {
   );
 };
 const SendRequest = () => {
-  const { patientId } = Route.useParams();
   return (
     <Dialog.Root>
       <Dialog.Trigger>
         <Button size={"3"}>Issue Requests</Button>
       </Dialog.Trigger>
       <Dialog.Content maxWidth={"60rem"}>
-        <IssueRequests patientId={patientId} />
+        <IssueRequests isAdmission />
       </Dialog.Content>
     </Dialog.Root>
   );

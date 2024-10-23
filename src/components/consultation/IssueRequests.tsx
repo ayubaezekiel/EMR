@@ -4,8 +4,14 @@ import { CreateLabRequestForm } from "../../forms/requests/LabRequestForm";
 import { CreatePharmRequestForm } from "../../forms/requests/PharmRequestForm";
 import { CreateProcedureRequestForm } from "../../forms/requests/ProcedureRequestForm";
 import { CreateRadiologyRequestForm } from "../../forms/requests/RadioloyRequestForm";
+import { useParams } from "@tanstack/react-router";
 
-export function IssueRequests({ patientId }: { patientId: string }) {
+export function IssueRequests({ isAdmission }: { isAdmission: boolean }) {
+  const { patientId } = useParams({
+    from: isAdmission
+      ? "/_layout/dashboard/admissions/$patientId"
+      : "/_layout/dashboard/appointments/$patientId",
+  });
   return (
     <div>
       <Card my={"6"}>

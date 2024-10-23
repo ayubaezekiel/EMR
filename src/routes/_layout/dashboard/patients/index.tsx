@@ -36,7 +36,6 @@ const PatientTable = () => {
     ) ?? [];
 
   const { id, schedule } = Route.useSearch<{ schedule: boolean; id: string }>();
-  console.log(id);
 
   return (
     <div>
@@ -45,11 +44,13 @@ const PatientTable = () => {
       ) : (
         <div>
           <DataTable columns={patients} data={patient_data} />
-          <CreateAppointmentForm
-            isSchedule={schedule}
-            patientId={id}
-            key={id}
-          />
+          {schedule && id && (
+            <CreateAppointmentForm
+              isSchedule={schedule}
+              patientId={id}
+              key={id}
+            />
+          )}
         </div>
       )}
     </div>

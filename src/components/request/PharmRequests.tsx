@@ -38,7 +38,6 @@ export function PharmRequestWaitingCard() {
       {pharm_request_waiting?.map((a) => (
         <Card key={a.id}>
           <PatientCardHeader
-            createdAt={a.created_at}
             firstName={a.patients?.first_name as string}
             lastName={a.patients?.last_name as string}
             patientId={a.patients_id}
@@ -157,7 +156,6 @@ export function PharmRequestCompletedCard() {
       {pharm_request_completed?.map((a) => (
         <Card key={a.id}>
           <PatientCardHeader
-            createdAt={a.created_at}
             firstName={a.patients?.first_name as string}
             lastName={a.patients?.last_name as string}
             patientId={a.patients_id}
@@ -273,7 +271,6 @@ export function PatientPharmRequestCard({ patientId }: { patientId: string }) {
       {pharm_request?.map((a) => (
         <Card key={a.id}>
           <PatientCardHeader
-            createdAt={a.created_at}
             firstName={a.patients?.first_name as string}
             lastName={a.patients?.last_name as string}
             patientId={a.patients_id}

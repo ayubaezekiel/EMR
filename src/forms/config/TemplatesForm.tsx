@@ -1,3 +1,4 @@
+import RichTextEditor from "@/components/textEditor/TipTapRichTextEditor";
 import { useProfile } from "@/lib/hooks";
 import { Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -5,7 +6,6 @@ import { Button, Flex, Text, TextField } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { Editor } from "@tinymce/tinymce-react";
 import { Edit } from "lucide-react";
 import { z } from "zod";
 import {
@@ -13,7 +13,6 @@ import {
   updateConsultationTemplatesAction,
 } from "../../actions/config/templates";
 import { FieldInfo } from "../../components/FieldInfo";
-import { editor_plugins } from "../../components/textEditor/RichTextEditor";
 
 export function CreateTemplateForm() {
   const [opened, { close, open }] = useDisclosure(false);
@@ -87,14 +86,9 @@ export function CreateTemplateForm() {
             children={(field) => (
               <label htmlFor={field.name} className="flex flex-col">
                 <Text size={"3"}>Content*</Text>
-                <Editor
-                  tinymceScriptSrc="/tinymce/tinymce.min.js"
-                  licenseKey="gpl"
-                  onBlur={(e) => {
-                    field.handleChange(e.target.getContent());
-                  }}
-                  initialValue={field.state.value}
-                  init={editor_plugins}
+                <RichTextEditor
+                  content={field.state.value}
+                  onChange={field.handleChange}
                 />
                 <FieldInfo field={field} />
               </label>
@@ -197,14 +191,9 @@ export function UpdateTemplateForm({
             children={(field) => (
               <label htmlFor={field.name} className="flex flex-col">
                 <Text size={"3"}>Content*</Text>
-                <Editor
-                  tinymceScriptSrc="/tinymce/tinymce.min.js"
-                  licenseKey="gpl"
-                  onBlur={(e) => {
-                    field.handleChange(e.target.getContent());
-                  }}
-                  initialValue={field.state.value}
-                  init={editor_plugins}
+                <RichTextEditor
+                  content={field.state.value!}
+                  onChange={field.handleChange}
                 />
                 <FieldInfo field={field} />
               </label>

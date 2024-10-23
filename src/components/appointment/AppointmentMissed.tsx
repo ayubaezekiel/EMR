@@ -87,7 +87,6 @@ export function AppointmentMissed() {
           {table.getRowModel().rows.map((row) => (
             <Card key={row.id}>
               <PatientCardHeader
-                createdAt={`${row.original.created_at}`}
                 firstName={row.getValue("first_name") as string}
                 lastName={row.getValue("last_name") as string}
                 patientId={row.getValue("patients_id") as string}

@@ -89,7 +89,6 @@ export function AppointmentCheckedIn() {
           {table.getRowModel().rows.map((row) => (
             <Card key={row.id}>
               <PatientCardHeader
-                createdAt={`${row.original.created_at}`}
                 firstName={row.getValue("first_name") as string}
                 lastName={row.getValue("last_name") as string}
                 patientId={row.getValue("patients_id") as string}
@@ -221,6 +220,7 @@ export function AppointmentCheckedIn() {
                       admission: false,
                       appointmentId: row.original.id,
                       completed: row.original.is_completed,
+                      active: 0,
                     }}
                   >
                     Attend

@@ -1,3 +1,5 @@
+import { useTemplatesQuery } from "@/actions/queries";
+import RichTextEditor from "@/components/textEditor/TipTapRichTextEditor";
 import { useProfile } from "@/lib/hooks";
 import { Button, Modal, Select } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -5,7 +7,6 @@ import { Flex, Spinner, Text } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { Editor } from "@tinymce/tinymce-react";
 import { Edit } from "lucide-react";
 import { z } from "zod";
 import {
@@ -13,8 +14,6 @@ import {
   updateAdmissionReportsAction,
 } from "../../actions/config/admission";
 import { FieldInfo } from "../../components/FieldInfo";
-import { editor_plugins } from "../../components/textEditor/RichTextEditor";
-import { useTemplatesQuery } from "@/actions/queries";
 
 export function RecordsAndTaskForm({
   patientId,
@@ -93,14 +92,9 @@ export function RecordsAndTaskForm({
             {(field) => (
               <label htmlFor={field.name} className="flex flex-col">
                 <Text size={"3"}>Task</Text>
-                <Editor
-                  tinymceScriptSrc="/tinymce/tinymce.min.js"
-                  licenseKey="gpl"
-                  onBlur={(e) => {
-                    field.handleChange(e.target.getContent());
-                  }}
-                  initialValue={field.state.value}
-                  init={editor_plugins}
+                <RichTextEditor
+                  content={field.state.value}
+                  onChange={field.handleChange}
                 />
                 <FieldInfo field={field} />
               </label>
@@ -208,14 +202,9 @@ export function UpdateRecordsAndTaskForm(
             {(field) => (
               <label htmlFor={field.name} className="flex flex-col">
                 <Text size={"3"}>Task</Text>
-                <Editor
-                  tinymceScriptSrc="/tinymce/tinymce.min.js"
-                  licenseKey="gpl"
-                  onBlur={(e) => {
-                    field.handleChange(e.target.getContent());
-                  }}
-                  initialValue={field.state.value}
-                  init={editor_plugins}
+                <RichTextEditor
+                  content={field.state.value!}
+                  onChange={field.handleChange}
                 />
                 <FieldInfo field={field} />
               </label>

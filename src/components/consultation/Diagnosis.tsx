@@ -31,10 +31,7 @@ export function Diagnosis({
   return (
     <div className="grid md:grid-cols-2 md:gap-10 gap-4">
       <Card>
-        <CreatePatientDiagnosisForm
-          patientId={patientId}
-          isAdmission={isAdmission}
-        />
+        <CreatePatientDiagnosisForm isAdmission={isAdmission} />
       </Card>
       <div>
         {isPending ? (

@@ -6,14 +6,14 @@ import { DataTable } from "../table/DataTable";
 import { treatment_plan_column } from "../table/columns/consultation/plan";
 import { SharedConsultationTypes } from "./SharedTypes";
 import { Spinner } from "@radix-ui/themes";
+import { useParams } from "@tanstack/react-router";
 
-export function TreatmentPlan({
-  isAdmission,
-  patientId,
-}: {
-  isAdmission: boolean;
-  patientId: string;
-}) {
+export function TreatmentPlan({ isAdmission }: { isAdmission: boolean }) {
+  const { patientId } = useParams({
+    from: isAdmission
+      ? "/_layout/dashboard/admissions/$patientId"
+      : "/_layout/dashboard/appointments/$patientId",
+  });
   const { data, isPending } = useQuery({
     queryFn: () => getTreatmentPlanById(patientId),
     queryKey: ["treatmentPlan", patientId],
@@ -39,10 +39,7 @@ export function TreatmentPlan({
       {isPending ? (
         <Spinner />
       ) : (
-        <CreateTreatmentPlanForm
-          patientId={patientId}
-          isAdmission={isAdmission}
-        />
+        <CreateTreatmentPlanForm isAdmission={isAdmission} />
       )}
 
       <DataTable columns={treatment_plan_column} data={plan_data} />

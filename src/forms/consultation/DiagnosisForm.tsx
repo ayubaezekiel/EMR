@@ -13,20 +13,24 @@ import {
 } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
+import { useParams } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Edit, X } from "lucide-react";
 import { useState } from "react";
 
 export function CreatePatientDiagnosisForm({
   isAdmission,
-  patientId,
 }: {
   isAdmission: boolean;
-  patientId: string;
 }) {
   const queryClient = useQueryClient();
   const { isProfilePending, profile_data } = useProfile();
   const { diagnosis_data, isDiagnosisPending } = useDiagnosis();
+  const { patientId } = useParams({
+    from: isAdmission
+      ? "/_layout/dashboard/admissions/$patientId"
+      : "/_layout/dashboard/appointments/$patientId",
+  });
 
   const form = useForm({
     defaultValues: {

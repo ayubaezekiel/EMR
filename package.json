@@ -61,6 +61,8 @@
     "dayjs": "^1.11.12",
     "framer-motion": "^11.3.17",
     "fs-extra": "^11.2.0",
+    "graphql": "^16.9.0",
+    "graphql-request": "^7.1.0",
     "lucide-react": "^0.438.0",
     "nigeria-states-lgas": "^0.0.2",
     "novel": "^0.5.0",

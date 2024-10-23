@@ -1,22 +1,19 @@
 import { usePatientsQuery, useTemplatesQuery } from "@/actions/queries";
 import { FieldInfo } from "@/components/FieldInfo";
-import { editor_plugins } from "@/components/textEditor/RichTextEditor";
+import RichTextEditor from "@/components/textEditor/TipTapRichTextEditor";
 import { useAntenatalPackage, useProfile } from "@/lib/hooks";
 import supabase from "@/supabase/client";
-import { Button, Group, Modal, Select } from "@mantine/core";
-import { DateInput } from "@mantine/dates";
-import { useDisclosure } from "@mantine/hooks";
-import { Text } from "@radix-ui/themes";
+import { Group } from "@mantine/core";
+import { Button, Dialog, Select, Text, TextField } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { zodValidator } from "@tanstack/zod-form-adapter";
-import { Editor } from "@tinymce/tinymce-react";
-import { addMonths } from "date-fns";
+import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
 export function CreateAntenatalRequestForm() {
-  const [opened, { open, close }] = useDisclosure(false);
+  const [open, onOpenChange] = useState(false);
   const { antenatal_package_data, isAntenatalPackagePending } =
     useAntenatalPackage();
   const { data, isPending } = useTemplatesQuery();
@@ -31,7 +28,7 @@ export function CreateAntenatalRequestForm() {
       services: {
         package: "",
         note: "",
-        expected_delivary_date: addMonths(new Date(), 9),
+        expected_delivary_date: "",
         amount: 0,
       },
       patients_id: "",
@@ -49,7 +46,7 @@ export function CreateAntenatalRequestForm() {
         services: {
           package: pkg,
           note: value.services.note,
-          expected_delivary_date: addMonths(new Date(), 9).toISOString(),
+          expected_delivary_date: value.services.expected_delivary_date,
           amount: amount,
         },
       });
@@ -58,33 +55,30 @@ export function CreateAntenatalRequestForm() {
       } else {
         toast.success("patient enrolled successfully");
         form.reset();
+        onOpenChange(false);
         queryClient.invalidateQueries({ queryKey: ["requests"] });
-        close();
       }
     },
   });
 
   return (
-    <div>
-      <Button
-        size={"md"}
-        onClick={open}
-        disabled={!profile_data?.can_issue_request}
-        loading={
-          isPatientsPending ||
-          isPending ||
-          isAntenatalPackagePending ||
-          isProfilePending
-        }
-      >
-        Enrol For Antental
-      </Button>
-      <Modal
-        opened={opened}
-        onClose={close}
-        title={"Antenatal Request"}
-        size={"60rem"}
-      >
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <Dialog.Trigger>
+        <Button
+          size={"4"}
+          disabled={!profile_data?.can_issue_request}
+          loading={
+            isPatientsPending ||
+            isPending ||
+            isAntenatalPackagePending ||
+            isProfilePending
+          }
+        >
+          Enrol For Antental
+        </Button>
+      </Dialog.Trigger>
+
+      <Dialog.Content title={"Antenatal Request"} maxWidth={"60rem"}>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -92,20 +86,24 @@ export function CreateAntenatalRequestForm() {
             form.handleSubmit();
           }}
         >
-          <Select
-            label="Use a template?"
-            onChange={(e) => {
-              form.setFieldValue("services.note", e!);
-            }}
-            data={
-              data?.consultation_templates_data?.map((t) => ({
-                value: t.content,
-                label: t.name,
-              })) ?? []
-            }
-          />
+          <div className="flex flex-col gap-1">
+            <Text>Use a template?</Text>
+            <Select.Root
+              size={"3"}
+              onValueChange={(e) => {
+                form.setFieldValue("services.note", e!);
+              }}
+            >
+              <Select.Trigger placeholder="Select a template" />
+              <Select.Content position="popper">
+                {data?.consultation_templates_data?.map((t) => (
+                  <Select.Item value={t.content}>{t.name}</Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+          </div>
 
-          <div className="grid grid-cols-3 gap-2 mt-4">
+          <div className="grid md:grid-cols-3 gap-2 mt-4">
             <form.Field
               name="patients_id"
               validators={{
@@ -113,20 +111,24 @@ export function CreateAntenatalRequestForm() {
               }}
               children={(field) => (
                 <div className="flex flex-col">
-                  <Select
-                    style={{ zIndex: 20000 }}
-                    allowDeselect={false}
-                    label="Patient"
-                    nothingFoundMessage="No Antenatal Package Fount"
+                  <Text>Patient*</Text>
+                  <Select.Root
+                    size={"3"}
                     required
                     name={field.name}
                     value={field.state.value}
-                    onChange={(e) => field.handleChange(e!)}
-                    data={patient_data?.patient_data?.map((p) => ({
-                      label: `${p.first_name} ${p.middle_name ?? ""} ${p.last_name} - [${p.id.slice(0, 8).toUpperCase()}]`,
-                      value: p.id,
-                    }))}
-                  />
+                    onValueChange={(e) => field.handleChange(e!)}
+                  >
+                    <Select.Trigger placeholder="Select patient" />
+                    <Select.Content position="popper">
+                      {patient_data?.patient_data?.map((p) => (
+                        <Select.Item key={p.id} value={p.id}>
+                          {p.first_name} {p.middle_name ?? ""} {p.last_name} - [
+                          {p.id.slice(0, 8).toUpperCase()}]
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Root>
                   <FieldInfo field={field} />
                 </div>
               )}
@@ -134,15 +136,16 @@ export function CreateAntenatalRequestForm() {
             <form.Field
               name="services.expected_delivary_date"
               validators={{
-                onChange: z.date(),
+                onChange: z.string(),
               }}
               children={(field) => (
                 <div className="flex flex-col">
-                  <DateInput
+                  <TextField.Root
+                    type="date"
                     required
+                    size={"3"}
                     value={field.state.value}
-                    onChange={(e) => field.handleChange(e!)}
-                    label="Expected Delivary Date"
+                    onChange={(e) => field.handleChange(e.target.value)}
                     placeholder="Select date"
                   />
                   <FieldInfo field={field} />
@@ -156,19 +159,26 @@ export function CreateAntenatalRequestForm() {
               }}
               children={(field) => (
                 <div className="flex flex-col">
-                  <Select
-                    allowDeselect={false}
-                    label="Antenatal Package"
+                  <Text>Patient*</Text>
+                  <Select.Root
+                    size={"3"}
                     required
                     name={field.name}
-                    nothingFoundMessage="No Antenatal Package Found"
                     value={field.state.value}
-                    onChange={(e) => field.handleChange(e!)}
-                    data={antenatal_package_data?.map((p) => ({
-                      label: p.name,
-                      value: `${p.name}**${p.default_price}`,
-                    }))}
-                  />
+                    onValueChange={(e) => field.handleChange(e!)}
+                  >
+                    <Select.Trigger placeholder="Select patient" />
+                    <Select.Content position="popper">
+                      {antenatal_package_data?.map((p) => (
+                        <Select.Item
+                          key={p.id}
+                          value={`${p.name}**${p.default_price}`}
+                        >
+                          {p.name}
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Root>
 
                   <FieldInfo field={field} />
                 </div>
@@ -187,14 +197,9 @@ export function CreateAntenatalRequestForm() {
             {(field) => (
               <label htmlFor={field.name} className="flex flex-col">
                 <Text size={"3"}>Note*</Text>
-                <Editor
-                  tinymceScriptSrc="/tinymce/tinymce.min.js"
-                  licenseKey="gpl"
-                  onBlur={(e) => {
-                    field.handleChange(e.target.getContent());
-                  }}
-                  initialValue={field.state.value}
-                  init={editor_plugins}
+                <RichTextEditor
+                  content={field.state.value}
+                  onChange={field.handleChange}
                 />
                 <FieldInfo field={field} />
               </label>
@@ -208,7 +213,7 @@ export function CreateAntenatalRequestForm() {
                   loading={isSubmitting}
                   type="submit"
                   disabled={!canSubmit || !profile_data?.can_issue_request}
-                  size={"md"}
+                  size={"4"}
                 >
                   Enroll Patient
                 </Button>
@@ -216,7 +221,7 @@ export function CreateAntenatalRequestForm() {
             />
           </Group>
         </form>
-      </Modal>
-    </div>
+      </Dialog.Content>
+    </Dialog.Root>
   );
 }

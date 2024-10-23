@@ -477,7 +477,7 @@ export const getConsultations = async () => {
   const branch_id = await getProfile();
   const { data: consultation_data, error: consultation_err } = await supabase
     .from("admission_consultations")
-    .select("*,admissions(*,patients(*),wards(*),beds(*))")
+    .select("*,profile(*),admissions(*,patients(*),wards(*),beds(*))")
     .eq("branch_id", branch_id?.branch_id as string);
 
   if (consultation_err && !consultation_data) {

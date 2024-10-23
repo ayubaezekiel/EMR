@@ -45,7 +45,6 @@ export function LabRequestWaitingCard() {
       {lab_request_waiting?.map((a) => (
         <Card key={a.id}>
           <PatientCardHeader
-            createdAt={a.created_at}
             firstName={a.patients?.first_name as string}
             lastName={a.patients?.last_name as string}
             patientId={a.patients_id}
@@ -272,7 +271,6 @@ export function LabRequestCompletedCard() {
         {lab_request_completed?.map((a) => (
           <Card key={a.id}>
             <PatientCardHeader
-              createdAt={a.created_at}
               firstName={a.patients?.first_name as string}
               lastName={a.patients?.last_name as string}
               patientId={a.patients_id}
@@ -398,7 +396,6 @@ export function PatientLabRequestCard({ patientId }: { patientId: string }) {
         {lab_request?.map((a) => (
           <Card key={a.id}>
             <PatientCardHeader
-              createdAt={a.created_at}
               firstName={a.patients?.first_name as string}
               lastName={a.patients?.last_name as string}
               patientId={a.patients_id}

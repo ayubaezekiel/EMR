@@ -16,10 +16,7 @@ export function HistoryTaking({
 }) {
   return (
     <div className="grid md:grid-cols-2 md:gap-10 gap-4">
-      <CreateHistoryTakingForm
-        patientId={patientId}
-        isAdmission={isAdmission}
-      />
+      <CreateHistoryTakingForm isAdmission={isAdmission} />
       <PatientHistory patientId={patientId} />
     </div>
   );

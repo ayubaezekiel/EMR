@@ -7,20 +7,24 @@ import { Select } from "@mantine/core";
 import { Button, Flex, Text } from "@radix-ui/themes";
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
+import { useParams } from "@tanstack/react-router";
 import { zodValidator } from "@tanstack/zod-form-adapter";
 import { z } from "zod";
 
 export function CreateTreatmentPlanForm({
   isAdmission,
-  patientId,
 }: {
   isAdmission: boolean;
-  patientId: string;
 }) {
   const { data, isPending } = useTemplatesQuery();
 
   const queryClient = useQueryClient();
   const { isProfilePending, profile_data } = useProfile();
+  const { patientId } = useParams({
+    from: isAdmission
+      ? "/_layout/dashboard/admissions/$patientId"
+      : "/_layout/dashboard/appointments/$patientId",
+  });
 
   const form = useForm({
     defaultValues: {

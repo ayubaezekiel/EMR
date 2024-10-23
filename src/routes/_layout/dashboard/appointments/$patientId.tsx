@@ -1,7 +1,6 @@
 import { Group, Stepper } from "@mantine/core";
 import { Badge, Button, Heading } from "@radix-ui/themes";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
 import {
   changeAppointmentStatus,
   changeConsultationStatus,
@@ -30,61 +29,21 @@ export const Route = createFileRoute(
   ),
 });
 
-const steps = ({ admission, patientId }: AdmissionStatus) => [
-  {
-    label: "Patient Vitals",
-    description: "Here are the patient vitals",
-    comp: <PatientVitals patientId={patientId as string} />,
-  },
-  {
-    label: "History Taking",
-    description: "Record patient history",
-    comp: (
-      <HistoryTaking isAdmission={admission} patientId={patientId as string} />
-    ),
-  },
-  {
-    label: "Examination",
-    description: "Record patient examination",
-    comp: (
-      <Examination isAdmission={admission} patientId={patientId as string} />
-    ),
-  },
-  {
-    label: "Patient Diagnosis",
-    description: "diagnose patient",
-    comp: <Diagnosis isAdmission={admission} patientId={patientId as string} />,
-  },
-  {
-    label: "Plan",
-    description: "Record treatment plan",
-    comp: (
-      <TreatmentPlan isAdmission={admission} patientId={patientId as string} />
-    ),
-  },
-  {
-    label: "Issue Requests",
-    description: "Issue requests for the patient",
-    comp: <IssueRequests patientId={patientId as string} />,
-  },
-];
-
 function ConsultationStepperForm() {
-  const [active, setActive] = useState(0);
-  const nextStep = () =>
-    setActive((current) => (current < 5 ? current + 1 : current));
-  const prevStep = () =>
-    setActive((current) => (current > 0 ? current - 1 : current));
-
+  const {
+    consultationId,
+    completed: con_completed,
+    active,
+  } = Route.useSearch<{
+    consultationId: string;
+    completed: boolean;
+    active: number;
+  }>();
+  const navigate = useNavigate();
   const { admission, appointmentId, completed } =
     Route.useSearch<AdmissionStatus>();
 
-  const { consultationId, completed: con_completed } = Route.useSearch<{
-    consultationId: string;
-    completed: boolean;
-  }>();
   const { patientId } = Route.useParams();
-  const navigate = useNavigate();
 
   return (
     <>
@@ -93,7 +52,16 @@ function ConsultationStepperForm() {
           disabled={active === 0}
           variant={"soft"}
           size={"4"}
-          onClick={prevStep}
+          onClick={() =>
+            navigate({
+              search: {
+                admission: admission,
+                appointmentId: appointmentId,
+                completed: completed,
+                active: active > 0 ? active - 1 : active,
+              },
+            })
+          }
         >
           Back
         </Button>
@@ -148,30 +116,66 @@ function ConsultationStepperForm() {
             )}
           </div>
         ) : (
-          <Button size={"4"} onClick={nextStep}>
+          <Button
+            size={"4"}
+            onClick={() =>
+              navigate({
+                search: {
+                  admission: admission,
+                  appointmentId: appointmentId,
+                  completed: completed,
+                  active: active < 5 ? active + 1 : active,
+                },
+              })
+            }
+          >
             Next step
           </Button>
         )}
+        {admission && (
+          <Link to={`/dashboard/admissions/${patientId}`}>
+            <Badge size={"3"} color="red" radius="full">
+              This patient is admitted, click here to check his/her progress
+              note.
+            </Badge>
+          </Link>
+        )}
       </Group>
 
-      <Stepper color="var(--accent-9)" active={active} onStepClick={setActive}>
-        {steps({ admission, patientId }).map((s) => (
-          <Stepper.Step
-            key={s.label}
-            label={s.label}
-            description={s.description}
-          >
-            {admission && (
-              <Link to={`/dashboard/admissions/${patientId}`}>
-                <Badge size={"3"} color="red" radius="full">
-                  This patient is admitted, click here to check his/her progress
-                  note.
-                </Badge>
-              </Link>
-            )}
-            {s.comp}
-          </Stepper.Step>
-        ))}
+      <Stepper color="var(--accent-9)" active={active}>
+        <Stepper.Step
+          label={"Patient Vitals"}
+          description="Here are the patient vitals"
+        >
+          <PatientVitals patientId={patientId as string} />
+        </Stepper.Step>
+        <Stepper.Step
+          label="History Taking"
+          description="Record patient history"
+        >
+          <HistoryTaking
+            isAdmission={admission}
+            patientId={patientId as string}
+          />
+        </Stepper.Step>
+        <Stepper.Step
+          label="Examination"
+          description="Record patient examination"
+        >
+          <Examination isAdmission={admission} />
+        </Stepper.Step>
+        <Stepper.Step label="Patient Diagnosis" description="diagnose patient">
+          <Diagnosis isAdmission={admission} patientId={patientId as string} />
+        </Stepper.Step>
+        <Stepper.Step label="Plan" description="Record treatment plan">
+          <TreatmentPlan isAdmission={admission} />
+        </Stepper.Step>
+        <Stepper.Step
+          label="Issue Requests"
+          description="Issue requests for the patient"
+        >
+          <IssueRequests isAdmission={admission} />
+        </Stepper.Step>
       </Stepper>
     </>
   );

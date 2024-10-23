@@ -26,7 +26,9 @@ export function CreateConsultationRequestForm() {
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       await createConsultationAction({
-        ...value,
+        admission_id: value.admission_id,
+        created_by: `${profile_data?.id}`,
+        note: value.note,
         branch_id: `${profile_data?.branch_id}`,
       });
       form.reset();

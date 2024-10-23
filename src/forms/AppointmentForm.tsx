@@ -49,7 +49,6 @@ export function CreateAppointmentForm({
       end_date: "",
       patients_id: patientId,
       follow_up: false,
-      is_all_day: false,
     },
     validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
@@ -58,7 +57,6 @@ export function CreateAppointmentForm({
         patients_id: value.patients_id ?? patientId,
         appointment_types_id: value.appointment_types_id,
         follow_up: value.follow_up,
-        is_all_day: value.is_all_day,
         duration: `[${value.start_date},${value.end_date})`,
         created_by: `${profile_data?.id}`,
         branch_id: `${profile_data?.branch_id}`,
@@ -252,26 +250,6 @@ export function CreateAppointmentForm({
                 </label>
               )}
             />
-            <form.Field
-              name="is_all_day"
-              children={(field) => (
-                <label htmlFor={field.name} className="flex gap-2 items-center">
-                  <Text size={"3"}>Is all day?</Text>
-                  <Checkbox
-                    defaultChecked={field.state.value}
-                    size={"3"}
-                    name={field.name}
-                    id={field.name}
-                    checked={Boolean(field.state.value)}
-                    onCheckedChange={(e) => {
-                      field.handleChange(Boolean(e));
-                    }}
-                    onBlur={field.handleBlur}
-                  />
-                  <FieldInfo field={field} />
-                </label>
-              )}
-            />
           </div>
           <Flex gap="3" mt="4" justify="end">
             <form.Subscribe
@@ -315,7 +293,6 @@ export function UpdateAppointmentForm({
       clinics_id: values.clinics_id,
       created_by: values.created_by,
       follow_up: values.follow_up,
-      is_all_day: values.follow_up,
       patients_id: values.patients_id,
       appointment_types_id: values.appointment_types_id,
       start_date: start,
@@ -505,29 +482,6 @@ export function UpdateAppointmentForm({
                   >
                     <Text size={"3"}>Follow Up?</Text>
                     <Checkbox
-                      size={"3"}
-                      name={field.name}
-                      id={field.name}
-                      checked={Boolean(field.state.value)}
-                      onCheckedChange={(e) => {
-                        field.handleChange(Boolean(e));
-                      }}
-                      onBlur={field.handleBlur}
-                    />
-                    <FieldInfo field={field} />
-                  </label>
-                )}
-              />
-              <form.Field
-                name="is_all_day"
-                children={(field) => (
-                  <label
-                    htmlFor={field.name}
-                    className="flex gap-2 items-center"
-                  >
-                    <Text size={"3"}>Is all day?</Text>
-                    <Checkbox
-                      defaultChecked={field.state.value!}
                       size={"3"}
                       name={field.name}
                       id={field.name}
